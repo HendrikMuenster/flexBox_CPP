@@ -11,7 +11,7 @@
 % Version 1.04
 % Date: 2016-12-16
 
-% FlexBox is copyright �2016 by Hendrik Dirks and is distributed under the terms of the GNU General Public License (GPL) version 3 (or later).
+% FlexBox is copyright ©2016 by Hendrik Dirks and is distributed under the terms of the GNU General Public License (GPL) version 3 (or later).
 %
 % If you plan to distribute the software (commercially or not). Please contact me for more information.
 
@@ -48,8 +48,8 @@ To compile the Cuda module, open the "compileCudaModule.m" and change the given 
 Requirements:
 The script assumes, that you have installed a full version of Microsoft Visual Studio 20XX, which is connected to your CUDA SDK. The Visual Studio version must coincide with your Matlab standard C++ compiler.
 
-Issues for University of M�nster users:
-There are some known problems for CUDA computers at the University of M�nster. You may have to preload libraries. To do so, simply start Matlab with:
+Issues for University of Münster users:
+There are some known problems for CUDA computers at the University of Münster. You may have to preload libraries. To do so, simply start Matlab with:
 env LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/local/cuda-7.5/lib64/libcudart.so.7.5 /usr/local/cuda-7.5/lib64/libcusparse.so.7.5" matlab
 
 %%%%%%%%%%%%%%%%%
