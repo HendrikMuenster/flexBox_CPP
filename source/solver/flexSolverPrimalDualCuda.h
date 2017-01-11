@@ -128,16 +128,18 @@ public:
 
 	void yTilde(flexBoxData<T, Tvector>* data, flexTermDual<T, Tvector>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
+        //printf("\n");
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
-			const int dualNum = dualNumbers[i];
+            
+			const int dualNum = dualNumbers[i];//printf("dual num is %d\n",dualNum);
             
             //yTilde = 0
             vectorScalarSet(data->yTilde[dualNum],(T)0);
             
 			for (int j = 0; j < (int)primalNumbers.size(); ++j)
 			{
-				int operatorNumber = (int)primalNumbers.size() * i + j;
+				int operatorNumber = (int)primalNumbers.size() * i + j;//printf("primal num is %d while operator num is %d\n",primalNumbers[j],operatorNumber);
                 
                 //yTilde = yTilde + KxBar
 				dualTerm->operatorList[operatorNumber]->timesPlus(data->xBar[primalNumbers[j]], data->yTilde[dualNum]);
@@ -153,14 +155,20 @@ public:
 
 	void xTilde(flexBoxData<T, Tvector>* data, flexTermDual<T, Tvector>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
+        //printf("Xtilde\n");
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
 			for (int j = 0; j < (int)primalNumbers.size(); ++j)
 			{
+                
+                
 				int operatorNumber = (int)primalNumbers.size() * i + j;
 
 				const int primalNum = primalNumbers[j];
 				const int dualNum = dualNumbers[i];
+                
+                //printf("dual num is %d\n",dualNum);
+                //printf("primal num is %d while operator num is %d\n",primalNumbers[j],operatorNumber);
 
 				dualTerm->operatorListT[operatorNumber]->timesPlus(data->y[dualNum], data->xTilde[primalNum]);
 			}
