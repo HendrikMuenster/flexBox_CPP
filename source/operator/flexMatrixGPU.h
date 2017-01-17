@@ -175,7 +175,7 @@ public:
 		}
 		else
 		{
-			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumRows(), this->getNumCols(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
+			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumCols(), this->getNumRows(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
 		}
 	}
 
@@ -193,7 +193,7 @@ public:
 		}
 		else
 		{
-			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumRows(), this->getNumCols(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
+			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumCols(), this->getNumRows(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
 		}
 	}
 
@@ -211,7 +211,7 @@ public:
 		}
 		else
 		{
-			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumRows(), this->getNumCols(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
+			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumCols(), this->getNumRows(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
 		}
 	}
 
@@ -222,9 +222,11 @@ public:
 		return 1;
 	}
 
+    //dummy, this function is not used in a CUDA setting
 	std::vector<T> getAbsRowSum()
 	{
-		std::vector<T> result(this->getNumRows(),1);
+        std::vector<T> result(1);
+
 
 		return result;
 	}
@@ -253,9 +255,13 @@ public:
 	//transpose current matrix
 	void transpose()
 	{
+        int numRowsTmp = this->getNumRows();
+        this->setNumRows(this->getNumCols());
+        this->setNumCols(numRowsTmp);
+            
 		if (transposed == false)
 		{
-            		transposed = true;
+            transposed = true;
 		}
 		else
 		{
@@ -269,7 +275,62 @@ public:
 	
 	thrust::device_vector<T> getAbsRowSumCUDA()
 	{
-		Tvector result(this->getNumRows(),(T)1);
+        
+        std::vector<T> resultTmp;
+		
+        
+        int numRowsVector = 0;
+        if (transposed == false)
+        {
+            resultTmp.resize(this->getNumRows());
+            numRowsVector = this->getNumRows();
+        }
+        else
+        {
+            resultTmp.resize(this->getNumCols());
+            numRowsVector = this->getNumCols();
+        }
+        
+		//allocate memory
+		T *hostValues = (T *)malloc(this->nnz * sizeof(T));
+		int *hostRowIndices = (int *)malloc((this->getNumRows() + 1) * sizeof(int));
+		int *hostColIndices = (int *)malloc(this->nnz * sizeof(int));
+
+		cudaMemcpy(hostValues, this->listValues, this->nnz * sizeof(T), cudaMemcpyDeviceToHost);
+		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
+		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
+
+        for (int row = 0; row < numRowsVector; row++)
+        {
+            int starting_col_index = hostRowIndices[row];
+            int stopping_col_index = hostRowIndices[row + 1];
+            if (starting_col_index == stopping_col_index)
+                continue;
+            else
+            {
+                for (int current_col_index = starting_col_index; current_col_index < stopping_col_index; current_col_index++)
+                {
+                    if (transposed == false)
+                    {
+                        resultTmp[row] += std::abs(hostValues[current_col_index]);
+                    }
+                    else
+                    {
+                        resultTmp[hostColIndices[current_col_index]] += std::abs(hostValues[current_col_index]);
+                    }
+                }
+            }
+        }
+        
+        free(hostValues);
+		free(hostRowIndices);
+		free(hostColIndices);
+        
+        Tvector result(resultTmp.size());
+
+        
+        thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
+        
 
 		return result;
 	}

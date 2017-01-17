@@ -20,11 +20,58 @@ public:
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
+	
+	#ifdef __CUDACC__
+		struct flexFrobeniusSquareFunctor 
+		{
+			__host__ __device__
+            flexFrobeniusSquareFunctor(){};
+			
+			__host__ __device__ T 
+			operator()(const T& x) const 
+			{ 
+				return x * x; 
+			} 
+		};
+
+        struct flexProxDualFrobeniusFunctor
+        {
+            __host__ __device__
+            flexProxDualFrobeniusFunctor(T _norm) : norm(_norm){};
+
+            template <typename Tuple>
+            __host__ __device__
+            void operator()(Tuple t)
+            {
+                thrust::get<0>(t) = this->norm * thrust::get<1>(t);
+            }
+
+            const T norm;
+        };
+    #endif
 
 	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		#ifdef __CUDACC__
-            printf("flexProxDualFrobenius Prox not implemented for CUDA\n");
+		    flexFrobeniusSquareFunctor unary_op;
+			thrust::plus<T> binary_op;
+	
+			T norm = (T)0;
+			for (int k = 0; k < dualNumbers.size(); k++)
+			{
+				//add sum of squared elements to norm
+				norm += thrust::transform_reduce(data->yTilde[dualNumbers[k]].begin(), data->yTilde[dualNumbers[k]].end(), unary_op, (T)0, binary_op);
+			}
+			
+			norm = (T)1 / std::max((T)1, std::sqrt(norm) / alpha);
+			
+			for (int k = 0; k < dualNumbers.size(); k++)
+			{
+                auto startIterator = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[k]].begin(), data->yTilde[dualNumbers[k]].begin()));
+                auto endIterator = thrust::make_zip_iterator(  thrust::make_tuple(data->y[dualNumbers[k]].end(),   data->yTilde[dualNumbers[k]].end()));
+                
+                thrust::for_each(startIterator,endIterator,flexProxDualFrobeniusFunctor(norm));
+			}
 		#else
 			T norm = (T)0;
 			for (int k = 0; k < dualNumbers.size(); k++)
@@ -39,7 +86,7 @@ public:
 					norm += ptrYTilde[i] * ptrYTilde[i];
 				}
 			}
-
+			
 			norm = (T)1 / std::max((T)1, std::sqrt(norm) / alpha);
 
 			for (int k = 0; k < dualNumbers.size(); k++)
