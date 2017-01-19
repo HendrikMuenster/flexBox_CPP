@@ -19,37 +19,29 @@ public:
 
 
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(bool transposed, const Tvector &input, Tvector &output)
 	{
 		vectorScalarSet(output, (T)0);
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output){}
+	void timesPlus(bool transposed, const Tvector &input, Tvector &output){}
 
-	void timesMinus(const Tvector &input, Tvector &output){}
+	void timesMinus(bool transposed, const Tvector &input, Tvector &output){}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
 		return static_cast<T>(1);
 	}
 
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
 		std::vector<T> result(this->getNumRows(),(T)0);
 
 		return result;
 	}
 
-	//transposing the identity does nothing
-	void transpose()
-	{
-		int numRowsTmp = this->getNumRows();
-		this->setNumRows(this->getNumCols());
-		this->setNumCols(numRowsTmp);
-	}
-
 #ifdef __CUDACC__
-	thrust::device_vector<T> getAbsRowSumCUDA()
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
 		Tvector result(this->getNumRows(),(T)0);
 

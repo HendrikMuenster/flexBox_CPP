@@ -10,13 +10,11 @@ class flexSuperpixelOperator : public flexLinearOperator<T, Tvector>
 private:
 	std::vector<int> targetDimension;
 	T upsamplingFactor;
-	bool transposed;
 public:
 
 	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_) : flexLinearOperator<T, Tvector>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp)
 	{
 		this->targetDimension.resize(targetDimension_.size());
-		this->transposed = false;
 
         this->targetDimension = targetDimension_;
 		this->upsamplingFactor = upsamplingFactor_;
@@ -171,9 +169,9 @@ public:
 	}
 
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(bool transposed, const Tvector &input, Tvector &output)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
 			calcTimesTransposed(input, output, EQUALS);
 		}
@@ -183,9 +181,9 @@ public:
 		}
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(bool transposed, const Tvector &input, Tvector &output)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
 			calcTimesTransposed(input, output, PLUS);
 		}
@@ -195,9 +193,9 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(bool transposed, const Tvector &input, Tvector &output)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
 			calcTimesTransposed(input, output, MINUS);
 		}
@@ -207,11 +205,11 @@ public:
 		}
 	}
     
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
-			return std::vector<T>(this->getNumRows(), (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor));
+			return std::vector<T>(this->getNumCols(), (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor));
 		}
 		else
 		{
@@ -219,9 +217,9 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
 			return (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor);
 		}
@@ -230,23 +228,18 @@ public:
 			return (T)1;
 		}
 	}
-
-	//transposing the identity does nothing
-	void transpose()
-	{
-		int numRowsTmp = this->getNumRows();
-		this->setNumRows(this->getNumCols());
-		this->setNumCols(numRowsTmp);
-
-		this->transposed = true;
-	}
     
     #ifdef __CUDACC__
-    thrust::device_vector<T> getAbsRowSumCUDA()
+    thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
-		Tvector result(this->getNumRows(),(T)1);
-
-		return result;
+		if (transposed)
+		{
+			return std::vector<T>(this->getNumRows(), (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor));
+		}
+		else
+		{
+			return std::vector<T>(this->getNumRows(), (T)1);
+		}
 	}
     #endif
 };

@@ -54,23 +54,20 @@ public:
 	virtual flexLinearOperator<T, Tvector>* copy() = 0;
 
 	//apply linear operator to vector
-	virtual void times(const Tvector &input, Tvector &output) = 0;
+	virtual void times(bool transposed, const Tvector &input, Tvector &output) = 0;
 
-	virtual void timesPlus(const Tvector &input, Tvector &output) = 0;
+	virtual void timesPlus(bool transposed, const Tvector &input, Tvector &output) = 0;
 
-	virtual void timesMinus(const Tvector &input, Tvector &output) = 0;
+	virtual void timesMinus(bool transposed, const Tvector &input, Tvector &output) = 0;
 
-	virtual std::vector<T> getAbsRowSum() = 0;
+	virtual std::vector<T> getAbsRowSum(bool transposed) = 0;
 
 	#ifdef __CUDACC__		
-		virtual thrust::device_vector<T> getAbsRowSumCUDA() = 0;
+		virtual thrust::device_vector<T> getAbsRowSumCUDA(bool transposed) = 0;
 	#endif
 
 	//used for preconditioning
-	virtual T getMaxRowSumAbs() = 0;
-
-	//transpose current matrix
-	virtual void transpose() = 0;
+	virtual T getMaxRowSumAbs(bool transposed) = 0;
 };
 
 #endif

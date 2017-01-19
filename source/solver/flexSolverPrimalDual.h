@@ -65,10 +65,10 @@ public:
 
 					auto operatorNumber = numPrimals * i + j;
 
-					tmpVec = termsDual[k]->operatorList[operatorNumber]->getAbsRowSum();
+					tmpVec = termsDual[k]->operatorList[operatorNumber]->getAbsRowSum(false);
 					vectorPlus(data->sigmaElt[dualNum], tmpVec);
 
-					tmpVec = termsDual[k]->operatorListT[operatorNumber]->getAbsRowSum();
+					tmpVec = termsDual[k]->operatorList[operatorNumber]->getAbsRowSum(true);
 					vectorPlus(data->tauElt[primalNum], tmpVec);
 				}
 			}
@@ -136,7 +136,7 @@ public:
 			{
 				int operatorNumber = (int)primalNumbers.size() * i + j;
 
-				dualTerm->operatorList[operatorNumber]->timesPlus(data->xBar[primalNumbers[j]], data->yTilde[dualNum]);
+				dualTerm->operatorList[operatorNumber]->timesPlus(false, data->xBar[primalNumbers[j]], data->yTilde[dualNum]);
 			}
             
             T* ptrYtilde = data->yTilde[dualNum].data();
@@ -164,7 +164,7 @@ public:
 				const int primalNum = primalNumbers[j];
 				const int dualNum = dualNumbers[i];
 
-				dualTerm->operatorListT[operatorNumber]->timesPlus(data->y[dualNum], data->xTilde[primalNum]);
+				dualTerm->operatorList[operatorNumber]->timesPlus(true, data->y[dualNum], data->xTilde[primalNum]);
 			}
 		}
 	}
@@ -263,7 +263,7 @@ public:
 				data->xTmp[primalNum] = data->x[primalNum];
 				vectorMinus(data->xTmp[primalNum], data->xOld[primalNum]);
 
-				dualTerm->operatorList[operatorNumber]->timesMinus(data->xTmp[primalNum], data->yError[dualNum]);
+				dualTerm->operatorList[operatorNumber]->timesMinus(false, data->xTmp[primalNum], data->yError[dualNum]);
 			}
 		}
 	}
@@ -283,7 +283,7 @@ public:
 				data->yTmp[dualNum] = data->y[dualNum];
 				vectorMinus(data->yTmp[dualNum], data->yOld[dualNum]);
 
-				dualTerm->operatorListT[operatorNumber]->timesMinus(data->yTmp[dualNum], data->xError[primalNum]);
+				dualTerm->operatorList[operatorNumber]->timesMinus(true, data->yTmp[dualNum], data->xError[primalNum]);
 			}
 		}
 	}

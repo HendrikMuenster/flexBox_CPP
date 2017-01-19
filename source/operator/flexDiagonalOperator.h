@@ -50,7 +50,7 @@ public:
     #endif
     
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(bool transposed, const Tvector &input, Tvector &output)
 	{
         #ifdef __CUDACC__
             thrust::for_each(
@@ -82,7 +82,7 @@ public:
 		}
 	};
     #endif
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(bool transposed, const Tvector &input, Tvector &output)
 	{
         #ifdef __CUDACC__
             thrust::for_each(
@@ -114,7 +114,7 @@ public:
 		}
 	};
     #endif
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(bool transposed, const Tvector &input, Tvector &output)
 	{
         #ifdef __CUDACC__
             thrust::for_each(
@@ -132,7 +132,7 @@ public:
         #endif
 	}
 
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
 		std::vector<T> result(this->getNumRows());
 		#pragma omp parallel for
@@ -144,7 +144,7 @@ public:
 		return result;
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
 		Tvector diagonalElementsCopy = this->diagonalElements;
 
@@ -153,11 +153,8 @@ public:
 		return vectorMax(diagonalElementsCopy);
 	}
 
-	//transposing the identity does nothing
-	void transpose(){}
-
 	#ifdef __CUDACC__
-	thrust::device_vector<T> getAbsRowSumCUDA()
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
 		Tvector diagonalElementsCopy = this->diagonalElements;
 

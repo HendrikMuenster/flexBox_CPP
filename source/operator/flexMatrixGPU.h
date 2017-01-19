@@ -29,8 +29,6 @@ private:
 public:
 	flexMatrixGPU(int  _numRows, int  _numCols, int* rowList, int *colList, T* indexVal, bool formatCRS) : flexLinearOperator<T, Tvector>(_numRows, _numCols, matrixGPUOp)
 	{
-		transposed = false;
-
 		//create sparse matrix
 		cusparseCreate(&this->handle);
 		cusparseCreateMatDescr(&this->descrA);
@@ -161,7 +159,7 @@ public:
 		return A;
 	}
 
-	void times(const Tvector &input, Tvector &output)
+	void times(bool transposed, const Tvector &input, Tvector &output)
 	{
 		const T alpha = (T)1;
 		const T beta = (T)0;
@@ -179,7 +177,7 @@ public:
 		}
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(bool transposed, const Tvector &input, Tvector &output)
 	{
 		const T alpha = (T)1;
 		const T beta = (T)1;
@@ -197,7 +195,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(bool transposed, const Tvector &input, Tvector &output)
 	{
 		const T alpha = -(T)1;
 		const T beta = (T)1;
@@ -215,7 +213,7 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
 		//todo
 
@@ -223,7 +221,7 @@ public:
 	}
 
     //dummy, this function is not used in a CUDA setting
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
         std::vector<T> result(1);
 
@@ -252,28 +250,8 @@ public:
 		free(hostColIndices);
 	}
 
-	//transpose current matrix
-	void transpose()
-	{
-        int numRowsTmp = this->getNumRows();
-        this->setNumRows(this->getNumCols());
-        this->setNumCols(numRowsTmp);
-            
-		if (transposed == false)
-		{
-            transposed = true;
-		}
-		else
-		{
-			transposed = false;
-		}
-	}
-
-
 #ifdef __CUDACC__
-
-	
-	thrust::device_vector<T> getAbsRowSumCUDA()
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
         
         std::vector<T> resultTmp;
