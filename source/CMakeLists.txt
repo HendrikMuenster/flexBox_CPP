@@ -165,6 +165,12 @@ if(USE_CUDA)
 
 endif(USE_CUDA)
 
+#EXAMPLES
+if(BUILD_EXAMPLES AND UNIX)
+  find_package(X11 REQUIRED)
+  find_package(Threads REQUIRED)
+endif(BUILD_EXAMPLES AND UNIX)
+
 
 #flexBox template library
 add_library(flexBoxLib INTERFACE)
@@ -173,7 +179,7 @@ target_include_directories(flexBoxLib INTERFACE ${INCLUDE_DIRS})
 
 add_custom_target(IDE SOURCES ${SOURCES_IDE})
 
-#add Matlab target if Matlab was found
+# Matlab target if Matlab was found
 if(Matlab_FOUND)
   add_subdirectory(${WRAPPERS_DIR}/matlab)
 endif(Matlab_FOUND)

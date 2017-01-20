@@ -28,6 +28,7 @@ int main()
 	float weightRegularizer = 0.1;
 
 	flexBox<floatingType, vectorData> mainObject;
+	mainObject.verbose = 1;
 
 	//read original image
 	CImg<float> imageOriginal(sampleFiles.imgA);

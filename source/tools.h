@@ -9,23 +9,26 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
-#include <omp.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #define VERBOSE 0
 
+#ifdef _OPENMP
+	#include <omp.h>
+#endif
+
 #ifdef __CUDACC__
-	#include <thrust/device_vector.h> 
-	#include <thrust/transform.h> 
-	#include <thrust/sequence.h> 
-	#include <thrust/copy.h> 
-	#include <thrust/fill.h> 
-	#include <thrust/replace.h> 
+	#include <thrust/device_vector.h>
+	#include <thrust/transform.h>
+	#include <thrust/sequence.h>
+	#include <thrust/copy.h>
+	#include <thrust/fill.h>
+	#include <thrust/replace.h>
 	#include <thrust/functional.h>
 	#include <thrust/iterator/zip_iterator.h>
-	#include <thrust/tuple.h> 
+	#include <thrust/tuple.h>
 	#include <thrust/for_each.h>
 	#include <thrust/transform_reduce.h>
 	#include <thrust/extrema.h>
@@ -42,7 +45,7 @@ static const int SIGN_PLUS = 0;
 static const int SIGN_MINUS = 1;
 static const int SIGN_EQUALS = 2;
 
-// Could be any number, but the whole array should fit into shared memory 
+// Could be any number, but the whole array should fit into shared memory
 #define CONST_ARRAY_SIZE 512
 #define BLOCK_SIZE (64)
 
@@ -209,7 +212,7 @@ void vectorAddVectorTimesVector(std::vector<T> &result, const std::vector<T> &v1
 class Timer
 {
 public:
-	Timer() : t_begin(omp_get_wtime())
+	Timer() : t_begin(std::chrono::system_clock::now()), isStopped(false)
 	{
 	};
 
@@ -218,7 +221,8 @@ public:
 #ifdef __CUDACC__
 			cudaDeviceSynchronize();
 		#endif
-		t_begin = omp_get_wtime();
+		t_begin = std::chrono::system_clock::now();
+		isStopped = false;
 	}
 
 	void end()
@@ -226,17 +230,25 @@ public:
 #ifdef __CUDACC__
 			cudaDeviceSynchronize();
 		#endif
-		t_end = omp_get_wtime();
+		t_end = std::chrono::system_clock::now();
+		isStopped = true;
 	}
 
 	double elapsed() const
 	{
-		return t_end - t_begin;
+		if(isStopped)
+		{
+			std::chrono::duration<double> diff = t_end - t_begin;
+			return diff.count();
+		}
+		return 0.0;
+
 	}
 
 private:
-	double t_begin;
-	double t_end;
+	bool isStopped;
+	std::chrono::system_clock::time_point t_begin;
+	std::chrono::system_clock::time_point t_end;
 };
 
 
@@ -297,7 +309,7 @@ private:
 	{
 		return a < b ? b : a;
 	}
-	
+
 	template < typename T >
 	T vectorSum(thrust::device_vector<T> &v)
 	{
@@ -310,7 +322,7 @@ private:
 	template < typename T >
 	struct KLprojectionDataGPU
 	{
-		__host__ __device__ 
+		__host__ __device__
 		KLprojectionDataGPU(T sigma) : sigma((T)4.0 * sigma){};
 
 		__host__ __device__
@@ -353,7 +365,7 @@ private:
 
 	struct vectorAddVectorTimesVectorGPU
 	{
-		__host__ __device__ 
+		__host__ __device__
 		vectorAddVectorTimesVectorGPU(const int signRule) : signRule(signRule){}
 
 		template <typename Tuple>
@@ -411,8 +423,8 @@ private:
 	{
 		return *thrust::max_element(v.begin(), v.end());
 	}
-	
-	
+
+
 
 
 #endif
