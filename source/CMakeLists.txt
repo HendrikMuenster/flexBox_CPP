@@ -13,7 +13,7 @@ set (FlexBox_VERSION_MINOR 4)
 
 option(USE_OPENMP "Use OpenMP" OFF)
 option(USE_CUDA "Use CUDA" OFF)
-option(BUILD_MATLAB "Build Matlab (mex) interface" OFF)
+option(BUILD_MATLAB "Build Matlab (mex) interface" ON)
 option(BUILD_EXAMPLES "Build C++/CUDA examples" ON)
 
 ##########################

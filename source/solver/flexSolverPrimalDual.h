@@ -108,19 +108,18 @@ public:
 		this->pcp.push_back(_correspondingPrimals);
 	}
 
-	void addDual(flexBoxData<T> *data, flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals)
+	void addDual(flexBoxData<T> *data, flexTermDual<T>* aDualPart, std::vector<int> aCorrespondingPrimals)
 	{
-		termsDual.push_back(_dualPart);
+		termsDual.push_back(aDualPart);
 
 		std::vector<int> tmpDCD;
-		for (int i = 0; i < _dualPart->getNumberVars(); ++i)
+		for (int i = 0; i < aDualPart->getNumberVars(); ++i)
 		{
-			data->addDualVar(_dualPart->dualVarLength(i));
-
+			data->addDualVar(aDualPart->dualVarLength(i));
 			tmpDCD.push_back(data->getNumDualVars() - 1);
 		}
 
-		dcp.push_back(_correspondingPrimals);
+		dcp.push_back(aCorrespondingPrimals);
 		dcd.push_back(tmpDCD);
 	}
 

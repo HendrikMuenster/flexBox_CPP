@@ -32,17 +32,17 @@ public:
 
 	}
 
-    flexTermDual(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList, std::vector<std::vector<T>> _fList) : myProx(aMyProx), alpha(aAlpha), numberPrimals(numberPrimals), numberVars((int)aOperatorList.size() / numberPrimals), p(aMyProx->getProx())
+    flexTermDual(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList, std::vector<std::vector<T>> aFList) : myProx(aMyProx), alpha(aAlpha), numberPrimals(numberPrimals), numberVars((int)aOperatorList.size() / numberPrimals), p(aMyProx->getProx())
     {
-        fList.resize(_fList.size());
+        fList.resize(aFList.size());
 
         for (int i = 0; i < fList.size(); ++i)
         {
-            this->fList[i].resize(_fList[i].size());
+            this->fList[i].resize(aFList[i].size());
             #ifdef __CUDACC__
-                thrust::copy(_fList[i].begin(), _fList[i].end(), this->fList[i].begin());
+                thrust::copy(aFList[i].begin(), aFList[i].end(), this->fList[i].begin());
             #else
-                std::copy(_fList[i].begin(), _fList[i].end(), this->fList[i].begin());
+                std::copy(aFList[i].begin(), aFList[i].end(), this->fList[i].begin());
             #endif
         }
 
@@ -59,7 +59,7 @@ public:
                 this->operatorListT[opNum]->transpose();
             }
         }
-    };
+    }
 
     int getNumberVars()
     {

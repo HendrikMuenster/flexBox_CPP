@@ -23,7 +23,7 @@ public:
 	flexIdentityOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T>(_numRows, _numCols, identityOp)
 	{
 		minus = _minus;
-	};
+    }
 
 	flexIdentityOperator<T>* copy()
 	{

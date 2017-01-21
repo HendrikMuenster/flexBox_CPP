@@ -29,7 +29,7 @@ public:
 		if (VERBOSE > 0) printf("Linear operator destructor");
 	}
 
-	flexLinearOperator(int aNumRows, int aNumCols, linOp aType) : numCols(aNumCols), type(aType)
+    flexLinearOperator(int aNumRows, int aNumCols, linOp aType) : numRows(aNumRows), numCols(aNumCols), type(aType)
 	{
 
 	}
