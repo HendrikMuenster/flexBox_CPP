@@ -19,7 +19,6 @@ using namespace std;
 using namespace cimg_library;
 
 typedef float floatingType;
-typedef std::vector<floatingType> vectorData;
 
 
 int main()
@@ -27,7 +26,7 @@ int main()
 	float weightDataTerm = 1.0;
 	float weightRegularizer = 0.1;
 
-	flexBox<floatingType, vectorData> mainObject;
+	flexBox<floatingType> mainObject;
 	mainObject.verbose = 1;
 
 	//read original image
@@ -65,11 +64,11 @@ int main()
 	std::vector<int> _correspondingPrimals;
 	_correspondingPrimals.push_back(0);
 
-	mainObject.addPrimal(new flexTermPrimal<floatingType, vectorData>(1, 1, primalEmptyProx), _correspondingPrimals);
+	mainObject.addPrimal(new flexTermPrimal<floatingType>(1, 1, primalEmptyProx), _correspondingPrimals);
 
 	//add dualized data term:
-	std::vector<flexLinearOperator<floatingType, vectorData>*> operatorList;
-	operatorList.push_back(new flexIdentityOperator<floatingType, vectorData>(nPx, nPx, false));
+	std::vector<flexLinearOperator<floatingType>*> operatorList;
+	operatorList.push_back(new flexIdentityOperator<floatingType>(nPx, nPx, false));
 
 	//convert input image to grey value and add to vector data
 	std::vector<floatingType> f(nPx, 0.0f);
@@ -86,17 +85,17 @@ int main()
 
 	//CImgDisplay main_disp(image, "Original"), draw_dispGr(gray, "Grey");
 
-	flexProx<floatingType, vectorData>* myProx = new flexProxDualDataL2<floatingType, vectorData>();
-	mainObject.addDual(new flexTermDual<floatingType, vectorData>(myProx, weightDataTerm, (int) _correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
+	flexProx<floatingType>* myProx = new flexProxDualDataL2<floatingType>();
+	mainObject.addDual(new flexTermDual<floatingType>(myProx, weightDataTerm, (int) _correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
 
 	//add dualized regularizer
 	operatorList.clear();
 	//add gradient for x and y direction as operators
-	operatorList.push_back(new flexGradientOperator<floatingType, vectorData>(mainObject.getDims(0), 0, 0));
-	operatorList.push_back(new flexGradientOperator<floatingType, vectorData>(mainObject.getDims(0), 1, 0));
+	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 0, 0));
+	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 1, 0));
 
-	flexProx<floatingType, vectorData>* myProx2 = new flexProxDualL1Iso<floatingType, vectorData>();
-	mainObject.addDual(new flexTermDual<floatingType, vectorData>(myProx2, weightRegularizer, 1, operatorList), _correspondingPrimals);
+	flexProx<floatingType>* myProx2 = new flexProxDualL1Iso<floatingType>();
+	mainObject.addDual(new flexTermDual<floatingType>(myProx2, weightRegularizer, 1, operatorList), _correspondingPrimals);
 
 	mainObject.runAlgorithm();
 

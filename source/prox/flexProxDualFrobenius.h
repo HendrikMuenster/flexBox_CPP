@@ -1,18 +1,21 @@
 #ifndef flexProxDualFrobenius_H
 #define flexProxDualFrobenius_H
 
-
-
 #include "flexProx.h"
 
-template < typename T, typename Tvector >
-class flexProxDualFrobenius : public flexProx<T, Tvector>
+template<typename T>
+class flexProxDualFrobenius : public flexProx<T>
 {
-private:
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
 
 public:
 
-	flexProxDualFrobenius() : flexProx<T, Tvector>(dualFrobeniusProx)
+	flexProxDualFrobenius() : flexProx<T>(dualFrobeniusProx)
 	{
 	}
 
@@ -20,18 +23,18 @@ public:
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
-	
+
 	#ifdef __CUDACC__
-		struct flexFrobeniusSquareFunctor 
+		struct flexFrobeniusSquareFunctor
 		{
 			__host__ __device__
             flexFrobeniusSquareFunctor(){};
-			
-			__host__ __device__ T 
-			operator()(const T& x) const 
-			{ 
-				return x * x; 
-			} 
+
+			__host__ __device__ T
+			operator()(const T& x) const
+			{
+				return x * x;
+			}
 		};
 
         struct flexProxDualFrobeniusFunctor
@@ -50,26 +53,26 @@ public:
         };
     #endif
 
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		#ifdef __CUDACC__
 		    flexFrobeniusSquareFunctor unary_op;
 			thrust::plus<T> binary_op;
-	
+
 			T norm = (T)0;
 			for (int k = 0; k < dualNumbers.size(); k++)
 			{
 				//add sum of squared elements to norm
 				norm += thrust::transform_reduce(data->yTilde[dualNumbers[k]].begin(), data->yTilde[dualNumbers[k]].end(), unary_op, (T)0, binary_op);
 			}
-			
+
 			norm = (T)1 / std::max((T)1, std::sqrt(norm) / alpha);
-			
+
 			for (int k = 0; k < dualNumbers.size(); k++)
 			{
                 auto startIterator = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[k]].begin(), data->yTilde[dualNumbers[k]].begin()));
                 auto endIterator = thrust::make_zip_iterator(  thrust::make_tuple(data->y[dualNumbers[k]].end(),   data->yTilde[dualNumbers[k]].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualFrobeniusFunctor(norm));
 			}
 		#else
@@ -86,7 +89,7 @@ public:
 					norm += ptrYTilde[i] * ptrYTilde[i];
 				}
 			}
-			
+
 			norm = (T)1 / std::max((T)1, std::sqrt(norm) / alpha);
 
 			for (int k = 0; k < dualNumbers.size(); k++)
@@ -104,8 +107,8 @@ public:
 			}
 		#endif
 	}
-	
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tvector> &fList)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tdata> &fList)
 	{
 
 	}

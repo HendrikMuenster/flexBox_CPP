@@ -1,24 +1,27 @@
 #ifndef flexProxDualL1Iso_H
 #define flexProxDualL1Iso_H
 
-
-
 #include "flexProx.h"
 
-template < typename T, typename Tvector >
-class flexProxDualL1Iso : public flexProx<T, Tvector>
+template<typename T>
+class flexProxDualL1Iso : public flexProx<T>
 {
-private:
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
 
 public:
 
-    flexProxDualL1Iso() : flexProx<T, Tvector>(dualL1IsoProx){}
+    flexProxDualL1Iso() : flexProx<T>(dualL1IsoProx){}
 
 	~flexProxDualL1Iso()
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
-    
+
     #ifdef __CUDACC__
 	struct flexProxDualL1IsoDim1Functor
 	{
@@ -34,7 +37,7 @@ public:
 
 		T alpha;
 	};
-	
+
 	struct flexProxDualL1IsoDim2Functor
 	{
 		__host__ __device__
@@ -52,7 +55,7 @@ public:
 
 		T alpha;
 	};
-	
+
 	struct flexProxDualL1IsoDim3Functor
 	{
 		__host__ __device__
@@ -73,28 +76,28 @@ public:
 	};
     #endif
 
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		#ifdef __CUDACC__
 			if (dualNumbers.size() == 1)
 			{
                 auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].begin()));
                 auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].end(),   data->yTilde[dualNumbers[0]].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualL1IsoDim1Functor(alpha));
 			}
 			else if (dualNumbers.size() == 2)
 			{
                 auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->y[dualNumbers[1]].begin(), data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[1]].begin()));
                 auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].end(),   data->y[dualNumbers[1]].end(),   data->yTilde[dualNumbers[0]].end(),   data->yTilde[dualNumbers[1]].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualL1IsoDim2Functor(alpha));
 			}
 			else if (dualNumbers.size() == 3)
 			{
                 auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->y[dualNumbers[1]].begin(), data->y[dualNumbers[2]].begin(), data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[1]].begin(), 	data->yTilde[dualNumbers[2]].begin()));
                 auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].end(),   data->y[dualNumbers[1]].end(), 	 data->y[dualNumbers[2]].end(),   data->yTilde[dualNumbers[0]].end(),   data->yTilde[dualNumbers[1]].end(), 	data->yTilde[dualNumbers[2]].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualL1IsoDim3Functor(alpha));
 			}
             else
@@ -165,8 +168,8 @@ public:
 			}
 		#endif
 	}
-	
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tvector> &fList)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tdata> &fList)
 	{
 
 	}

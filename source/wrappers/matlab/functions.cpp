@@ -85,11 +85,11 @@ typedef float floatingType;
 
 
 void copyToVector(std::vector<floatingType> &vector, const double *input, int numElements);
-bool checkClassType(mxArray *object, char *className);
+bool checkClassType(mxArray *object, const std::string& className);
 bool checkSparse(mxArray *object);
 bool checkProx(mxArray *inputClass,const char* proxName);
 
-void copyMatlabToFlexmatrix(const mxArray *input, flexMatrix<floatingType,vectorData> *output);
+void copyMatlabToFlexmatrix(const mxArray *input, flexMatrix<floatingType> *output);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -99,7 +99,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     #endif
 
 // Initialize main flexBox object
-	flexBox<floatingType,vectorData> mainObject;
+	flexBox<floatingType> mainObject;
 	mainObject.isMATLAB = true;
 
 	// read params
@@ -197,7 +197,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (strcmp(mxGetClassName(mxGetCell(primals,i)), "emptyDataTerm") == 0)
 		{
 			//add primal term
-			mainObject.addPrimal(new flexTermPrimal<floatingType, vectorData>(1, alpha, primalEmptyProx), _correspondingPrimals);
+			mainObject.addPrimal(new flexTermPrimal<floatingType>(1, alpha, primalEmptyProx), _correspondingPrimals);
 		}
 		else
 		{
@@ -244,7 +244,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		int numberOfOperators = (int)mxGetN(matlabOperatorList) * (int)mxGetM(matlabOperatorList);
 
-		std::vector<flexLinearOperator<floatingType, vectorData>*> operatorList;
+		std::vector<flexLinearOperator<floatingType>*> operatorList;
 		for (int k = 0; k < numberOfOperators; ++k)
 		{
 			int correspondingNumberPrimalVar = k%_correspondingPrimals.size();
@@ -253,7 +253,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
 
-			if (checkClassType(pointerA, "gradientOperator"))
+			if (checkClassType(pointerA, std::string("gradientOperator")))
 			{
 				if (verbose > 1)
 				{
@@ -269,9 +269,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					//gradientTypeInt = 1;
 				}
 
-				operatorList.push_back(new flexGradientOperator<floatingType, vectorData>(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]), gradientDirection, gradientTypeInt));
+				operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]), gradientDirection, gradientTypeInt));
 			}
-			else if (checkClassType(pointerA, "identityOperator"))
+			else if (checkClassType(pointerA, std::string("identityOperator")))
 			{
 				if (verbose > 1)
 				{
@@ -280,18 +280,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 				bool isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "minus")) > 0;
 
-				operatorList.push_back(new flexIdentityOperator<floatingType, vectorData>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
+				operatorList.push_back(new flexIdentityOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
 			}
-			else if (checkClassType(pointerA, "zeroOperator"))
+			else if (checkClassType(pointerA, std::string("zeroOperator")))
 			{
 				if (verbose > 1)
 				{
 					printf("Operator %d is type <zeroOperator>\n", k);
 				}
 
-				operatorList.push_back(new flexZeroOperator<floatingType, vectorData>(numElementsPrimalVar, numElementsPrimalVar));
+				operatorList.push_back(new flexZeroOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar));
 			}
-			else if (checkClassType(pointerA, "diagonalOperator"))
+			else if (checkClassType(pointerA, std::string("diagonalOperator")))
 			{
 				if (verbose > 1)
 				{
@@ -307,9 +307,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					tmpDiagonal[l] = static_cast<floatingType>(tmpDiagonalVector[l]);
 				}
 
-				operatorList.push_back(new flexDiagonalOperator<floatingType, vectorData>(tmpDiagonal));
+				operatorList.push_back(new flexDiagonalOperator<floatingType>(tmpDiagonal));
 			}
-            else if (checkClassType(pointerA, "superpixelOperator") && isGPU == false)
+            else if (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == false)
 			{
 				if (verbose > 1)
 				{
@@ -328,9 +328,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					targetDimension[l] = (int)targetDimensionInput[l];
 				}
 
-				operatorList.push_back(new flexSuperpixelOperator<floatingType, vectorData>(targetDimension, factor));
+				operatorList.push_back(new flexSuperpixelOperator<floatingType>(targetDimension, factor));
 			}
-            else if (checkSparse(pointerA) || (checkClassType(pointerA, "superpixelOperator") && isGPU == true))
+            else if (checkSparse(pointerA) || (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == true))
 			{
 				if (verbose > 1)
 				{
@@ -338,7 +338,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				}
 
                 //check if super pixel operator
-                if (checkClassType(pointerA, "superpixelOperator"))
+                if (checkClassType(pointerA, std::string("superpixelOperator")))
                 {
                     pointerA = mxGetProperty(pointerA,0,"matrix");
                 }
@@ -367,9 +367,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 						rowList[l] = ir[l];
 						valList[l] = pr[l];
 					}
-					operatorList.push_back(new flexMatrixGPU<floatingType, vectorData>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList,false));
+					operatorList.push_back(new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList,false));
 				#else
-					flexMatrix<floatingType, vectorData>*A = new flexMatrix<floatingType, vectorData>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)));
+					flexMatrix<floatingType>*A = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)));
 					copyMatlabToFlexmatrix(pointerA, A);
 					operatorList.push_back(A);
 				#endif
@@ -380,52 +380,52 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			}
 		}
 
-		flexProx<floatingType, vectorData>* myProx;
+		flexProx<floatingType>* myProx;
 
 		if (checkProx(classPointer,"L1IsoProxDual"))
 		{
-			myProx = new flexProxDualL1Iso<floatingType, vectorData>();
+			myProx = new flexProxDualL1Iso<floatingType>();
 		}
 		else if (checkProx(classPointer,"L1AnisoProxDual"))
 		{
-			myProx = new flexProxDualL1Aniso<floatingType, vectorData>();
+			myProx = new flexProxDualL1Aniso<floatingType>();
 		}
 		else if (checkProx(classPointer,"L2proxDual"))
 		{
-			myProx = new flexProxDualL2<floatingType, vectorData>();
+			myProx = new flexProxDualL2<floatingType>();
 		}
 		else if (checkProx(classPointer,"HuberProxDual"))
 		{
 			float huberEpsilon = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"epsi"));
-			myProx = new flexProxDualHuber<floatingType, vectorData>(huberEpsilon);
+			myProx = new flexProxDualHuber<floatingType>(huberEpsilon);
 		}
 		else if (checkProx(classPointer,"FrobeniusProxDual"))
 		{
-			myProx = new flexProxDualFrobenius<floatingType, vectorData>();
+			myProx = new flexProxDualFrobenius<floatingType>();
 		}
 		//data
 		else if (checkProx(classPointer,"L2DataProxDual"))
 		{
-			myProx = new flexProxDualDataL2<floatingType, vectorData>();
+			myProx = new flexProxDualDataL2<floatingType>();
 		}
 		else if (checkProx(classPointer,"L1DataProxDual"))
 		{
-			myProx = new flexProxDualDataL1<floatingType, vectorData>();
+			myProx = new flexProxDualDataL1<floatingType>();
 		}
 		else if (checkProx(classPointer,"KLDataProxDual"))
 		{
-			myProx = new flexProxDualDataKL<floatingType, vectorData>();
+			myProx = new flexProxDualDataKL<floatingType>();
 		}
 		else if (checkProx(classPointer,"constraintBoxDualized"))
 		{
 			float minVal = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"minVal"));
 			float maxVal = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"maxVal"));
 
-			myProx = new flexProxDualBoxConstraint<floatingType, vectorData>(minVal, maxVal);
+			myProx = new flexProxDualBoxConstraint<floatingType>(minVal, maxVal);
 		}
         else if (checkProx(classPointer,"innerProductProxDual"))
 		{
-			myProx = new flexProxDualInnerProduct<floatingType, vectorData>();
+			myProx = new flexProxDualInnerProduct<floatingType>();
 		}
 		else
 		{
@@ -446,7 +446,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			copyToVector(fList[k], mxGetPr(fListInputElement), (int)mxGetN(fListInputElement) * (int)mxGetM(fListInputElement));
 		}
 
-		mainObject.addDual(new flexTermDual<floatingType, vectorData>(myProx, alpha,(int)_correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
+		mainObject.addDual(new flexTermDual<floatingType>(myProx, alpha,(int)_correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
 	}
 
 	// copy content for dual vars from MATLAB
@@ -518,13 +518,13 @@ void copyToVector(std::vector<floatingType> &vector,const double *input, int num
 	}
 }
 
-bool checkClassType(mxArray *object,char *className)
+bool checkClassType(mxArray *object, const std::string& className)
 {
 
 	mxArray *output[1], *input[2];
 
 	input[0] = object;
-	input[1] = mxCreateString(className);
+	input[1] = mxCreateString(className.c_str());
 
 	mexCallMATLAB(1, output, 2, input, "isa");
 
@@ -557,7 +557,7 @@ bool checkSparse(mxArray *object)
 	}
 }
 
-bool checkProx(mxArray *inputClass,const char* proxName)
+bool checkProx(mxArray *inputClass, const char* proxName)
 {
 	mxArray *output[1], *input[1];
 
@@ -579,7 +579,7 @@ bool checkProx(mxArray *inputClass,const char* proxName)
 }
 
 
-void copyMatlabToFlexmatrix(const mxArray *input, flexMatrix<floatingType, vectorData> *output)
+void copyMatlabToFlexmatrix(const mxArray *input, flexMatrix<floatingType> *output)
 {
 	double  *pr;
 	mwIndex  *ir, *jc;

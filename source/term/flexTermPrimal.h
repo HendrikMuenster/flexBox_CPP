@@ -5,46 +5,47 @@
 #include "vector"
 #include "tools.h"
 
-template < typename T, typename Tdata>
+template <typename T>
 class flexTermPrimal
 {
-	private:
-		int numberVars;
-		
-	public:
-		T alpha;
-		prox p;
 
-		flexTermPrimal(int _numberVars, T _alpha, prox _p) : p(_p)
-		{
-			this->numberVars = _numberVars;
-			this->alpha = _alpha;
-		};
+private:
+	int numberVars;
 
-		int getNumberVars()
-		{
-			return numberVars;
-		}
+public:
+	T alpha;
+	prox p;
 
-		std::vector<int> getDims()
-		{
-			return this->dims;
-		}
+	flexTermPrimal(int _numberVars, T _alpha, prox _p) : p(_p)
+	{
+		this->numberVars = _numberVars;
+		this->alpha = _alpha;
+	};
 
-		virtual void applyProx(flexBoxData<T, Tdata>* data, std::vector<int> primalNumbers)
+	int getNumberVars()
+	{
+		return numberVars;
+	}
+
+	std::vector<int> getDims()
+	{
+		return this->dims;
+	}
+
+	virtual void applyProx(flexBoxData<T>* data, std::vector<int> primalNumbers)
+	{
+		switch (p)
 		{
-			switch (p)
+			case primalEmptyProx :
 			{
-				case primalEmptyProx :
-				{
-                    for (int i = 0; i < primalNumbers.size(); ++i)
-                    {
-                        data->x[primalNumbers[i]].swap(data->xTilde[primalNumbers[i]]);
-                    }
-					break;
-				}
+                for (int i = 0; i < primalNumbers.size(); ++i)
+                {
+                    data->x[primalNumbers[i]].swap(data->xTilde[primalNumbers[i]]);
+                }
+				break;
 			}
 		}
+	}
 
 #ifdef __CUDACC__
 		__device__ int getNumberPrimals()

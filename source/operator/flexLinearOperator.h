@@ -1,23 +1,27 @@
 #ifndef flexLinearOperator_H
 #define flexLinearOperator_H
 
-#include "vector"
+#include <vector>
 #include "tools.h"
 
-template < typename T, typename Tvector >
+template <typename T>
 class flexLinearOperator
 {
+	#ifdef __CUDACC__
+		typedef thrust::device_vector<T> Tdata;
+	#else
+		typedef std::vector<T> Tdata;
+	#endif
+
 private:
 	int numRows;
 	int numCols;
 public:
 	linOp type;
 
-	flexLinearOperator(int _numRows, int _numCols)
+	flexLinearOperator(int aNumRows, int aNumCols) : numRows(aNumRows), numCols(aNumCols), type(linearOp)
 	{
-		numRows = _numRows; 
-		numCols = _numCols;
-		type = linearOp;
+
 	}
 
 	virtual ~flexLinearOperator()
@@ -25,10 +29,9 @@ public:
 		if (VERBOSE > 0) printf("Linear operator destructor");
 	}
 
-	flexLinearOperator(int _numRows, int _numCols, linOp _type) : type(_type)
+	flexLinearOperator(int aNumRows, int aNumCols, linOp aType) : numCols(aNumCols), type(aType)
 	{
-		numRows = _numRows;
-		numCols = _numCols;
+
 	}
 
 	int getNumCols() const
@@ -41,28 +44,28 @@ public:
 		return numRows;
 	}
 
-	void setNumCols(int _numCols)
+	void setNumCols(int aNumCols)
 	{
-		numCols = _numCols;
+		numCols = aNumCols;
 	}
 
-	void setNumRows(int _numRows)
+	void setNumRows(int aNumRows)
 	{
-		numRows = _numRows;
+		numRows = aNumRows;
 	}
 
-	virtual flexLinearOperator<T, Tvector>* copy() = 0;
+	virtual flexLinearOperator<T>* copy() = 0;
 
 	//apply linear operator to vector
-	virtual void times(const Tvector &input, Tvector &output) = 0;
+	virtual void times(const Tdata &input, Tdata &output) = 0;
 
-	virtual void timesPlus(const Tvector &input, Tvector &output) = 0;
+	virtual void timesPlus(const Tdata &input, Tdata &output) = 0;
 
-	virtual void timesMinus(const Tvector &input, Tvector &output) = 0;
+	virtual void timesMinus(const Tdata &input, Tdata &output) = 0;
 
 	virtual std::vector<T> getAbsRowSum() = 0;
 
-	#ifdef __CUDACC__		
+	#ifdef __CUDACC__
 		virtual thrust::device_vector<T> getAbsRowSumCUDA() = 0;
 	#endif
 

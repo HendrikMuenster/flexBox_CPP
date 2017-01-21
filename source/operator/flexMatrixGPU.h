@@ -1,21 +1,18 @@
 #ifndef flexMatrixGPU_H
 #define flexMatrixGPU_H
 
-
-
 #include <cuda_runtime.h>
 #include <cusparse_v2.h>
 
+#include <vector>
 
 #include "flexLinearOperator.h"
 
-#include <vector>
-
-template < typename T, typename Tvector >
-class flexMatrixGPU : public flexLinearOperator<T, Tvector>
+template<typename T>
+class flexMatrixGPU : public flexLinearOperator<T>
 {
 private:
-	cusparseHandle_t handle;    
+	cusparseHandle_t handle;
 	cusparseMatDescr_t descrA;
 
 	int* listRowEntries;
@@ -27,7 +24,7 @@ private:
 	bool transposed;
 
 public:
-	flexMatrixGPU(int  _numRows, int  _numCols, int* rowList, int *colList, T* indexVal, bool formatCRS) : flexLinearOperator<T, Tvector>(_numRows, _numCols, matrixGPUOp)
+	flexMatrixGPU(int  aNumRows, int  aNumCols, int* rowList, int *colList, T* indexVal, bool formatCRS) : flexLinearOperator<T>(aNumRows, aNumCols, matrixGPUOp)
 	{
 		transposed = false;
 
@@ -41,16 +38,16 @@ public:
 		//if formatCRS is true then the input data is already in compressed row storage format, otherwise we have to convert it
 		if (formatCRS)
 		{
-			this->nnz = rowList[_numRows]; //access last entry
+			this->nnz = rowList[aNumRows]; //access last entry
 		}
 		else
 		{
-			this->nnz = colList[_numCols]; //access last entry
+			this->nnz = colList[aNumCols]; //access last entry
 		}
 
-        cudaMalloc(&this->listValues, this->nnz * sizeof(T)); 
-		cudaMalloc(&this->listColIndices, this->nnz * sizeof(int)); 
-		cudaMalloc(&this->listRowEntries, (_numRows + 1) * sizeof(int)); 
+        cudaMalloc(&this->listValues, this->nnz * sizeof(T));
+		cudaMalloc(&this->listColIndices, this->nnz * sizeof(int));
+		cudaMalloc(&this->listRowEntries, (aNumRows + 1) * sizeof(int));
 
 		if (formatCRS == false)
 		{
@@ -59,16 +56,16 @@ public:
 			int* listColIndicesTmp;
 			int* listRowEntriesTmp;
 
-			cudaMalloc(&listValuesTmp, this->nnz * sizeof(T));	
-			cudaMemcpy(listValuesTmp, indexVal, this->nnz * sizeof(T), cudaMemcpyHostToDevice); 
-			cudaMalloc(&listColIndicesTmp, (_numCols + 1) * sizeof(int));	
-			cudaMemcpy(listColIndicesTmp, colList, (_numCols + 1) * sizeof(int), cudaMemcpyHostToDevice); 
-			cudaMalloc(&listRowEntriesTmp, this->nnz  * sizeof(int));	
+			cudaMalloc(&listValuesTmp, this->nnz * sizeof(T));
+			cudaMemcpy(listValuesTmp, indexVal, this->nnz * sizeof(T), cudaMemcpyHostToDevice);
+			cudaMalloc(&listColIndicesTmp, (aNumCols + 1) * sizeof(int));
+			cudaMemcpy(listColIndicesTmp, colList, (aNumCols + 1) * sizeof(int), cudaMemcpyHostToDevice);
+			cudaMalloc(&listRowEntriesTmp, this->nnz  * sizeof(int));
 			cudaMemcpy(listRowEntriesTmp, rowList, this->nnz * sizeof(int), cudaMemcpyHostToDevice);
 
 
 			cudaDeviceSynchronize();
-			cusparseStatus_t status = cusparseScsr2csc(this->handle, _numCols, _numRows, this->nnz, listValuesTmp, listColIndicesTmp, listRowEntriesTmp, this->listValues, this->listColIndices, this->listRowEntries, CUSPARSE_ACTION_NUMERIC, CUSPARSE_INDEX_BASE_ZERO); 
+			cusparseStatus_t status = cusparseScsr2csc(this->handle, aNumCols, aNumRows, this->nnz, listValuesTmp, listColIndicesTmp, listRowEntriesTmp, this->listValues, this->listColIndices, this->listRowEntries, CUSPARSE_ACTION_NUMERIC, CUSPARSE_INDEX_BASE_ZERO);
 			cudaDeviceSynchronize();
 
 			cudaFree(listValuesTmp);
@@ -126,7 +123,7 @@ public:
 		{
 			cudaMemcpy(this->listValues, indexVal, this->nnz * sizeof(T), cudaMemcpyHostToDevice);
 			cudaMemcpy(this->listColIndices, colList, this->nnz * sizeof(int), cudaMemcpyHostToDevice);
-			cudaMemcpy(this->listRowEntries, rowList, (_numRows + 1) * sizeof(int), cudaMemcpyHostToDevice);
+			cudaMemcpy(this->listRowEntries, rowList, (aNumRows + 1) * sizeof(int), cudaMemcpyHostToDevice);
 		}
 	};
 
@@ -134,12 +131,12 @@ public:
 	{
 		if (VERBOSE > 0) printf("MatrixGPU destructor!");
 		//free cuda memory
-		cudaFree(this->listValues); 
-		cudaFree(this->listColIndices); 
-		cudaFree(this->listRowEntries); 
+		cudaFree(this->listValues);
+		cudaFree(this->listColIndices);
+		cudaFree(this->listRowEntries);
 	}
 
-	flexMatrixGPU<T, Tvector>* copy()
+	flexMatrixGPU<T>* copy()
 	{
 		//copy matrix data to host
 
@@ -152,7 +149,7 @@ public:
 		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
 
-		flexMatrixGPU<T, Tvector>* A = new flexMatrixGPU<T, Tvector>(this->getNumRows(), this->getNumCols(), hostRowIndices, hostColIndices, hostValues,true);
+		flexMatrixGPU<T>* A = new flexMatrixGPU<T>(this->getNumRows(), this->getNumCols(), hostRowIndices, hostColIndices, hostValues,true);
 
 		free(hostValues);
 		free(hostRowIndices);
@@ -161,7 +158,7 @@ public:
 		return A;
 	}
 
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
 		const T alpha = (T)1;
 		const T beta = (T)0;
@@ -179,7 +176,7 @@ public:
 		}
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(const Tdata &input, Tdata &output)
 	{
 		const T alpha = (T)1;
 		const T beta = (T)1;
@@ -197,7 +194,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(const Tdata &input, Tdata &output)
 	{
 		const T alpha = -(T)1;
 		const T beta = (T)1;
@@ -258,7 +255,7 @@ public:
         int numRowsTmp = this->getNumRows();
         this->setNumRows(this->getNumCols());
         this->setNumCols(numRowsTmp);
-            
+
 		if (transposed == false)
 		{
             transposed = true;
@@ -272,13 +269,13 @@ public:
 
 #ifdef __CUDACC__
 
-	
+
 	thrust::device_vector<T> getAbsRowSumCUDA()
 	{
-        
+
         std::vector<T> resultTmp;
-		
-        
+
+
         int numRowsVector = 0;
         if (transposed == false)
         {
@@ -290,7 +287,7 @@ public:
             resultTmp.resize(this->getNumCols());
             numRowsVector = this->getNumCols();
         }
-        
+
 		//allocate memory
 		T *hostValues = (T *)malloc(this->nnz * sizeof(T));
 		int *hostRowIndices = (int *)malloc((this->getNumRows() + 1) * sizeof(int));
@@ -321,16 +318,16 @@ public:
                 }
             }
         }
-        
+
         free(hostValues);
 		free(hostRowIndices);
 		free(hostColIndices);
-        
-        Tvector result(resultTmp.size());
 
-        
+        Tdata result(resultTmp.size());
+
+
         thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
-        
+
 
 		return result;
 	}

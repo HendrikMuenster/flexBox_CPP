@@ -1,20 +1,22 @@
 #ifndef flexSolver_H
 #define flexSolver_H
 
-
-
 #include <vector>
 
-template < class T, class Tvector >
+template<typename T>
 class flexSolver
 {
-private:
+	
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
 
 public:
-
 	flexSolver()
 	{
-		
+
 	}
 
 	virtual ~flexSolver()
@@ -22,15 +24,15 @@ public:
 		if (VERBOSE > 0) printf("Destructor solver\n!");
 	}
 
-	virtual void init(flexBoxData<T, Tvector> *data) = 0;
+	virtual void init(flexBoxData<T> *data) = 0;
 
-	virtual void addPrimal(flexTermPrimal<T, Tvector>* _primalPart, std::vector<int> _correspondingPrimals) = 0;
+	virtual void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals) = 0;
 
-	virtual void addDual(flexBoxData<T, Tvector> *data, flexTermDual<T, Tvector>* _dualPart, std::vector<int> _correspondingPrimals) = 0;
+	virtual void addDual(flexBoxData<T> *data, flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals) = 0;
 
-	virtual void doIteration(flexBoxData<T, Tvector> *data) = 0;
+	virtual void doIteration(flexBoxData<T> *data) = 0;
 
-	virtual T calculateError(flexBoxData<T, Tvector> *data) = 0;
+	virtual T calculateError(flexBoxData<T> *data) = 0;
 };
 
 #endif

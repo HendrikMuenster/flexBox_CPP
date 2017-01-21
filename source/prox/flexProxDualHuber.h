@@ -1,18 +1,23 @@
 #ifndef flexProxDualHuber_H
 #define flexProxDualHuber_H
 
-
-
 #include "flexProx.h"
 
-template < typename T, typename Tvector >
-class flexProxDualHuber : public flexProx<T, Tvector>
+template<typename T>
+class flexProxDualHuber : public flexProx<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	T huberEpsilon;
 public:
 
-	flexProxDualHuber(T _huberEpsilon) : flexProx<T, Tvector>(dualHuberProx)
+	flexProxDualHuber(T _huberEpsilon) : flexProx<T>(dualHuberProx)
 	{
 		huberEpsilon = _huberEpsilon;
 	}
@@ -21,7 +26,7 @@ public:
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
-    
+
     #ifdef __CUDACC__
 	struct flexProxDualHuberDim2Functor
 	{
@@ -34,27 +39,27 @@ public:
 		{
             T huberFactor1 = (T)1 / ((T)1 + thrust::get<4>(t) * epsiAlpha);
             T huberFactor2 = (T)1 / ((T)1 + thrust::get<5>(t) * epsiAlpha);
-            
+
 			T norm = max((T)1, sqrt( pow(thrust::get<2>(t)*huberFactor1,(int)2) + pow(thrust::get<3>(t)*huberFactor2,(int)2)) / alpha);
 
 			thrust::get<0>(t) = thrust::get<2>(t) * huberFactor1 / norm;
 			thrust::get<1>(t) = thrust::get<3>(t) * huberFactor2 / norm;
 		}
-        
+
         const T epsi;
 		const T alpha;
         const T epsiAlpha;
 	};
     #endif
 
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		#ifdef __CUDACC__
             if (dualNumbers.size() == 2)
 			{
                 auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->y[dualNumbers[1]].begin(), data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[1]].begin(), data->sigmaElt[dualNumbers[0]].begin(), data->sigmaElt[dualNumbers[1]].begin()));
                 auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].end(),   data->y[dualNumbers[1]].end(),   data->yTilde[dualNumbers[0]].end(),   data->yTilde[dualNumbers[1]].end(),   data->sigmaElt[dualNumbers[0]].end(),   data->sigmaElt[dualNumbers[1]].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualHuberDim2Functor(this->huberEpsilon,alpha));
 			}
             else
@@ -71,7 +76,7 @@ public:
 				T* ptrSigma = data->sigmaElt[dualNumbers[0]].data();
 
 				int numElements = (int)data->yTilde[dualNumbers[0]].size();
-                
+
                 T epsiAlpha = this->huberEpsilon / alpha;
 
 				#pragma omp parallel for
@@ -95,7 +100,7 @@ public:
 				T* ptrSigma = data->sigmaElt[dualNumbers[0]].data();
 
 				int numElements = (int)data->yTilde[dualNumbers[0]].size();
-                
+
                 T epsiAlpha = this->huberEpsilon / alpha;
 
 				#pragma omp parallel for
@@ -122,7 +127,7 @@ public:
 				T* ptrSigma = data->sigmaElt[dualNumbers[0]].data();
 
 				int numElements = (int)data->yTilde[dualNumbers[0]].size();
-                
+
                 T epsiAlpha = this->huberEpsilon / alpha;
 
 				#pragma omp parallel for
@@ -143,8 +148,8 @@ public:
 			}
 		#endif
 	}
-	
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tvector> &fList)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tdata> &fList)
 	{
 
 	}

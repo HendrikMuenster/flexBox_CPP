@@ -5,24 +5,34 @@
 #include "prox/flexProx.h"
 #include "data/flexBoxData.h"
 
-template < typename T, typename Tvector >
+template<typename T>
 class flexTermDual
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
     int numberVars;
     int numberPrimals;
 public:
     const prox p;
     T alpha;
-    std::vector<flexLinearOperator<T, Tvector>* > operatorList;
-    std::vector<flexLinearOperator<T, Tvector>* > operatorListT;
-        
-	flexProx<T,Tvector>* myProx;
-    std::vector<Tvector> fList;
+    std::vector<flexLinearOperator<T>* > operatorList;
+    std::vector<flexLinearOperator<T>* > operatorListT;
 
-    flexTermDual(flexProx<T,Tvector>* _myProx, T _alpha, int numberPrimals, std::vector<flexLinearOperator<T, Tvector>* > _operatorList) : flexTermDual(_myProx,_alpha,numberPrimals,_operatorList, std::vector<std::vector<T>>(0)){};
+	flexProx<T>* myProx;
+    std::vector<Tdata> fList;
 
-    flexTermDual(flexProx<T,Tvector>* _myProx, T _alpha, int numberPrimals, std::vector<flexLinearOperator<T, Tvector>* > _operatorList, std::vector<std::vector<T>> _fList) : myProx(_myProx), alpha(_alpha), numberPrimals(numberPrimals), numberVars((int)_operatorList.size() / numberPrimals), p(_myProx->getProx())	
+    flexTermDual(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList) : flexTermDual(aMyProx,aAlpha,numberPrimals,aOperatorList, std::vector<std::vector<T>>(0))
+	{
+
+	}
+
+    flexTermDual(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList, std::vector<std::vector<T>> _fList) : myProx(aMyProx), alpha(aAlpha), numberPrimals(numberPrimals), numberVars((int)aOperatorList.size() / numberPrimals), p(aMyProx->getProx())
     {
         fList.resize(_fList.size());
 
@@ -36,10 +46,10 @@ public:
             #endif
         }
 
-        this->operatorList = _operatorList;
+        this->operatorList = aOperatorList;
 
         //create sigma and tau
-        for (int i = 0; i < _operatorList.size() / numberPrimals; ++i)
+        for (int i = 0; i < aOperatorList.size() / numberPrimals; ++i)
         {
             for (int j = 0; j < numberPrimals; ++j)
             {
@@ -50,7 +60,7 @@ public:
             }
         }
     };
-    
+
     int getNumberVars()
     {
         return numberVars;
@@ -64,7 +74,7 @@ public:
 	~flexTermDual()
 	{
 		delete myProx;
-        
+
         for (int i = (int)operatorList.size() - 1; i >= 0; --i)
         {
             delete operatorList[i];
@@ -73,11 +83,11 @@ public:
 
         operatorList.clear();
         operatorListT.clear();
-            
+
 		if (VERBOSE > 0) printf("Destructor of data term!");
 	}
 
-	void applyProx(flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void applyProx(flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
         //apply both prox operators. Usually one is empty
         myProx->applyProx(this->alpha, data,dualNumbers,primalNumbers,this->fList);

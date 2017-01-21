@@ -3,14 +3,19 @@
 
 #include "flexProx.h"
 
-template < typename T, typename Tvector >
-class flexProxDualDataL2 : public flexProx<T, Tvector>
+template<typename T>
+class flexProxDualDataL2 : public flexProx<T>
 {
-private:
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
 
 public:
 
-	flexProxDualDataL2() : flexProx<T, Tvector>(dualL2DataProx)
+	flexProxDualDataL2() : flexProx<T>(dualL2DataProx)
 	{
 	}
 
@@ -19,11 +24,11 @@ public:
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
 
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
-		
+
 	}
-    
+
     #ifdef __CUDACC__
         struct flexProxDualDataL2Functor
         {
@@ -40,15 +45,15 @@ public:
             const T alpha;
         };
     #endif
-	
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tvector> &fList)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tdata> &fList)
 	{
 		#ifdef __CUDACC__
             for (int i = 0; i < dualNumbers.size(); i++)
 			{
                 auto startIterator = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[i]].begin(), data->yTilde[dualNumbers[i]].begin(), data->sigmaElt[dualNumbers[i]].begin(),  fList[i].begin()));
                 auto endIterator = thrust::make_zip_iterator(  thrust::make_tuple(data->y[dualNumbers[i]].end(),   data->yTilde[dualNumbers[i]].end(),   data->sigmaElt[dualNumbers[i]].end(),    fList[i].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualDataL2Functor(alpha));
             }
 		#else
@@ -59,7 +64,7 @@ public:
 				T* ptrSigma = data->sigmaElt[dualNumbers[i]].data();
 
 				T* ptrF = fList[i].data();
-				
+
 				int numElements = (int)data->yTilde[dualNumbers[i]].size();
 
 				#pragma omp parallel for

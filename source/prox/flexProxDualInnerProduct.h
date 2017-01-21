@@ -1,18 +1,21 @@
 #ifndef flexProxDualInnerProduct_H
 #define flexProxDualInnerProduct_H
 
-
-
 #include "flexProx.h"
 
-template < typename T, typename Tvector >
-class flexProxDualInnerProduct : public flexProx<T, Tvector>
+template<typename T>
+class flexProxDualInnerProduct : public flexProx<T>
 {
-private:
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
 
 public:
 
-	flexProxDualInnerProduct() : flexProx<T, Tvector>(dualInnerProductProx)
+	flexProxDualInnerProduct() : flexProx<T>(dualInnerProductProx)
 	{
 	}
 
@@ -20,15 +23,15 @@ public:
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
-    
 
 
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
-		
+
 	}
-	
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tvector> &fList)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tdata> &fList)
 	{
 		#ifdef __CUDACC__
             for (int i = 0; i < dualNumbers.size(); i++)

@@ -1,19 +1,26 @@
 #ifndef flexSuperpixelOperator_H
 #define flexSuperpixelOperator_H
 
-#include "vector"
+#include <vector>
 #include "flexLinearOperator.h"
 
-template < typename T, typename Tvector >
-class flexSuperpixelOperator : public flexLinearOperator<T, Tvector>
+template<typename T>
+class flexSuperpixelOperator : public flexLinearOperator<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	std::vector<int> targetDimension;
 	T upsamplingFactor;
 	bool transposed;
 public:
 
-	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_) : flexLinearOperator<T, Tvector>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp)
+	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_) : flexLinearOperator<T>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp)
 	{
 		this->targetDimension.resize(targetDimension_.size());
 		this->transposed = false;
@@ -22,9 +29,9 @@ public:
 		this->upsamplingFactor = upsamplingFactor_;
 	};
 
-	flexSuperpixelOperator<T, Tvector>* copy()
+	flexSuperpixelOperator<T>* copy()
 	{
-		return new flexSuperpixelOperator<T, Tvector>(this->targetDimension, this->upsamplingFactor);
+		return new flexSuperpixelOperator<T>(this->targetDimension, this->upsamplingFactor);
 	}
 
 	int indexI(int index, int sizeX)
@@ -42,7 +49,7 @@ public:
 		return (i*sizeY + j);
 	}
 
-	void calcTimes(const Tvector &input, Tvector &output, mySign signRule)
+	void calcTimes(const Tdata &input, Tdata &output, mySign signRule)
 	{
 
 		T factor = (T)1 / (this->upsamplingFactor*this->upsamplingFactor);
@@ -119,7 +126,7 @@ public:
 		//mexErrMsgTxt("Stop!\n");
 	}
 
-	void calcTimesTransposed(const Tvector &input, Tvector &output, mySign signRule)
+	void calcTimesTransposed(const Tdata &input, Tdata &output, mySign signRule)
 	{
 		T factor = (T)1 / (this->upsamplingFactor*this->upsamplingFactor);
 
@@ -141,7 +148,7 @@ public:
 				int backI = i / (int)this->upsamplingFactor;
 				int backJ = j / (int)this->upsamplingFactor;
 
-				
+
 				int outputIndex = index2DtoLinear(backI, backJ, targetDimension[1]);
 
 				//printf("Back: (%d,%d) %d,%d \n", backI, backJ, inputIndex, outputIndex);
@@ -171,7 +178,7 @@ public:
 	}
 
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
 		if (this->transposed)
 		{
@@ -183,7 +190,7 @@ public:
 		}
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(const Tdata &input, Tdata &output)
 	{
 		if (this->transposed)
 		{
@@ -195,7 +202,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(const Tdata &input, Tdata &output)
 	{
 		if (this->transposed)
 		{
@@ -206,7 +213,7 @@ public:
 			calcTimes(input, output, MINUS);
 		}
 	}
-    
+
 	std::vector<T> getAbsRowSum()
 	{
 		if (this->transposed)
@@ -240,11 +247,11 @@ public:
 
 		this->transposed = true;
 	}
-    
+
     #ifdef __CUDACC__
     thrust::device_vector<T> getAbsRowSumCUDA()
 	{
-		Tvector result(this->getNumRows(),(T)1);
+		Tdata result(this->getNumRows(),(T)1);
 
 		return result;
 	}

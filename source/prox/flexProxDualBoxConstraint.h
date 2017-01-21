@@ -1,19 +1,24 @@
 #ifndef flexProxDualBoxConstraint_H
 #define flexProxDualBoxConstraint_H
 
-
-
 #include "flexProx.h"
 
-template < typename T, typename Tvector >
-class flexProxDualBoxConstraint : public flexProx<T, Tvector>
+template <typename T>
+class flexProxDualBoxConstraint : public flexProx<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	T minVal;
 	T maxVal;
 public:
 
-	flexProxDualBoxConstraint(T _minVal, T _maxVal) : flexProx<T, Tvector>(dualBoxConstraintProx)
+	flexProxDualBoxConstraint(T _minVal, T _maxVal) : flexProx<T>(dualBoxConstraintProx)
 	{
 		minVal = _minVal;
 		maxVal = _maxVal;
@@ -23,7 +28,7 @@ public:
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
-    
+
     #ifdef __CUDACC__
 	struct flexProxDualBoxConstraintFunctor
 	{
@@ -42,14 +47,14 @@ public:
 	};
     #endif
 
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		#ifdef __CUDACC__
             for (int k = 0; k < dualNumbers.size(); k++)
             {
                 auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[k]].begin(), data->yTilde[dualNumbers[k]].begin(), data->sigmaElt[dualNumbers[k]].begin()));
                 auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[k]].end(),   data->yTilde[dualNumbers[k]].end(),   data->sigmaElt[dualNumbers[k]].end()));
-                
+
                 thrust::for_each(startIterator,endIterator,flexProxDualBoxConstraintFunctor(this->minVal,this->maxVal));
             }
 		#else
@@ -69,8 +74,8 @@ public:
 			}
 		#endif
 	}
-	
-	void applyProx(T alpha, flexBoxData<T, Tvector>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tvector> &fList)
+
+	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers, std::vector<Tdata> &fList)
 	{
 
 	}

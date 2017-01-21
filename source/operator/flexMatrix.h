@@ -5,23 +5,30 @@
 
 #include <vector>
 
-template < typename T, typename Tvector >
-class flexMatrix : public flexLinearOperator<T, Tvector>
+template<typename T>
+class flexMatrix : public flexLinearOperator<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	std::vector<int> rowToIndexList;
 	std::vector<int> indexList;
-	Tvector valueList;
+	Tdata valueList;
 
 public:
-	flexMatrix(void) : indexList(), valueList(), rowToIndexList(), flexLinearOperator<T, Tvector>(0, 0, matrixGPUOp){};
+	flexMatrix(void) : indexList(), valueList(), rowToIndexList(), flexLinearOperator<T>(0, 0, matrixGPUOp){};
 
-	flexMatrix(int  _numRows, int  _numCols) : rowToIndexList(_numRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T, Tvector>(_numRows, _numCols, matrixGPUOp){};
+	flexMatrix(int  _numRows, int  _numCols) : rowToIndexList(_numRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(_numRows, _numCols, matrixGPUOp){};
 
-	flexMatrix<T, Tvector>* copy()
+	flexMatrix<T>* copy()
 	{
-		flexMatrix<T, Tvector>* A = new flexMatrix<T, Tvector>(this->getNumRows(), this->getNumCols());
-		
+		flexMatrix<T>* A = new flexMatrix<T>(this->getNumRows(), this->getNumCols());
+
 		A->rowToIndexList = rowToIndexList;
 		A->indexList = indexList;
 		A->valueList = valueList;
@@ -30,7 +37,7 @@ public:
 	}
 
 
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
 		#pragma omp parallel for
 		for (int i = 0; i < this->getNumRows(); ++i)
@@ -46,7 +53,7 @@ public:
 		}
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(const Tdata &input, Tdata &output)
 	{
 		#pragma omp parallel for
 		for (int i = 0; i < this->getNumRows(); ++i)
@@ -62,7 +69,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(const Tdata &input, Tdata &output)
 	{
 		#pragma omp parallel for
 		for (int i = 0; i < this->getNumRows(); i++)
@@ -92,7 +99,7 @@ public:
 	}
 
 	//this is the fast way to fill flexMatrix
-	void blockInsert(std::vector<int> &indexI,const  std::vector<int> &indexJ,const Tvector &indexVal)
+	void blockInsert(std::vector<int> &indexI,const  std::vector<int> &indexJ,const Tdata &indexVal)
 	{
 		//clear matrix
 		//clear();
@@ -242,7 +249,7 @@ public:
 	{
 		std::vector<int> tmpindexI(0, 0);
 		std::vector<int> tmpindexJ(0, 0);
-		Tvector tmpindexVal(0,(T)0);
+		Tdata tmpindexVal(0,(T)0);
 
 		for (int i = 0; i < this->getNumRows(); i++)
 		{

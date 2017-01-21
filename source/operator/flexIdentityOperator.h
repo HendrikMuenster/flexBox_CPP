@@ -6,27 +6,34 @@
 #include "tools.h"
 #include "flexLinearOperator.h"
 
-template < typename T, typename Tvector >
-class flexIdentityOperator : public flexLinearOperator<T, Tvector>
+template<typename T>
+class flexIdentityOperator : public flexLinearOperator<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	bool minus;
 public:
 
-	flexIdentityOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T, Tvector>(_numRows, _numCols, identityOp)
+	flexIdentityOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T>(_numRows, _numCols, identityOp)
 	{
 		minus = _minus;
 	};
 
-	flexIdentityOperator<T, Tvector>* copy()
+	flexIdentityOperator<T>* copy()
 	{
-		flexIdentityOperator<T, Tvector>* A = new flexIdentityOperator<T, Tvector>(this->getNumRows(), this->getNumCols(), this->minus);
+		flexIdentityOperator<T>* A = new flexIdentityOperator<T>(this->getNumRows(), this->getNumCols(), this->minus);
 
 		return A;
 	}
 
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
 		int numElements = (int)output.size();
 
@@ -50,7 +57,7 @@ public:
 		}
 	}
 
-	void doTimesPlus(const Tvector &input, Tvector &output)
+	void doTimesPlus(const Tdata &input, Tdata &output)
 	{
 		#ifdef __CUDACC__
 			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::plus<T>());
@@ -64,7 +71,7 @@ public:
 		#endif
 	}
 
-	void doTimesMinus(const Tvector &input, Tvector &output)
+	void doTimesMinus(const Tdata &input, Tdata &output)
 	{
 		#ifdef __CUDACC__
 			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::minus<T>());
@@ -78,7 +85,7 @@ public:
 		#endif
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(const Tdata &input, Tdata &output)
 	{
 		if (this->minus == true)
 		{
@@ -90,7 +97,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(const Tdata &input, Tdata &output)
 	{
 		if (this->minus == true)
 		{

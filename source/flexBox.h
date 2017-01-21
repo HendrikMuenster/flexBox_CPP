@@ -22,10 +22,10 @@
 
 #include <vector>
 
-template < typename T, typename Tdata >
+template <typename T>
 class flexBox
 {
-	typedef flexLinearOperator < T, Tdata > linOpType;
+	typedef flexLinearOperator<T> linOpType;
 
 	private:
 
@@ -39,10 +39,10 @@ class flexBox
 		int verbose;
 
 		//List of dimensions
-		std::vector<std::vector<int> > dims;
+		std::vector<std::vector<int>> dims;
 
-		flexBoxData<T,Tdata>* data;
-		flexSolver<T, Tdata>* solver;
+		flexBoxData<T>* data;
+		flexSolver<T>* solver;
 
 		bool isMATLAB; // indicates whether flexBox is used via MALTAB
 
@@ -56,11 +56,11 @@ class flexBox
 			this->verbose = static_cast<int>(0);
 
 			#ifdef __CUDACC__
-				this->data = new flexBoxDataGPU<T, Tdata>();
-				this->solver = new flexSolverPrimalDualCuda<T, Tdata>();
+				this->data = new flexBoxDataGPU<T>();
+				this->solver = new flexSolverPrimalDualCuda<T>();
 			#else
-				this->data = new flexBoxDataCPU<T, Tdata>();
-				this->solver = new flexSolverPrimalDual<T, Tdata>();
+				this->data = new flexBoxDataCPU<T>();
+				this->solver = new flexSolverPrimalDual<T>();
 			#endif
 
 			this->isMATLAB = false;
@@ -124,12 +124,12 @@ class flexBox
 			return getNumPrimalVars() - 1;
 		}
 
-		void addPrimal(flexTermPrimal<T,Tdata>* _primalPart, std::vector<int> _correspondingPrimals)
+		void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals)
 		{
 			solver->addPrimal(_primalPart, _correspondingPrimals);
 		}
 
-		void addDual(flexTermDual<T, Tdata>* _dualPart, std::vector<int> _correspondingPrimals)
+		void addDual(flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals)
 		{
 			solver->addDual(data, _dualPart, _correspondingPrimals);
 		}

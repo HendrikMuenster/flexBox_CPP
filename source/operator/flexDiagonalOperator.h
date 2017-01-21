@@ -1,62 +1,73 @@
 #ifndef flexDiagonalOperator_H
 #define flexDiagonalOperator_H
 
-#include "vector"
+#include <vector>
 #include "flexLinearOperator.h"
 
-template < typename T, typename Tvector >
-class flexDiagonalOperator : public flexLinearOperator<T, Tvector>
+template <typename T>
+class flexDiagonalOperator : public flexLinearOperator<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
-	Tvector diagonalElements;
+	Tdata diagonalElements;
 public:
 
-	flexDiagonalOperator(std::vector<T> _diagonalElements) : flexLinearOperator<T, Tvector>((int)_diagonalElements.size(), (int)_diagonalElements.size(), diagonalOp)
+	flexDiagonalOperator(std::vector<T> aDiagonalElements)
+	: flexLinearOperator<T>(static_cast<int>(aDiagonalElements.size()), static_cast<int>(aDiagonalElements.size()), diagonalOp)
 	{
-		this->diagonalElements.resize((int)_diagonalElements.size());
+		this->diagonalElements.resize(aDiagonalElements.size());
 
 		#ifdef __CUDACC__
-			thrust::copy(_diagonalElements.begin(), _diagonalElements.end(), this->diagonalElements.begin());
+			thrust::copy(aDiagonalElements.begin(), aDiagonalElements.end(), this->diagonalElements.begin());
 
 		#else
-			this->diagonalElements = _diagonalElements;
+			this->diagonalElements = aDiagonalElements;
 		#endif
-	};
+	}
 
 	#ifdef __CUDACC__
-	flexDiagonalOperator(Tvector _diagonalElements) : diagonalElements(_diagonalElements), flexLinearOperator<T, Tvector>((int)_diagonalElements.size(), (int)_diagonalElements.size(), diagonalOp){};
+		flexDiagonalOperator(Tdata aDiagonalElements) : diagonalElements(aDiagonalElements), flexLinearOperator<T>(static_cast<int>(aDiagonalElements.size()), static_cast<int>(aDiagonalElements.size()), diagonalOp)
+		{
+
+		};
 	#endif
 
-	flexDiagonalOperator<T, Tvector>* copy()
+	flexDiagonalOperator<T>* copy()
 	{
-		flexDiagonalOperator<T, Tvector>* A = new flexDiagonalOperator<T, Tvector>(this->diagonalElements);
+		flexDiagonalOperator<T>* A = new flexDiagonalOperator<T>(this->diagonalElements);
 
 		return A;
 	}
-    
-    #ifdef __CUDACC__
-    struct flexDiagonalOperatorTimesFunctor
-	{
-		__host__ __device__ 
-		flexDiagonalOperatorTimesFunctor(){}
 
-		template <typename Tuple>
-		__host__ __device__
-		void operator()(Tuple t)
+  #ifdef __CUDACC__
+	  struct flexDiagonalOperatorTimesFunctor
 		{
-            thrust::get<0>(t) = thrust::get<1>(t) * thrust::get<2>(t);
-		}
-	};
-    #endif
-    
+			__host__ __device__
+			flexDiagonalOperatorTimesFunctor(){}
+
+			template <typename Tuple>
+			__host__ __device__
+			void operator()(Tuple t)
+			{
+	            thrust::get<0>(t) = thrust::get<1>(t) * thrust::get<2>(t);
+			}
+		};
+  #endif
+
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
         #ifdef __CUDACC__
             thrust::for_each(
                 thrust::make_zip_iterator(thrust::make_tuple(output.begin(), input.begin(), this->diagonalElements.begin())),
                 thrust::make_zip_iterator(thrust::make_tuple(output.end(),   input.end(),   this->diagonalElements.end())),
-			flexDiagonalOperatorTimesFunctor());
+				flexDiagonalOperatorTimesFunctor());
         #else
             int numElements = (int)output.size();
 
@@ -67,11 +78,11 @@ public:
             }
         #endif
 	}
-    
-    #ifdef __CUDACC__
-    struct flexDiagonalOperatorTimesPlusFunctor
+
+  #ifdef __CUDACC__
+  struct flexDiagonalOperatorTimesPlusFunctor
 	{
-		__host__ __device__ 
+		__host__ __device__
 		flexDiagonalOperatorTimesPlusFunctor(){}
 
 		template <typename Tuple>
@@ -81,46 +92,48 @@ public:
             thrust::get<0>(t) += thrust::get<1>(t) * thrust::get<2>(t);
 		}
 	};
-    #endif
-	void timesPlus(const Tvector &input, Tvector &output)
-	{
-        #ifdef __CUDACC__
-            thrust::for_each(
-                thrust::make_zip_iterator(thrust::make_tuple(output.begin(), input.begin(), this->diagonalElements.begin())),
-                thrust::make_zip_iterator(thrust::make_tuple(output.end(),   input.end(),   this->diagonalElements.end())),
-			flexDiagonalOperatorTimesPlusFunctor());
-        #else
-            int numElements = (int)output.size();
+  #endif
 
-            #pragma omp parallel for
-            for (int i = 0; i < numElements; ++i)
-            {
-                output[i] += input[i] * this->diagonalElements[i];
-            }
-        #endif
+	void timesPlus(const Tdata &input, Tdata &output)
+	{
+		#ifdef __CUDACC__
+			thrust::for_each(
+			    thrust::make_zip_iterator(thrust::make_tuple(output.begin(), input.begin(), this->diagonalElements.begin())),
+			    thrust::make_zip_iterator(thrust::make_tuple(output.end(),   input.end(),   this->diagonalElements.end())),
+				flexDiagonalOperatorTimesPlusFunctor());
+    #else
+	    int numElements = (int)output.size();
+
+	    #pragma omp parallel for
+	    for (int i = 0; i < numElements; ++i)
+	    {
+	        output[i] += input[i] * this->diagonalElements[i];
+	    }
+		#endif
 	}
 
-    #ifdef __CUDACC__
-    struct flexDiagonalOperatorTimesMinusFunctor
-	{
-		__host__ __device__ 
-		flexDiagonalOperatorTimesMinusFunctor(){}
-
-		template <typename Tuple>
-		__host__ __device__
-		void operator()(Tuple t)
+  #ifdef __CUDACC__
+	  struct flexDiagonalOperatorTimesMinusFunctor
 		{
-            thrust::get<0>(t) -= thrust::get<1>(t) * thrust::get<2>(t);
-		}
-	};
-    #endif
-	void timesMinus(const Tvector &input, Tvector &output)
+			__host__ __device__
+			flexDiagonalOperatorTimesMinusFunctor(){}
+
+			template <typename Tuple>
+			__host__ __device__
+			void operator()(Tuple t)
+			{
+				thrust::get<0>(t) -= thrust::get<1>(t) * thrust::get<2>(t);
+			}
+		};
+  #endif
+
+	void timesMinus(const Tdata &input, Tdata &output)
 	{
         #ifdef __CUDACC__
             thrust::for_each(
                 thrust::make_zip_iterator(thrust::make_tuple(output.begin(), input.begin(), this->diagonalElements.begin())),
                 thrust::make_zip_iterator(thrust::make_tuple(output.end(),   input.end(),   this->diagonalElements.end())),
-			flexDiagonalOperatorTimesPlusFunctor());
+				flexDiagonalOperatorTimesPlusFunctor());
         #else
             int numElements = (int)output.size();
 
@@ -135,6 +148,7 @@ public:
 	std::vector<T> getAbsRowSum()
 	{
 		std::vector<T> result(this->getNumRows());
+
 		#pragma omp parallel for
 		for (int k = 0; k < this->getNumRows(); ++k)
 		{
@@ -146,7 +160,7 @@ public:
 
 	T getMaxRowSumAbs()
 	{
-		Tvector diagonalElementsCopy = this->diagonalElements;
+		Tdata diagonalElementsCopy = this->diagonalElements;
 
 		vectorAbs(diagonalElementsCopy);
 
@@ -159,7 +173,7 @@ public:
 	#ifdef __CUDACC__
 	thrust::device_vector<T> getAbsRowSumCUDA()
 	{
-		Tvector diagonalElementsCopy = this->diagonalElements;
+		Tdata diagonalElementsCopy = this->diagonalElements;
 
 		vectorAbs(diagonalElementsCopy);
 

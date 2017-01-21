@@ -5,18 +5,18 @@
 
 using namespace thrust::placeholders;
 
-template < class T, class Tvector >
-class flexSolverPrimalDualCuda : public  flexSolver<T,Tvector>
+template<typename T>
+class flexSolverPrimalDualCuda : public  flexSolver<T>
 {
 private:
 	//Params
 	T theta;
 
 	//List of primal terms is list of pointers to terms
-	std::vector<flexTermPrimal<T, Tvector>*> termsPrimal;
+	std::vector<flexTermPrimal<T>*> termsPrimal;
 	//List of dual terms is list of pointers to terms
-	std::vector<flexTermDual<T, Tvector>*> termsDual;
-    
+	std::vector<flexTermDual<T>*> termsDual;
+
     //List of primal variables corresponding to primal terms
 	std::vector<std::vector<int> > pcp;
 	//List of primal variables corresponding to dual terms
@@ -46,14 +46,14 @@ public:
 		}
 	}
 
-	void init(flexBoxData<T, Tvector> *data)
+	void init(flexBoxData<T> *data)
 	{
 		//zero init
 
 		this->calculateTauSigma(data);
 	}
-	
-	void calculateTauSigma(flexBoxData<T, Tvector> *data)
+
+	void calculateTauSigma(flexBoxData<T> *data)
 	{
 		for (int k = 0; k < (int)termsDual.size(); ++k)
 		{
@@ -90,14 +90,14 @@ public:
 		}
 	}
 
-	void addPrimal(flexTermPrimal<T, Tvector>* _primalPart, std::vector<int> _correspondingPrimals)
+	void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals)
 	{
-		termsPrimal.push_back(_primalPart); 
-		
+		termsPrimal.push_back(_primalPart);
+
 		pcp.push_back(_correspondingPrimals);
 	}
 
-	void addDual(flexBoxData<T, Tvector> *data,flexTermDual<T, Tvector>* _dualPart, std::vector<int> _correspondingPrimals)
+	void addDual(flexBoxData<T> *data,flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals)
 	{
 		termsDual.push_back(_dualPart);
 
@@ -112,7 +112,7 @@ public:
 		dcp.push_back(_correspondingPrimals);
 		dcd.push_back(tmpDCD);
 	}
-    
+
     struct yTildeFunctor
     {
         __host__ __device__
@@ -126,25 +126,25 @@ public:
         }
     };
 
-	void yTilde(flexBoxData<T, Tvector>* data, flexTermDual<T, Tvector>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void yTilde(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
         //printf("\n");
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
-            
+
 			const int dualNum = dualNumbers[i];//printf("dual num is %d\n",dualNum);
-            
+
             //yTilde = 0
             vectorScalarSet(data->yTilde[dualNum],(T)0);
-            
+
 			for (int j = 0; j < (int)primalNumbers.size(); ++j)
 			{
 				int operatorNumber = (int)primalNumbers.size() * i + j;//printf("primal num is %d while operator num is %d\n",primalNumbers[j],operatorNumber);
-                
+
                 //yTilde = yTilde + KxBar
 				dualTerm->operatorList[operatorNumber]->timesPlus(data->xBar[primalNumbers[j]], data->yTilde[dualNum]);
 			}
-            
+
             //yTilde = yOld + sigma * yTilde
             thrust::for_each(
                 thrust::make_zip_iterator(thrust::make_tuple(data->yTilde[dualNum].begin(), data->yOld[dualNum].begin(), data->sigmaElt[dualNum].begin())),
@@ -153,20 +153,20 @@ public:
 		}
 	}
 
-	void xTilde(flexBoxData<T, Tvector>* data, flexTermDual<T, Tvector>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void xTilde(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
         //printf("Xtilde\n");
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
 			for (int j = 0; j < (int)primalNumbers.size(); ++j)
 			{
-                
-                
+
+
 				int operatorNumber = (int)primalNumbers.size() * i + j;
 
 				const int primalNum = primalNumbers[j];
 				const int dualNum = dualNumbers[i];
-                
+
                 //printf("dual num is %d\n",dualNum);
                 //printf("primal num is %d while operator num is %d\n",primalNumbers[j],operatorNumber);
 
@@ -174,7 +174,7 @@ public:
 			}
 		}
 	}
-    
+
     struct xTildeFunctor
     {
         __host__ __device__
@@ -188,22 +188,22 @@ public:
         }
     };
 
-	void doIteration(flexBoxData<T, Tvector> *data)
+	void doIteration(flexBoxData<T> *data)
 	{
         //Timer timer;
-        
+
         //timer.reset();
         data->xOld.swap(data->x);
         data->yOld.swap(data->y);
         //timer.end();printf("Time for swap was: %f\n", timer.elapsed());
-        
+
         //if (doTime) timer.reset();
 		for (int i = 0; i < (int)termsDual.size(); ++i)
 		{
 			//timer.reset();
 			this->yTilde(data, termsDual[i], dcd[i], dcp[i]);
 			//timer.end(); printf("Time for termsDual[i]->yTilde(data,sigma, dcd[i], dcp[i]); was: %f\n", timer.elapsed());
-            
+
 			//timer.reset();
 			termsDual[i]->applyProx(data, dcd[i], dcp[i]);
 			//timer.end();printf("Time for termsDual[i]->applyProx(data,sigma, dcd[i], dcp[i]); was: %f\n", timer.elapsed());
@@ -222,7 +222,7 @@ public:
 			this->xTilde(data, termsDual[i], dcd[i], dcp[i]);
 		}
         //timer.end(); printf("Time for this->xTilde was: %f\n", timer.elapsed());
-        
+
         //timer.reset();
 		// set tildeX = xOld - tau * tildeX
 		for (int primalNum = 0; primalNum < data->xTilde.size(); ++primalNum)
@@ -233,7 +233,7 @@ public:
 			xTildeFunctor());
 		}
         //timer.end(); printf("Time for this->xTilde2 was: %f\n", timer.elapsed());
-        
+
 
 		//timer.reset();
 		for (int primalNum = 0; primalNum < (int)termsPrimal.size(); ++primalNum)
@@ -249,11 +249,11 @@ public:
             thrust::transform(data->x[primalNum].begin(), data->x[primalNum].end(),data->xOld[primalNum].begin(), data->xBar[primalNum].begin(), _1 + _1 - _2);
 		}
         //timer.end(); printf("Time for overrelax was: %f\n", timer.elapsed());
-        
+
         //printf("\n\n\nNewIt\n\n\n");
 	}
-    
-	void yError(flexBoxData<T, Tvector>* data, flexTermDual<T, Tvector>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+
+	void yError(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
@@ -273,7 +273,7 @@ public:
 		}
 	}
 
-	void xError(flexBoxData<T, Tvector>* data, flexTermDual<T, Tvector>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void xError(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
@@ -292,7 +292,7 @@ public:
 			}
 		}
 	}
-    
+
     struct calculateErrorFunctor
     {
         __host__ __device__
@@ -306,7 +306,7 @@ public:
         }
     };
 
-	T calculateError(flexBoxData<T, Tvector> *data)
+	T calculateError(flexBoxData<T> *data)
 	{
 		//first part of primal and dual residuals
         //xError = (x - xOld) / tau

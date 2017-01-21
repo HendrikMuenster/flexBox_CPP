@@ -3,49 +3,11 @@
 
 #include "flexBoxData.h"
 
-template < class T, class Tdata >
-class flexBoxDataCPU : public flexBoxData<T, Tdata>
+template <class T>
+class flexBoxDataCPU : public flexBoxData<T>
 {
-	public:
-
-	flexBoxDataCPU() : flexBoxData<T, Tdata>(){}
-
-	void addPrimalVar(int numberOfElements)
-	{
-		Tdata emptyX(numberOfElements, static_cast<T>(0));
-
-		this->x.push_back(emptyX);
-		this->xTmp.push_back(emptyX);
-		this->xOld.push_back(emptyX);
-		this->xBar.push_back(emptyX);
-		this->xTilde.push_back(emptyX);
-		this->xError.push_back(emptyX);
-
-		this->tauElt.push_back(emptyX);
-	}
-
-	void addDualVar(int numberOfElements)
-	{
-		Tdata emptyY(numberOfElements, static_cast<T>(0));
-
-		this->y.push_back(emptyY);
-		this->yTmp.push_back(emptyY);
-		this->yOld.push_back(emptyY);
-		this->yTilde.push_back(emptyY);
-		this->yError.push_back(emptyY);
-
-		this->sigmaElt.push_back(emptyY);
-	}
-
-	int getNumPrimalVars()
-	{
-		return (int)this->x.size();
-	}
-
-	int getNumDualVars()
-	{
-		return (int)this->y.size();
-	}
+public:
+	flexBoxDataCPU() : flexBoxData<T>(){}
 
 	std::vector<T> getPrimal(int i)
 	{
@@ -68,4 +30,4 @@ class flexBoxDataCPU : public flexBoxData<T, Tdata>
 	}
 };
 
-#endif
+#endif //flexBoxDataCPU_H

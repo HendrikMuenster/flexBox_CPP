@@ -8,6 +8,15 @@ set (FlexBox_VERSION_MINOR 4)
 #TODO: add /MP for visual studio parallel builds
 
 ##########################
+#        OPTIONS         #
+##########################
+
+option(USE_OPENMP "Use OpenMP" OFF)
+option(USE_CUDA "Use CUDA" OFF)
+option(BUILD_MATLAB "Build Matlab (mex) interface" OFF)
+option(BUILD_EXAMPLES "Build C++/CUDA examples" ON)
+
+##########################
 #     FILES/INCUDES      #
 ##########################
 
@@ -111,11 +120,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
-
-option(USE_OPENMP "Use OpenMP" OFF)
-option(USE_CUDA "Use CUDA" OFF)
-option(BUILD_MATLAB "Build Matlab (mex) interface" ON)
-option(BUILD_EXAMPLES "Build C++/CUDA examples" OFF)
 
 set (WRAPPERS_DIR "wrappers")
 

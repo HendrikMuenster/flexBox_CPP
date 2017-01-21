@@ -1,15 +1,22 @@
 #ifndef flexGradientOperator_H
 #define flexGradientOperator_H
 
-#include "vector"
+#include <vector>
 #include "flexLinearOperator.h"
 
-template < typename T, typename Tvector >
-class flexGradientOperator : public flexLinearOperator<T, Tvector>
+template<typename T>
+class flexGradientOperator : public flexLinearOperator<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	std::vector<int> inputDimension;
-	
+
 	int* inputDimensionPtr;
 	int gradDirection;
 	int type;
@@ -21,20 +28,20 @@ public:
 	//type:
 	// 0 = forward
 	// 1 = backward
-	flexGradientOperator(std::vector<int> _inputDimension, int _gradDirection, int _type) : flexLinearOperator<T, Tvector>(vectorProduct(_inputDimension), vectorProduct(_inputDimension),gradientOp)
+	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, int aType) : flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp)
 	{
-		
-		this->gradDirection = _gradDirection;
-		this->type = _type;
-		this->transposed = false;
-		this->numberDimensions = (int)_inputDimension.size();
 
-		this->inputDimension = _inputDimension;
+		this->gradDirection = aGradDirection;
+		this->type = aType;
+		this->transposed = false;
+		this->numberDimensions = static_cast<int>(AInputDimension.size());
+
+		this->inputDimension = AInputDimension;
 		this->inputDimensionPtr = this->inputDimension.data();
 
 	};
 
-	flexGradientOperator<T, Tvector>* copy()
+	flexGradientOperator<T>* copy()
 	{
 
 		std::vector<int> dimsCopy;
@@ -42,18 +49,18 @@ public:
 
 		std::copy(this->inputDimension.begin(), this->inputDimension.end(), dimsCopy.begin());
 
-		return new flexGradientOperator<T, Tvector>(dimsCopy, this->gradDirection, this->type);
+		return new flexGradientOperator<T>(dimsCopy, this->gradDirection, this->type);
 	}
 
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
 
 	}
 
 
 
-	void dxp2d(const Tvector &input, Tvector &output, mySign s)
+	void dxp2d(const Tdata &input, Tdata &output, mySign s)
 	{
 		int sizeY = this->inputDimension[1];
 		int sizeX = this->inputDimension[0] - 1;
@@ -87,7 +94,7 @@ public:
 		}
 	}
 
-	void dyp2d(const Tvector &input, Tvector &output, mySign s)
+	void dyp2d(const Tdata &input, Tdata &output, mySign s)
 	{
 		int sizeY = this->inputDimension[1] - 1;
 		int sizeX = this->inputDimension[0];
@@ -121,7 +128,7 @@ public:
 		}
 	}
 
-	void dxp2dTransposed(const Tvector &input, Tvector &output, mySign s)
+	void dxp2dTransposed(const Tdata &input, Tdata &output, mySign s)
 	{
 		int sizeY = this->inputDimension[1];
 		int sizeX = this->inputDimension[0] - 1;
@@ -180,7 +187,7 @@ public:
 		}
 	}
 
-	void dyp2dTransposed(const Tvector &input, Tvector &output, mySign s)
+	void dyp2dTransposed(const Tdata &input, Tdata &output, mySign s)
 	{
 		int sizeY = this->inputDimension[1] - 1;
 		int sizeX = this->inputDimension[0];
@@ -240,7 +247,7 @@ public:
 	}
 
 
-	void timesPlus(const Tvector &input, Tvector &output)
+	void timesPlus(const Tdata &input, Tdata &output)
 	{
         #ifdef __CUDACC__
 			dim3 block2d = dim3(32, 16, 1);
@@ -298,7 +305,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tvector &input, Tvector &output)
+	void timesMinus(const Tdata &input, Tdata &output)
 	{
 		#ifdef __CUDACC__
 			dim3 block2d = dim3(32, 16, 1);
@@ -307,7 +314,7 @@ public:
 			T* ptrOutput = thrust::raw_pointer_cast(output.data());
 			const T* ptrInput = thrust::raw_pointer_cast(input.data());
 		#endif
-        
+
 		if (this->inputDimension.size() == 2)
 		{
 			if (this->gradDirection == 0)
@@ -394,7 +401,7 @@ public:
 		return (i + j*this->inputDimension[0]);
 	}
 
-	#ifdef __CUDACC__	
+	#ifdef __CUDACC__
 	thrust::device_vector<T> getAbsRowSumCUDA()
 	{
 		thrust::device_vector<T> result(this->getNumRows(), (T)2);

@@ -1,32 +1,39 @@
 #ifndef flexZeroOperator_H
 #define flexZeroOperator_H
 
-#include "vector"
+#include <vector>
 #include "flexLinearOperator.h"
 
-template < typename T, typename Tvector >
-class flexZeroOperator : public flexLinearOperator<T, Tvector>
+template<typename T>
+class flexZeroOperator : public flexLinearOperator<T>
 {
-public:
-	flexZeroOperator(int _numRows, int _numCols) : flexLinearOperator<T, Tvector>(_numRows, _numCols, zeroOp){};
 
-	flexZeroOperator<T, Tvector>* copy()
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
+public:
+	flexZeroOperator(int aNumRows, int aNumCols) : flexLinearOperator<T>(aNumRows, aNumCols, zeroOp){};
+
+	flexZeroOperator<T>* copy()
 	{
-		flexZeroOperator<T, Tvector>* A = new flexZeroOperator<T, Tvector>(this->getNumRows(), this->getNumCols());
+		flexZeroOperator<T>* A = new flexZeroOperator<T>(this->getNumRows(), this->getNumCols());
 
 		return A;
 	}
 
 
 	//apply linear operator to vector
-	void times(const Tvector &input, Tvector &output)
+	void times(const Tdata &input, Tdata &output)
 	{
 		vectorScalarSet(output, (T)0);
 	}
 
-	void timesPlus(const Tvector &input, Tvector &output){}
+	void timesPlus(const Tdata &input, Tdata &output){}
 
-	void timesMinus(const Tvector &input, Tvector &output){}
+	void timesMinus(const Tdata &input, Tdata &output){}
 
 	T getMaxRowSumAbs()
 	{
@@ -51,7 +58,7 @@ public:
 #ifdef __CUDACC__
 	thrust::device_vector<T> getAbsRowSumCUDA()
 	{
-		Tvector result(this->getNumRows(),(T)0);
+		Tdata result(this->getNumRows(),(T)0);
 
 		return result;
 	}
