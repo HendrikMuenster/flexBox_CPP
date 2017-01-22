@@ -11,6 +11,13 @@
 template<typename T>
 class flexMatrixGPU : public flexLinearOperator<T>
 {
+
+#ifdef __CUDACC__
+	typedef thrust::device_vector<T> Tdata;
+#else
+	typedef std::vector<T> Tdata;
+#endif
+
 private:
 	cusparseHandle_t handle;
 	cusparseMatDescr_t descrA;
@@ -45,7 +52,7 @@ public:
 			this->nnz = colList[aNumCols]; //access last entry
 		}
 
-        cudaMalloc(&this->listValues, this->nnz * sizeof(T));
+    cudaMalloc(&this->listValues, this->nnz * sizeof(T));
 		cudaMalloc(&this->listColIndices, this->nnz * sizeof(int));
 		cudaMalloc(&this->listRowEntries, (aNumRows + 1) * sizeof(int));
 
@@ -297,37 +304,34 @@ public:
 		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
 
-        for (int row = 0; row < numRowsVector; row++)
+    for (int row = 0; row < numRowsVector; row++)
+    {
+        int starting_col_index = hostRowIndices[row];
+        int stopping_col_index = hostRowIndices[row + 1];
+        if (starting_col_index == stopping_col_index)
+            continue;
+        else
         {
-            int starting_col_index = hostRowIndices[row];
-            int stopping_col_index = hostRowIndices[row + 1];
-            if (starting_col_index == stopping_col_index)
-                continue;
-            else
+            for (int current_col_index = starting_col_index; current_col_index < stopping_col_index; current_col_index++)
             {
-                for (int current_col_index = starting_col_index; current_col_index < stopping_col_index; current_col_index++)
+                if (transposed == false)
                 {
-                    if (transposed == false)
-                    {
-                        resultTmp[row] += std::abs(hostValues[current_col_index]);
-                    }
-                    else
-                    {
-                        resultTmp[hostColIndices[current_col_index]] += std::abs(hostValues[current_col_index]);
-                    }
+                    resultTmp[row] += std::abs(hostValues[current_col_index]);
+                }
+                else
+                {
+                    resultTmp[hostColIndices[current_col_index]] += std::abs(hostValues[current_col_index]);
                 }
             }
         }
+    }
 
-        free(hostValues);
+    free(hostValues);
 		free(hostRowIndices);
 		free(hostColIndices);
 
-        Tdata result(resultTmp.size());
-
-
-        thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
-
+    Tdata result(resultTmp.size());
+    thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
 
 		return result;
 	}
