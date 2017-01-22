@@ -4,6 +4,7 @@ if(CUDA_FOUND)
   #known issue in cmakes CUDA-Module
   include_directories(${Matlab_INCLUDE_DIRS})
   include_directories(${INCLUDE_DIRS})
+  #TODO: use maximum compatibility fallback, dont use fpic on windows systems
   set(CUDA_NVCC_FLAGS --std=c++11 -Xcompiler -fPIC -arch=compute_50 -code=sm_50)
   cuda_compile(cuda_generated functions.cu SHARED)
   matlab_add_mex(NAME Matlab
