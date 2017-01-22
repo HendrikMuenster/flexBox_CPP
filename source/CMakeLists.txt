@@ -180,7 +180,6 @@ endif(BUILD_EXAMPLES AND UNIX)
 add_library(flexBoxLib INTERFACE)
 target_include_directories(flexBoxLib INTERFACE ${INCLUDE_DIRS})
 
-
 add_custom_target(IDE SOURCES ${SOURCES_IDE})
 
 # Matlab target if Matlab was found
