@@ -122,19 +122,6 @@ public:
 		}
 	}
 
-	T timesElement(int index, const T* input)
-	{
-		T rowsum = (T)0;
-		// initialize result
-		int indexNext = this->rowToIndexList[index + 1];
-		for (int elementIndex = this->rowToIndexList[index]; elementIndex < indexNext; ++elementIndex)
-		{
-			rowsum += input[this->indexList[elementIndex]] * this->valueList[elementIndex];
-		}
-
-		return rowsum;
-	}
-
 	//this is the fast way to fill flexMatrix
 	void blockInsert(std::vector<int> &indexI,const  std::vector<int> &indexJ,const Tdata &indexVal)
 	{
@@ -207,19 +194,6 @@ public:
 			++rowToIndexList[index];
 		}
 	}*/
-
-	//clear current matrix
-	void clear()
-	{
-		indexList.clear();
-		valueList.clear();
-
-		//set all rowToIndexList to 0
-		for (int i = 0; i < this->getNumRows() + 1; i++)
-		{
-			rowToIndexList[i] = 0;
-		}
-	}
 
 	T getMaxRowSumAbs(bool transposed)
 	{
