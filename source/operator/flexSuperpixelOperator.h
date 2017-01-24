@@ -217,7 +217,7 @@ public:
 	{
 		if (transposed)
 		{
-			return std::vector<T>(this->getNumRows(), (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor));
+			return std::vector<T>(this->getNumCols(), (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor));
 		}
 		else
 		{

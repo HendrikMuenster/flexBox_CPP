@@ -253,7 +253,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
 			
-			bool isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
+			bool isMinus = false;
+			
+			if (mxGetProperty(pointerA, 0, "isMinus") != NULL) //matrix does not have this property
+			{
+				isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
+			}
 
 			if (checkClassType(pointerA, std::string("gradientOperator")))
 			{

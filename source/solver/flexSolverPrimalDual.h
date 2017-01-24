@@ -116,6 +116,7 @@ public:
 		for (int i = 0; i < aDualPart->getNumberVars(); ++i)
 		{
 			data->addDualVar(aDualPart->dualVarLength(i));
+			
 			tmpDCD.push_back(data->getNumDualVars() - 1);
 		}
 
