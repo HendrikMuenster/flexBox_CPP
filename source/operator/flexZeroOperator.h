@@ -15,54 +15,53 @@ class flexZeroOperator : public flexLinearOperator<T>
 #endif
 
 public:
-	flexZeroOperator(int aNumRows, int aNumCols) : flexLinearOperator<T>(aNumRows, aNumCols, zeroOp){};
+	flexZeroOperator(int aNumRows, int aNumCols, bool _minus) : flexLinearOperator<T>(aNumRows, aNumCols, zeroOp, _minus){};
 
 	flexZeroOperator<T>* copy()
 	{
-		flexZeroOperator<T>* A = new flexZeroOperator<T>(this->getNumRows(), this->getNumCols());
+		flexZeroOperator<T>* A = new flexZeroOperator<T>(this->getNumRows(), this->getNumCols(), this->isMinus);
 
 		return A;
 	}
 
 
 	//apply linear operator to vector
-	void times(const Tdata &input, Tdata &output)
+	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
 		vectorScalarSet(output, (T)0);
 	}
 
-	void timesPlus(const Tdata &input, Tdata &output){}
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output){}
 
-	void timesMinus(const Tdata &input, Tdata &output){}
+	void timesMinus(bool transposed, const Tdata &input, Tdata &output){}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
 		return static_cast<T>(1);
 	}
 
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
 		std::vector<T> result(this->getNumRows(),(T)0);
 
 		return result;
 	}
 
-	//transposing the identity does nothing
-	void transpose()
+	#ifdef __CUDACC__
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
-		int numRowsTmp = this->getNumRows();
-		this->setNumRows(this->getNumCols());
-		this->setNumCols(numRowsTmp);
-	}
-
-#ifdef __CUDACC__
-	thrust::device_vector<T> getAbsRowSumCUDA()
-	{
-		Tdata result(this->getNumRows(),(T)0);
-
+		if (this->getNumCols())
+		{
+			Tdata result(this->getNumCols(),(T)0);
+		}
+		else
+		{
+			Tdata result(this->getNumRows(),(T)0);
+		}
+		
 		return result;
 	}
-#endif
+	#endif
 };
 
 #endif

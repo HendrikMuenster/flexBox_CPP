@@ -252,6 +252,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			int numElementsPrimalVar = vectorProduct(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]));
 
 			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
+			
+			bool isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
 
 			if (checkClassType(pointerA, std::string("gradientOperator")))
 			{
@@ -269,7 +271,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					//gradientTypeInt = 1;
 				}
 
-				operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]), gradientDirection, gradientTypeInt));
+				operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]), gradientDirection, gradientTypeInt, isMinus));
 			}
 			else if (checkClassType(pointerA, std::string("identityOperator")))
 			{
@@ -277,8 +279,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				{
 					printf("Operator %d is type <identityOperator>\n", k);
 				}
-
-				bool isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "minus")) > 0;
 
 				operatorList.push_back(new flexIdentityOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
 			}
@@ -289,7 +289,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					printf("Operator %d is type <zeroOperator>\n", k);
 				}
 
-				operatorList.push_back(new flexZeroOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar));
+				operatorList.push_back(new flexZeroOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
 			}
 			else if (checkClassType(pointerA, std::string("diagonalOperator")))
 			{
@@ -307,7 +307,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					tmpDiagonal[l] = static_cast<floatingType>(tmpDiagonalVector[l]);
 				}
 
-				operatorList.push_back(new flexDiagonalOperator<floatingType>(tmpDiagonal));
+				operatorList.push_back(new flexDiagonalOperator<floatingType>(tmpDiagonal, isMinus));
 			}
             else if (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == false)
 			{
@@ -328,7 +328,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					targetDimension[l] = (int)targetDimensionInput[l];
 				}
 
-				operatorList.push_back(new flexSuperpixelOperator<floatingType>(targetDimension, factor));
+				operatorList.push_back(new flexSuperpixelOperator<floatingType>(targetDimension, factor, isMinus));
 			}
             else if (checkSparse(pointerA) || (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == true))
 			{
@@ -367,9 +367,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 						rowList[l] = ir[l];
 						valList[l] = pr[l];
 					}
-					operatorList.push_back(new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList,false));
+					operatorList.push_back(new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList, false, isMinus));
 				#else
-					flexMatrix<floatingType>*A = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)));
+					flexMatrix<floatingType>*A = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)), isMinus);
 					copyMatlabToFlexmatrix(pointerA, A);
 					operatorList.push_back(A);
 				#endif

@@ -16,28 +16,23 @@ class flexIdentityOperator : public flexLinearOperator<T>
 	typedef std::vector<T> Tdata;
 #endif
 
-private:
-	bool minus;
 public:
 
-	flexIdentityOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T>(_numRows, _numCols, identityOp)
-	{
-		minus = _minus;
-    }
+	flexIdentityOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T>(_numRows, _numCols, identityOp, _minus){}
 
 	flexIdentityOperator<T>* copy()
 	{
-		flexIdentityOperator<T>* A = new flexIdentityOperator<T>(this->getNumRows(), this->getNumCols(), this->minus);
+		flexIdentityOperator<T>* A = new flexIdentityOperator<T>(this->getNumRows(), this->getNumCols(), this->isMinus);
 
 		return A;
 	}
 
 	//apply linear operator to vector
-	void times(const Tdata &input, Tdata &output)
+	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
 		int numElements = (int)output.size();
 
-		if (this->minus == true)
+		if (this->isMinus)
 		{
 			int numElements = (int)input.size();
 			#pragma omp parallel for
@@ -85,9 +80,9 @@ public:
 		#endif
 	}
 
-	void timesPlus(const Tdata &input, Tdata &output)
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		if (this->minus == true)
+		if (this->isMinus)
 		{
 			doTimesMinus(input, output);
 		}
@@ -97,9 +92,9 @@ public:
 		}
 	}
 
-	void timesMinus(const Tdata &input, Tdata &output)
+	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		if (this->minus == true)
+		if (this->isMinus)
 		{
 			doTimesPlus(input, output);
 		}
@@ -109,28 +104,20 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
 		return static_cast<T>(1);
 	}
 
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
 		std::vector<T> result(this->getNumRows(), (T)1);
 
 		return result;
 	}
 
-	//transposing the identity does nothing
-	void transpose()
-	{
-		int numRowsTmp = this->getNumRows();
-		this->setNumRows(this->getNumCols());
-		this->setNumCols(numRowsTmp);
-	}
-
 	#ifdef __CUDACC__
-	thrust::device_vector<T> getAbsRowSumCUDA()
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
 		thrust::device_vector<T> result(this->getNumRows(), (T)1);
 

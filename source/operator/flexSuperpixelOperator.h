@@ -17,13 +17,11 @@ class flexSuperpixelOperator : public flexLinearOperator<T>
 private:
 	std::vector<int> targetDimension;
 	T upsamplingFactor;
-	bool transposed;
 public:
 
-	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_) : flexLinearOperator<T>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp)
+	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_, bool _minus) : flexLinearOperator<T>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp, _minus)
 	{
 		this->targetDimension.resize(targetDimension_.size());
-		this->transposed = false;
 
         this->targetDimension = targetDimension_;
 		this->upsamplingFactor = upsamplingFactor_;
@@ -31,7 +29,7 @@ public:
 
 	flexSuperpixelOperator<T>* copy()
 	{
-		return new flexSuperpixelOperator<T>(this->targetDimension, this->upsamplingFactor);
+		return new flexSuperpixelOperator<T>(this->targetDimension, this->upsamplingFactor, this->isMinus);
 	}
 
 	int indexI(int index, int sizeX)
@@ -122,8 +120,6 @@ public:
 				}
 			}
 		}
-
-		//mexErrMsgTxt("Stop!\n");
 	}
 
 	void calcTimesTransposed(const Tdata &input, Tdata &output, mySign signRule)
@@ -173,50 +169,53 @@ public:
 				}
 			}
 		}
-
-		//mexErrMsgTxt("Stop!\n");
 	}
-
-	//apply linear operator to vector
-	void times(const Tdata &input, Tdata &output)
+	
+	void doTimes(bool transposed, const Tdata &input, Tdata &output, mySign signRule)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
-			calcTimesTransposed(input, output, EQUALS);
+			calcTimesTransposed(input, output, signRule);
 		}
 		else
 		{
-			calcTimes(input, output, EQUALS);
+			calcTimes(input, output, signRule);
 		}
+    }
+
+	//to implement
+	void times(bool transposed, const Tdata &input, Tdata &output)
+	{
+		
 	}
 
-	void timesPlus(const Tdata &input, Tdata &output)
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		if (this->transposed)
-		{
-			calcTimesTransposed(input, output, PLUS);
-		}
-		else
-		{
-			calcTimes(input, output, PLUS);
-		}
+        if (this->isMinus)
+        {
+            doTimes(transposed,input,output, MINUS);
+        }
+        else
+        {
+            doTimes(transposed,input,output, PLUS);
+        }
 	}
 
-	void timesMinus(const Tdata &input, Tdata &output)
+	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		if (this->transposed)
-		{
-			calcTimesTransposed(input, output, MINUS);
-		}
-		else
-		{
-			calcTimes(input, output, MINUS);
-		}
+        if (this->isMinus)
+        {
+            doTimes(transposed,input,output, PLUS);
+        }
+        else
+        {
+            doTimes(transposed,input,output, MINUS);
+        }
 	}
 
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
 			return std::vector<T>(this->getNumRows(), (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor));
 		}
@@ -226,9 +225,9 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
-		if (this->transposed)
+		if (transposed)
 		{
 			return (T)1 / (T)(this->upsamplingFactor*this->upsamplingFactor);
 		}
@@ -238,18 +237,8 @@ public:
 		}
 	}
 
-	//transposing the identity does nothing
-	void transpose()
-	{
-		int numRowsTmp = this->getNumRows();
-		this->setNumRows(this->getNumCols());
-		this->setNumCols(numRowsTmp);
-
-		this->transposed = true;
-	}
-
     #ifdef __CUDACC__
-    thrust::device_vector<T> getAbsRowSumCUDA()
+    thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
 		Tdata result(this->getNumRows(),(T)1);
 

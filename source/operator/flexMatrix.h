@@ -21,13 +21,13 @@ private:
 	Tdata valueList;
 
 public:
-	flexMatrix(void) : indexList(), valueList(), rowToIndexList(), flexLinearOperator<T>(0, 0, matrixGPUOp){};
+	flexMatrix(void) : indexList(), valueList(), rowToIndexList(), flexLinearOperator<T>(0, 0, matrixOp, false){};
 
-	flexMatrix(int  _numRows, int  _numCols) : rowToIndexList(_numRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(_numRows, _numCols, matrixGPUOp){};
+	flexMatrix(int  _numRows, int  _numCols, bool _minus) : rowToIndexList(_numRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(_numRows, _numCols, matrixOp, _minus){};
 
 	flexMatrix<T>* copy()
 	{
-		flexMatrix<T>* A = new flexMatrix<T>(this->getNumRows(), this->getNumCols());
+		flexMatrix<T>* A = new flexMatrix<T>(this->getNumRows(), this->getNumCols(), this->isMinus);
 
 		A->rowToIndexList = rowToIndexList;
 		A->indexList = indexList;
@@ -35,53 +35,90 @@ public:
 
 		return A;
 	}
-
-
-	void times(const Tdata &input, Tdata &output)
+	
+    void doTimesCPU(bool transposed, const Tdata &input, Tdata &output,const mySign s)
 	{
-		#pragma omp parallel for
-		for (int i = 0; i < this->getNumRows(); ++i)
+        if (transposed)
 		{
-			T rowsum = (T)0;
-			// initialize result
-			int indexNext = rowToIndexList[i + 1];
-			for (int index = rowToIndexList[i]; index < indexNext; ++index)
+            //todo: check if transposed multiplication can be parallelized
+            for (int i = 0; i < this->getNumRows(); ++i)
+            {
+                int indexNext = rowToIndexList[i + 1];
+                for (int index = rowToIndexList[i]; index < indexNext; ++index)
+                {
+                    switch (s)
+                    {
+                        case PLUS:
+                        {
+                            output[indexList[index]] += input[i] * valueList[index];
+                            break;
+                        }
+                        case MINUS:
+                        {
+                            output[indexList[index]] -= input[i] * valueList[index];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+			#pragma omp parallel for
+			for (int i = 0; i < this->getNumRows(); ++i)
 			{
-				rowsum += input[indexList[index]] * valueList[index];
+				T rowsum = (T)0;
+				// initialize result
+				int indexNext = rowToIndexList[i + 1];
+				for (int index = rowToIndexList[i]; index < indexNext; ++index)
+				{
+					rowsum += input[indexList[index]] * valueList[index];
+				}
+                
+                switch (s)
+                {
+                    case PLUS:
+                    {
+                        output[i] += rowsum;
+                        break;
+                    }
+                    case MINUS:
+                    {
+                        output[i] -= rowsum;
+                        break;
+                    }
+                }
 			}
-			output[i] = rowsum;
+        }
+    }
+
+
+	void times(bool transposed, const Tdata &input, Tdata &output)
+	{
+        
+	}
+
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
+	{
+		if (this->isMinus)
+		{
+			doTimesCPU(transposed, input, output,MINUS);
+		}
+		else
+		{
+			doTimesCPU(transposed, input, output,PLUS);
 		}
 	}
 
-	void timesPlus(const Tdata &input, Tdata &output)
+	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		#pragma omp parallel for
-		for (int i = 0; i < this->getNumRows(); ++i)
+		if (this->isMinus)
 		{
-			T rowsum = (T)0;
-			// initialize result
-			int indexNext = rowToIndexList[i + 1];
-			for (int index = rowToIndexList[i]; index < indexNext; ++index)
-			{
-				rowsum += input[indexList[index]] * valueList[index];
-			}
-			output[i] += rowsum;
+			doTimesCPU(transposed, input, output,PLUS);
 		}
-	}
-
-	void timesMinus(const Tdata &input, Tdata &output)
-	{
-		#pragma omp parallel for
-		for (int i = 0; i < this->getNumRows(); i++)
+		else
 		{
-			T rowsum = (T)0;
-			// initialize result
-			int indexNext = rowToIndexList[i + 1];
-			for (int index = rowToIndexList[i]; index < indexNext; ++index)
-			{
-				rowsum += input[indexList[index]] * valueList[index];
-			}
-			output[i] -= rowsum;
+			doTimesCPU(transposed, input, output,MINUS);
 		}
 	}
 
@@ -184,45 +221,50 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
-		T maxSum = static_cast<T>(0);
-
-		for (int i = 0; i < this->getNumRows(); ++i)
-		{
-			T tmpSum = static_cast<T>(0);
-			for (int index = rowToIndexList[i]; index < rowToIndexList[i + 1]; ++index)
-			{
-				tmpSum += abs(valueList[index]);
-			}
-
-			if (tmpSum > maxSum)
-			{
-				maxSum = tmpSum;
-			}
-		}
-
-		return maxSum;
+		std::vector<T> rowSum = this->getAbsRowSum(transposed);
+		
+		return *std::max_element(rowSum.begin(), rowSum.end());
 	}
 
 
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
-		std::vector<T> result(this->getNumRows());
-		#pragma omp parallel for
-		for (int k = 0; k < this->getNumRows(); ++k)
+		if (transposed)
 		{
-			T tmpSum = static_cast<T>(0);
-			for (int index = rowToIndexList[k]; index < rowToIndexList[k + 1]; ++index)
+			std::vector<T> result(this->getNumCols());
+			
+			//todo check if omp is possible
+			for (int k = 0; k < this->getNumRows(); ++k)
 			{
-				tmpSum += std::abs(valueList[index]);
+				for (int index = rowToIndexList[k]; index < rowToIndexList[k + 1]; ++index)
+				{
+					result[indexList[index]] += std::abs(valueList[index]);
+				}
 			}
-
-
-			result[k] = tmpSum;
+			
+			return result;
 		}
+		else
+		{
+			std::vector<T> result(this->getNumRows());
+			
+			#pragma omp parallel for
+			for (int k = 0; k < this->getNumRows(); ++k)
+			{
+				T tmpSum = static_cast<T>(0);
+				for (int index = rowToIndexList[k]; index < rowToIndexList[k + 1]; ++index)
+				{
+					tmpSum += std::abs(valueList[index]);
+				}
 
-		return result;
+
+				result[k] = tmpSum;
+			}
+			
+			return result;
+		}
 	}
 
 
@@ -244,35 +286,9 @@ public:
 		}
 	}
 
-	//transpose current matrix
-	void transpose()
-	{
-		std::vector<int> tmpindexI(0, 0);
-		std::vector<int> tmpindexJ(0, 0);
-		Tdata tmpindexVal(0,(T)0);
-
-		for (int i = 0; i < this->getNumRows(); i++)
-		{
-			for (int index = rowToIndexList[i]; index < rowToIndexList[i + 1]; ++index)
-			{
-				tmpindexI.push_back(indexList[index]);
-				tmpindexJ.push_back(i);
-				tmpindexVal.push_back(valueList[index]);
-			}
-		}
-
-		this->clear();
-
-		int numRowsTmp = this->getNumRows();
-		this->setNumRows(this->getNumCols());
-		this->setNumCols(numRowsTmp);
-		this->rowToIndexList.resize(this->getNumRows() + 1);
-
-		this->blockInsert(tmpindexI, tmpindexJ, tmpindexVal);
-	}
     //DUMMY FUNCTION
     #ifdef __CUDACC__
-    thrust::device_vector<T> getAbsRowSumCUDA()
+    thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
 		thrust::device_vector<T> result(this->getNumRows(), (T)1);
 

@@ -22,7 +22,6 @@ public:
     const prox p;
     T alpha;
     std::vector<flexLinearOperator<T>* > operatorList;
-    std::vector<flexLinearOperator<T>* > operatorListT;
 
 	flexProx<T>* myProx;
     std::vector<Tdata> fList;
@@ -47,18 +46,6 @@ public:
         }
 
         this->operatorList = aOperatorList;
-
-        //create sigma and tau
-        for (int i = 0; i < aOperatorList.size() / numberPrimals; ++i)
-        {
-            for (int j = 0; j < numberPrimals; ++j)
-            {
-                int opNum = i*numberPrimals + j;
-
-                this->operatorListT.push_back(this->operatorList[opNum]->copy());
-                this->operatorListT[opNum]->transpose();
-            }
-        }
     }
 
     int getNumberVars()
@@ -78,11 +65,9 @@ public:
         for (int i = (int)operatorList.size() - 1; i >= 0; --i)
         {
             delete operatorList[i];
-            delete operatorListT[i];
         }
 
         operatorList.clear();
-        operatorListT.clear();
 
 		if (VERBOSE > 0) printf("Destructor of data term!");
 	}

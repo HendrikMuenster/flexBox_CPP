@@ -28,13 +28,9 @@ private:
 
 	int nnz;
 
-	bool transposed;
-
 public:
-	flexMatrixGPU(int  aNumRows, int  aNumCols, int* rowList, int *colList, T* indexVal, bool formatCRS) : flexLinearOperator<T>(aNumRows, aNumCols, matrixGPUOp)
+	flexMatrixGPU(int  aNumRows, int  aNumCols, int* rowList, int *colList, T* indexVal, bool formatCRS, bool _minus) : flexLinearOperator<T>(aNumRows, aNumCols, matrixGPUOp, _minus)
 	{
-		transposed = false;
-
 		//create sparse matrix
 		cusparseCreate(&this->handle);
 		cusparseCreateMatDescr(&this->descrA);
@@ -52,7 +48,7 @@ public:
 			this->nnz = colList[aNumCols]; //access last entry
 		}
 
-    cudaMalloc(&this->listValues, this->nnz * sizeof(T));
+		cudaMalloc(&this->listValues, this->nnz * sizeof(T));
 		cudaMalloc(&this->listColIndices, this->nnz * sizeof(int));
 		cudaMalloc(&this->listRowEntries, (aNumRows + 1) * sizeof(int));
 
@@ -156,7 +152,7 @@ public:
 		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
 
-		flexMatrixGPU<T>* A = new flexMatrixGPU<T>(this->getNumRows(), this->getNumCols(), hostRowIndices, hostColIndices, hostValues,true);
+		flexMatrixGPU<T>* A = new flexMatrixGPU<T>(this->getNumRows(), this->getNumCols(), hostRowIndices, hostColIndices, hostValues,true, this->isMinus);
 
 		free(hostValues);
 		free(hostRowIndices);
@@ -165,9 +161,17 @@ public:
 		return A;
 	}
 
-	void times(const Tdata &input, Tdata &output)
+	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
-		const T alpha = (T)1;
+        if (this->isMinus)
+        {
+            const T alpha = (T)-1;
+        }
+        else
+        {
+            const T alpha = (T)1;
+        }
+		
 		const T beta = (T)0;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -183,9 +187,17 @@ public:
 		}
 	}
 
-	void timesPlus(const Tdata &input, Tdata &output)
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		const T alpha = (T)1;
+		if (this->isMinus)
+        {
+            const T alpha = (T)-1;
+        }
+        else
+        {
+            const T alpha = (T)1;
+        }
+		
 		const T beta = (T)1;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -201,9 +213,16 @@ public:
 		}
 	}
 
-	void timesMinus(const Tdata &input, Tdata &output)
+	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		const T alpha = -(T)1;
+		if (this->isMinus)
+        {
+            const T alpha = (T)1;
+        }
+        else
+        {
+            const T alpha = (T)-1;
+        }
 		const T beta = (T)1;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -219,7 +238,7 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs()
+	T getMaxRowSumAbs(bool transposed)
 	{
 		//todo
 
@@ -227,7 +246,7 @@ public:
 	}
 
     //dummy, this function is not used in a CUDA setting
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
         std::vector<T> result(1);
 
@@ -256,33 +275,12 @@ public:
 		free(hostColIndices);
 	}
 
-	//transpose current matrix
-	void transpose()
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
-        int numRowsTmp = this->getNumRows();
-        this->setNumRows(this->getNumCols());
-        this->setNumCols(numRowsTmp);
-
-		if (transposed == false)
-		{
-            transposed = true;
-		}
-		else
-		{
-			transposed = false;
-		}
-	}
-
-
-#ifdef __CUDACC__
-
-
-	thrust::device_vector<T> getAbsRowSumCUDA()
-	{
-
+        
         std::vector<T> resultTmp;
-
-
+		
+        
         int numRowsVector = 0;
         if (transposed == false)
         {
@@ -294,7 +292,7 @@ public:
             resultTmp.resize(this->getNumCols());
             numRowsVector = this->getNumCols();
         }
-
+        
 		//allocate memory
 		T *hostValues = (T *)malloc(this->nnz * sizeof(T));
 		int *hostRowIndices = (int *)malloc((this->getNumRows() + 1) * sizeof(int));
@@ -304,38 +302,40 @@ public:
 		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
 
-    for (int row = 0; row < numRowsVector; row++)
-    {
-        int starting_col_index = hostRowIndices[row];
-        int stopping_col_index = hostRowIndices[row + 1];
-        if (starting_col_index == stopping_col_index)
-            continue;
-        else
+        for (int row = 0; row < numRowsVector; row++)
         {
-            for (int current_col_index = starting_col_index; current_col_index < stopping_col_index; current_col_index++)
+            int starting_col_index = hostRowIndices[row];
+            int stopping_col_index = hostRowIndices[row + 1];
+            if (starting_col_index == stopping_col_index)
+                continue;
+            else
             {
-                if (transposed == false)
+                for (int current_col_index = starting_col_index; current_col_index < stopping_col_index; current_col_index++)
                 {
-                    resultTmp[row] += std::abs(hostValues[current_col_index]);
-                }
-                else
-                {
-                    resultTmp[hostColIndices[current_col_index]] += std::abs(hostValues[current_col_index]);
+                    if (transposed == false)
+                    {
+                        resultTmp[row] += std::abs(hostValues[current_col_index]);
+                    }
+                    else
+                    {
+                        resultTmp[hostColIndices[current_col_index]] += std::abs(hostValues[current_col_index]);
+                    }
                 }
             }
         }
-    }
-
-    free(hostValues);
+        
+        free(hostValues);
 		free(hostRowIndices);
 		free(hostColIndices);
+        
+        Tvector result(resultTmp.size());
 
-    Tdata result(resultTmp.size());
-    thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
+        
+        thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
+        
 
 		return result;
 	}
-#endif
 };
 
 #endif

@@ -18,8 +18,9 @@ private:
 	int numCols;
 public:
 	linOp type;
+	bool isMinus;
 
-	flexLinearOperator(int aNumRows, int aNumCols) : numRows(aNumRows), numCols(aNumCols), type(linearOp)
+	flexLinearOperator(int aNumRows, int aNumCols, linOp _type, bool _isMinus) : numRows(aNumRows), numCols(aNumCols), type(linearOp), isMinus(_isMinus)
 	{
 
 	}
@@ -27,11 +28,6 @@ public:
 	virtual ~flexLinearOperator()
 	{
 		if (VERBOSE > 0) printf("Linear operator destructor");
-	}
-
-    flexLinearOperator(int aNumRows, int aNumCols, linOp aType) : numRows(aNumRows), numCols(aNumCols), type(aType)
-	{
-
 	}
 
 	int getNumCols() const
@@ -53,27 +49,29 @@ public:
 	{
 		numRows = aNumRows;
 	}
+	
+	void setMinus(bool _isMinus)
+    {
+        this->isMinus = _isMinus;
+    }
 
 	virtual flexLinearOperator<T>* copy() = 0;
 
 	//apply linear operator to vector
-	virtual void times(const Tdata &input, Tdata &output) = 0;
+	virtual void times(bool transposed, const Tdata &input, Tdata &output) = 0;
 
-	virtual void timesPlus(const Tdata &input, Tdata &output) = 0;
+	virtual void timesPlus(bool transposed, const Tdata &input, Tdata &output) = 0;
 
-	virtual void timesMinus(const Tdata &input, Tdata &output) = 0;
+	virtual void timesMinus(bool transposed, const Tdata &input, Tdata &output) = 0;
 
-	virtual std::vector<T> getAbsRowSum() = 0;
+	virtual std::vector<T> getAbsRowSum(bool transposed) = 0;
 
 	#ifdef __CUDACC__
-		virtual thrust::device_vector<T> getAbsRowSumCUDA() = 0;
+		virtual thrust::device_vector<T> getAbsRowSumCUDA(bool transposed) = 0;
 	#endif
 
 	//used for preconditioning
-	virtual T getMaxRowSumAbs() = 0;
-
-	//transpose current matrix
-	virtual void transpose() = 0;
+	virtual T getMaxRowSumAbs(bool transposed) = 0;
 };
 
 #endif

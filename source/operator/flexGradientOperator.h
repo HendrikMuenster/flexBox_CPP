@@ -28,12 +28,11 @@ public:
 	//type:
 	// 0 = forward
 	// 1 = backward
-	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, int aType) : flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp)
+	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, int aType, bool _minus) : flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp, _minus)
 	{
 
 		this->gradDirection = aGradDirection;
 		this->type = aType;
-		this->transposed = false;
 		this->numberDimensions = static_cast<int>(AInputDimension.size());
 
 		this->inputDimension = AInputDimension;
@@ -49,11 +48,11 @@ public:
 
 		std::copy(this->inputDimension.begin(), this->inputDimension.end(), dimsCopy.begin());
 
-		return new flexGradientOperator<T>(dimsCopy, this->gradDirection, this->type);
+		return new flexGradientOperator<T>(dimsCopy, this->gradDirection, this->type, this->isMinus);
 	}
 
 	//apply linear operator to vector
-	void times(const Tdata &input, Tdata &output)
+	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
 
 	}
@@ -247,7 +246,7 @@ public:
 	}
 
 
-	void timesPlus(const Tdata &input, Tdata &output)
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
         #ifdef __CUDACC__
 			dim3 block2d = dim3(32, 16, 1);
@@ -256,44 +255,58 @@ public:
 			T* ptrOutput = thrust::raw_pointer_cast(output.data());
 			const T* ptrInput = thrust::raw_pointer_cast(input.data());
 		#endif
+		
+        mySign s;
+        int s2;
+		
+		if (this->isMinus)
+        {
+            s = MINUS;
+            s2 = SIGN_MINUS;
+		}
+        else
+        {
+            s = PLUS;
+            s2 = SIGN_PLUS;
+        }
 
 		if (this->inputDimension.size() == 2)
 		{
 			if (this->gradDirection == 0)
 			{
-				if (this->transposed == false)
+				if (transposed == false)
 				{
 					#ifdef __CUDACC__
-						dxp2dCUDA << <grid2d, block2d >> >(ptrOutput,ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_PLUS);
+						dxp2dCUDA << <grid2d, block2d >> >(ptrOutput,ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dxp2d(input,output,PLUS);
+						this->dxp2d(input,output,s);
 					#endif
 				}
 				else
 				{
 					#ifdef __CUDACC__
-						dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_PLUS);
+						dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dxp2dTransposed(input, output, PLUS);
+						this->dxp2dTransposed(input, output, s);
 					#endif
 				}
 			}
 			else if (this->gradDirection == 1)
 			{
-				if (this->transposed == false)
+				if (transposed == false)
 				{
 					#ifdef __CUDACC__
-						dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_PLUS);
+						dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dyp2d(input, output, PLUS);
+						this->dyp2d(input, output, s);
 					#endif
 				}
 				else
 				{
 					#ifdef __CUDACC__
-						dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_PLUS);
+						dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dyp2dTransposed(input, output, PLUS);
+						this->dyp2dTransposed(input, output, s);
 					#endif
 				}
 			}
@@ -305,7 +318,7 @@ public:
 		}
 	}
 
-	void timesMinus(const Tdata &input, Tdata &output)
+	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
 		#ifdef __CUDACC__
 			dim3 block2d = dim3(32, 16, 1);
@@ -314,44 +327,58 @@ public:
 			T* ptrOutput = thrust::raw_pointer_cast(output.data());
 			const T* ptrInput = thrust::raw_pointer_cast(input.data());
 		#endif
+		
+        mySign s;
+        int s2;
+		
+		if (this->isMinus)
+        {
+            s = MINUS;
+            s2 = SIGN_MINUS;
+		}
+        else
+        {
+            s = PLUS;
+            s2 = SIGN_PLUS;
+        }
 
 		if (this->inputDimension.size() == 2)
 		{
 			if (this->gradDirection == 0)
 			{
-				if (this->transposed == false)
+				if (transposed == false)
 				{
 					#ifdef __CUDACC__
-						dxp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_MINUS);
+						dxp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dxp2d(input, output, MINUS);
+						this->dxp2d(input, output, s);
 					#endif
 				}
 				else
 				{
 					#ifdef __CUDACC__
-						dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_MINUS);
+						dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dxp2dTransposed(input, output, MINUS);
+						this->dxp2dTransposed(input, output, s);
 					#endif
 				}
 			}
 			else if (this->gradDirection == 1)
 			{
-				if (this->transposed == false)
+				if (transposed == false)
 				{
 					#ifdef __CUDACC__
-						dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_MINUS);
+						dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dyp2d(input, output, MINUS);
+						this->dyp2d(input, output, s);
 					#endif
 				}
 				else
 				{
 					#ifdef __CUDACC__
-						dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], SIGN_MINUS);
+						dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
 					#else
-						this->dyp2dTransposed(input, output, MINUS);
+						this->dyp2dTransposed(input, output, s);
 					#endif
 				}
 			}
@@ -363,37 +390,17 @@ public:
 		}
 	}
 
-	T getMaxRowSumAbs() const
+	T getMaxRowSumAbs(bool transposed)
 	{
 		//row sum of absolute values is at maximum 2
 		return static_cast<T>(2);
 	}
 
-	T getMaxRowSumAbs()
-	{
-		//row sum of absolute values is at maximum 2
-		return static_cast<T>(2);
-	}
-
-	std::vector<T> getAbsRowSum()
+	std::vector<T> getAbsRowSum(bool transposed)
 	{
 		std::vector<T> result(this->getNumRows(),(T)2);
 
 		return result;
-	}
-
-	//transposing the identity does nothing
-	void transpose()
-	{
-		//swith type from forward to backward and vice versa
-		if (this->transposed == false)
-		{
-			this->transposed = true;
-		}
-		else
-		{
-			this->transposed = false;
-		}
 	}
 
 	int index2DtoLinear(int i, int j)
@@ -402,7 +409,7 @@ public:
 	}
 
 	#ifdef __CUDACC__
-	thrust::device_vector<T> getAbsRowSumCUDA()
+	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
 		thrust::device_vector<T> result(this->getNumRows(), (T)2);
 
