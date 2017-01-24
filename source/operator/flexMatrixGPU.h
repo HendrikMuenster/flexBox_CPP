@@ -27,7 +27,7 @@ private:
 	bool transposed;
 
 public:
-	flexMatrixGPU(int  _numRows, int  _numCols, int* rowList, int *colList, T* indexVal, bool formatCRS) : flexLinearOperator<T, Tvector>(_numRows, _numCols, matrixGPUOp)
+	flexMatrixGPU(int  _numRows, int  _numCols, int* rowList, int *colList, T* indexVal, bool formatCRS, bool _minus) : flexLinearOperator<T, Tvector>(_numRows, _numCols, matrixGPUOp, _minus)
 	{
 		//create sparse matrix
 		cusparseCreate(&this->handle);
@@ -150,7 +150,7 @@ public:
 		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
 
-		flexMatrixGPU<T, Tvector>* A = new flexMatrixGPU<T, Tvector>(this->getNumRows(), this->getNumCols(), hostRowIndices, hostColIndices, hostValues,true);
+		flexMatrixGPU<T, Tvector>* A = new flexMatrixGPU<T, Tvector>(this->getNumRows(), this->getNumCols(), hostRowIndices, hostColIndices, hostValues,true, this->isMinus);
 
 		free(hostValues);
 		free(hostRowIndices);
@@ -161,7 +161,15 @@ public:
 
 	void times(bool transposed, const Tvector &input, Tvector &output)
 	{
-		const T alpha = (T)1;
+        if (this->isMinus)
+        {
+            const T alpha = (T)-1;
+        }
+        else
+        {
+            const T alpha = (T)1;
+        }
+		
 		const T beta = (T)0;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -179,7 +187,14 @@ public:
 
 	void timesPlus(bool transposed, const Tvector &input, Tvector &output)
 	{
-		const T alpha = (T)1;
+		if (this->isMinus)
+        {
+            const T alpha = (T)-1;
+        }
+        else
+        {
+            const T alpha = (T)1;
+        }
 		const T beta = (T)1;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -197,7 +212,14 @@ public:
 
 	void timesMinus(bool transposed, const Tvector &input, Tvector &output)
 	{
-		const T alpha = -(T)1;
+		if (this->isMinus)
+        {
+            const T alpha = (T)1;
+        }
+        else
+        {
+            const T alpha = (T)-1;
+        }
 		const T beta = (T)1;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());

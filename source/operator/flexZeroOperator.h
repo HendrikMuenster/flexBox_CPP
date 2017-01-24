@@ -8,11 +8,11 @@ template < typename T, typename Tvector >
 class flexZeroOperator : public flexLinearOperator<T, Tvector>
 {
 public:
-	flexZeroOperator(int _numRows, int _numCols) : flexLinearOperator<T, Tvector>(_numRows, _numCols, zeroOp){};
+	flexZeroOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T, Tvector>(_numRows, _numCols, zeroOp, _minus){};
 
 	flexZeroOperator<T, Tvector>* copy()
 	{
-		flexZeroOperator<T, Tvector>* A = new flexZeroOperator<T, Tvector>(this->getNumRows(), this->getNumCols());
+		flexZeroOperator<T, Tvector>* A = new flexZeroOperator<T, Tvector>(this->getNumRows(), this->getNumCols(), this->isMinus);
 
 		return A;
 	}

@@ -278,7 +278,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					printf("Operator %d is type <identityOperator>\n", k);
 				}
 
-				bool isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "minus")) > 0;
+				bool isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
 
 				operatorList.push_back(new flexIdentityOperator<floatingType, vectorData>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
 			}

@@ -12,7 +12,7 @@ private:
 	T upsamplingFactor;
 public:
 
-	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_) : flexLinearOperator<T, Tvector>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp)
+	flexSuperpixelOperator(std::vector<int> targetDimension_, T upsamplingFactor_, bool _minus) : flexLinearOperator<T, Tvector>((int)(vectorProduct(targetDimension_)), (int)(vectorProduct(targetDimension_)*upsamplingFactor_*upsamplingFactor_), superpixelOp, _minus)
 	{
 		this->targetDimension.resize(targetDimension_.size());
 
@@ -22,7 +22,7 @@ public:
 
 	flexSuperpixelOperator<T, Tvector>* copy()
 	{
-		return new flexSuperpixelOperator<T, Tvector>(this->targetDimension, this->upsamplingFactor);
+		return new flexSuperpixelOperator<T, Tvector>(this->targetDimension, this->upsamplingFactor, this->isMinus);
 	}
 
 	int indexI(int index, int sizeX)
@@ -167,42 +167,47 @@ public:
 
 		//mexErrMsgTxt("Stop!\n");
 	}
-
-	//apply linear operator to vector
-	void times(bool transposed, const Tvector &input, Tvector &output)
+    
+    void doTimes(bool transposed, const Tvector &input, Tvector &output, mySign signRule)
 	{
 		if (transposed)
 		{
-			calcTimesTransposed(input, output, EQUALS);
+			calcTimesTransposed(input, output, signRule);
 		}
 		else
 		{
-			calcTimes(input, output, EQUALS);
+			calcTimes(input, output, signRule);
 		}
+    }
+
+	//to implement
+	void times(bool transposed, const Tvector &input, Tvector &output)
+	{
+
 	}
 
 	void timesPlus(bool transposed, const Tvector &input, Tvector &output)
 	{
-		if (transposed)
-		{
-			calcTimesTransposed(input, output, PLUS);
-		}
-		else
-		{
-			calcTimes(input, output, PLUS);
-		}
+        if (this->isMinus)
+        {
+            doTimes(transposed,input,output, MINUS);
+        }
+        else
+        {
+            doTimes(transposed,input,output, PLUS);
+        }
 	}
 
 	void timesMinus(bool transposed, const Tvector &input, Tvector &output)
 	{
-		if (transposed)
-		{
-			calcTimesTransposed(input, output, MINUS);
-		}
-		else
-		{
-			calcTimes(input, output, MINUS);
-		}
+        if (this->isMinus)
+        {
+            doTimes(transposed,input,output, PLUS);
+        }
+        else
+        {
+            doTimes(transposed,input,output, MINUS);
+        }
 	}
     
 	std::vector<T> getAbsRowSum(bool transposed)

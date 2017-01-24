@@ -12,20 +12,14 @@ private:
 	int numCols;
 public:
 	linOp type;
-
-	flexLinearOperator(int _numRows, int _numCols)
-	{
-		numRows = _numRows; 
-		numCols = _numCols;
-		type = linearOp;
-	}
+    bool isMinus;
 
 	virtual ~flexLinearOperator()
 	{
 		if (VERBOSE > 0) printf("Linear operator destructor");
 	}
 
-	flexLinearOperator(int _numRows, int _numCols, linOp _type) : type(_type)
+	flexLinearOperator(int _numRows, int _numCols, linOp _type, bool _isMinus) : type(_type), isMinus(_isMinus)
 	{
 		numRows = _numRows;
 		numCols = _numCols;
@@ -50,6 +44,11 @@ public:
 	{
 		numRows = _numRows;
 	}
+    
+    void setMinus(bool _isMinus)
+    {
+        this->isMinus = _isMinus;
+    }
 
 	virtual flexLinearOperator<T, Tvector>* copy() = 0;
 
