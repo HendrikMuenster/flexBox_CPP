@@ -199,7 +199,7 @@ public:
         }
         else
         {
-           T alpha = (T)1;
+           alpha = (T)1;
         }
 		
 		const T beta = (T)1;
