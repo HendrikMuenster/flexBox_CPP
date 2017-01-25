@@ -12,6 +12,18 @@ if(CUDA_FOUND)
         LINK_TO flexBoxLib ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} ${CUDA_LIBRARIES} ${CUDA_cusparse_LIBRARY} ${CUDA_CUFFT_LIBRARIES}
         OUTPUT_NAME flexBoxCPP
   )
+  
+  if(MSVC)
+ 	configure_file(project.def ${CMAKE_CURRENT_BINARY_DIR}/project.def COPYONLY)
+    get_target_property(existing_link_flags Matlab LINK_FLAGS)
+	if (existing_link_flags STREQUAL "existing_link_flags-NOTFOUND")
+		set(existing_link_flags "")
+	endif()
+    set(new_link_flags "${existing_link_flags} /DEF:project.def")
+		
+    set_target_properties(Matlab PROPERTIES LINK_FLAGS ${new_link_flags})
+  endif()
+  
   set_target_properties(Matlab PROPERTIES LINKER_LANGUAGE CXX)
 
 else()

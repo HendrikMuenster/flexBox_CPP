@@ -163,13 +163,15 @@ public:
 
 	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
+		T alpha;
+
         if (this->isMinus)
         {
-            const T alpha = (T)-1;
+           alpha = (T)-1;
         }
         else
         {
-            const T alpha = (T)1;
+            alpha = (T)1;
         }
 		
 		const T beta = (T)0;
@@ -189,13 +191,15 @@ public:
 
 	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
+		T alpha;
+
 		if (this->isMinus)
         {
-            const T alpha = (T)-1;
+           alpha = (T)-1;
         }
         else
         {
-            const T alpha = (T)1;
+           T alpha = (T)1;
         }
 		
 		const T beta = (T)1;
@@ -215,13 +219,15 @@ public:
 
 	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
+		T alpha;
+
 		if (this->isMinus)
         {
-            const T alpha = (T)1;
+          alpha = (T)1;
         }
         else
         {
-            const T alpha = (T)-1;
+            alpha = (T)-1;
         }
 		const T beta = (T)1;
 
@@ -328,9 +334,8 @@ public:
 		free(hostRowIndices);
 		free(hostColIndices);
         
-        Tvector result(resultTmp.size());
+		Tdata result(resultTmp.size());
 
-        
         thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
         
 

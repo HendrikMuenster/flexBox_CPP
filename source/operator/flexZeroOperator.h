@@ -50,13 +50,11 @@ public:
 	#ifdef __CUDACC__
 	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
-		if (this->getNumCols())
+		Tdata result(this->getNumRows(),(T)0);
+
+		if (transposed)
 		{
-			Tdata result(this->getNumCols(),(T)0);
-		}
-		else
-		{
-			Tdata result(this->getNumRows(),(T)0);
+			result.resize(this->getNumCols());
 		}
 		
 		return result;
