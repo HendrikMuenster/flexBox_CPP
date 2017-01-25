@@ -283,10 +283,8 @@ public:
 
 	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
-        
         std::vector<T> resultTmp;
 		
-        
         int numRowsVector = 0;
         if (transposed == false)
         {

@@ -259,6 +259,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			{
 				isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
 			}
+            
+            if (verbose > 1)
+            {
+                printf("isMinus is set to %d\n", isMinus);
+            }
 
 			if (checkClassType(pointerA, std::string("gradientOperator")))
 			{
