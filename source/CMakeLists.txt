@@ -48,6 +48,7 @@ set(SOURCES_IDE_OP
   operator/flexMatrixGPU.h
   operator/flexSuperpixelOperator.h
   operator/flexZeroOperator.h
+  operator/flexConcatOperator.h
 )
 
 #prox

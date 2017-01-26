@@ -48,6 +48,7 @@
 #include "operator/flexMatrix.h"
 #include "operator/flexGradientOperator.h"
 #include "operator/flexSuperpixelOperator.h"
+#include "operator/flexConcatOperator.h"
 
 #include "flexBox.h"
 
@@ -83,7 +84,7 @@ typedef float floatingType;
 #endif
 
 
-
+flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointerA, int verbose, int operatorNumber);
 void copyToVector(std::vector<floatingType> &vector, const double *input, int numElements);
 bool checkClassType(mxArray *object, const std::string& className);
 bool checkSparse(mxArray *object);
@@ -249,145 +250,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			int correspondingNumberPrimalVar = k%_correspondingPrimals.size();
 
-			int numElementsPrimalVar = vectorProduct(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]));
-
 			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
 			
-			bool isMinus = false;
-			
-			if (mxGetProperty(pointerA, 0, "isMinus") != NULL) //matrix does not have this property
-			{
-				isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
-			}
-            
-            if (verbose > 1)
-            {
-                printf("isMinus is set to %d\n", isMinus);
-            }
-
-			if (checkClassType(pointerA, std::string("gradientOperator")))
-			{
-				if (verbose > 1)
-				{
-					printf("Operator %d is type <gradientOperator>\n",k);
-				}
-
-				char *gradientType = mxArrayToString(mxGetProperty(pointerA, 0, "type"));
-				int gradientDirection = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "gradDirection"))) - 1; //substract one!
-
-				int gradientTypeInt = 0;
-				if (strcmp(gradientType, "backward") == 0)
-				{
-					//gradientTypeInt = 1;
-				}
-
-				operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(_correspondingPrimals[correspondingNumberPrimalVar]), gradientDirection, gradientTypeInt, isMinus));
-			}
-			else if (checkClassType(pointerA, std::string("identityOperator")))
-			{
-				if (verbose > 1)
-				{
-					printf("Operator %d is type <identityOperator>\n", k);
-				}
-
-				operatorList.push_back(new flexIdentityOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
-			}
-			else if (checkClassType(pointerA, std::string("zeroOperator")))
-			{
-				if (verbose > 1)
-				{
-					printf("Operator %d is type <zeroOperator>\n", k);
-				}
-
-				operatorList.push_back(new flexZeroOperator<floatingType>(numElementsPrimalVar, numElementsPrimalVar, isMinus));
-			}
-			else if (checkClassType(pointerA, std::string("diagonalOperator")))
-			{
-				if (verbose > 1)
-				{
-					printf("Operator %d is type <diagonalOperator>\n", k);
-				}
-
-				//copy diagonal vector
-				double *tmpDiagonalVector = mxGetPr(mxGetProperty(pointerA, 0, "diagonalElements"));
-				std::vector<floatingType> tmpDiagonal(numElementsPrimalVar, static_cast<floatingType>(0));
-
-				for (int l = 0; l < numElementsPrimalVar; ++l)
-				{
-					tmpDiagonal[l] = static_cast<floatingType>(tmpDiagonalVector[l]);
-				}
-
-				operatorList.push_back(new flexDiagonalOperator<floatingType>(tmpDiagonal, isMinus));
-			}
-            else if (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == false)
-			{
-				if (verbose > 1)
-				{
-					printf("Operator %d is type <superpixelOperator>\n", k);
-				}
-
-				float factor = (float)mxGetScalar(mxGetProperty(pointerA, 0, "factor"));// factor that f is being upsized
-				//dimension of data f
-
-				auto targetDimensionStruct = mxGetProperty(pointerA, 0, "targetDimension");
-				double *targetDimensionInput = mxGetPr(targetDimensionStruct);
-				int targetDimensionSize = (int)(mxGetN(targetDimensionStruct) * mxGetM(targetDimensionStruct));
-				std::vector<int> targetDimension(targetDimensionSize, 0);
-				for (int l = 0; l < targetDimensionSize; ++l)
-				{
-					targetDimension[l] = (int)targetDimensionInput[l];
-				}
-
-				operatorList.push_back(new flexSuperpixelOperator<floatingType>(targetDimension, factor, isMinus));
-			}
-            else if (checkSparse(pointerA) || (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == true))
-			{
-				if (verbose > 1)
-				{
-					printf("Operator %d is type <matrix>\n", k);
-				}
-
-                //check if super pixel operator
-                if (checkClassType(pointerA, std::string("superpixelOperator")))
-                {
-                    pointerA = mxGetProperty(pointerA,0,"matrix");
-                }
-
-				#ifdef __CUDACC__
-					mwIndex  *ir, *jc;
-
-					jc = mxGetJc(pointerA);
-					ir = mxGetIr(pointerA);
-					double* pr = mxGetPr(pointerA);
-
-					//matlab stores in compressed column format
-					int numCols = mxGetN(pointerA);
-					int* colList = new int[numCols + 1];
-					for (int l = 0; l <= numCols; ++l)
-					{
-						colList[l] = jc[l];
-					}
-
-					int nnz = colList[numCols];
-
-					int* rowList = new int[nnz];
-					float* valList = new float[nnz];
-					for (int l = 0; l < nnz; ++l)
-					{
-						rowList[l] = ir[l];
-						valList[l] = pr[l];
-					}
-					operatorList.push_back(new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList, false, isMinus));
-				#else
-					flexMatrix<floatingType>*A = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)), isMinus);
-					copyMatlabToFlexmatrix(pointerA, A);
-					operatorList.push_back(A);
-				#endif
-			}
-			else
-			{
-				mexErrMsgTxt("Operator type not supported!\n");
-			}
+			operatorList.push_back(transformMatlabToFlexOperator(pointerA, verbose, k));
 		}
 
 		flexProx<floatingType>* myProx;
@@ -516,6 +381,204 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 	}
 }
+
+flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointerA, int verbose, int operatorNumber)
+{
+	flexLinearOperator<floatingType>*A;
+
+	bool isGPU = false;
+	#ifdef __CUDACC__
+	isGPU = true;
+	#endif
+
+	bool isMinus = false;
+
+	if (mxGetProperty(pointerA, 0, "isMinus") != NULL) //matrix does not have this property
+	{
+		isMinus = mxGetScalar(mxGetProperty(pointerA, 0, "isMinus")) > 0;
+	}
+
+	if (verbose > 1)
+	{
+		printf("isMinus is set to %d\n", isMinus);
+	}
+
+	if (checkClassType(pointerA, std::string("gradientOperator")))
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <gradientOperator>\n", operatorNumber);
+		}
+
+		char *gradientType = mxArrayToString(mxGetProperty(pointerA, 0, "type"));
+		int gradientDirection = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "gradDirection"))) - 1; //substract one!
+
+		int gradientTypeInt = 0;
+		if (strcmp(gradientType, "backward") == 0)
+		{
+			//gradientTypeInt = 1;
+		}
+
+		auto inputDimensionMatlab = mxGetProperty(pointerA, 0, "inputDimension");
+		double *inputDimensionMatlabPtr = mxGetPr(inputDimensionMatlab);
+		std::vector<int> tmpDiagonal(mxGetM(inputDimensionMatlab) * mxGetN(inputDimensionMatlab), 0);
+
+		for (int l = 0; l < mxGetM(inputDimensionMatlab) * mxGetN(inputDimensionMatlab); ++l)
+		{
+			tmpDiagonal[l] = static_cast<int>(inputDimensionMatlabPtr[l]);
+		}
+
+		A = new flexGradientOperator<floatingType>(tmpDiagonal, gradientDirection, gradientTypeInt, isMinus);
+	}
+	else if (checkClassType(pointerA, std::string("identityOperator")))
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <identityOperator>\n", operatorNumber);
+		}
+
+		int nPx = mxGetScalar(mxGetProperty(pointerA, 0, "nPx"));
+
+		A = new flexIdentityOperator<floatingType>(nPx, nPx, isMinus);
+	}
+	else if (checkClassType(pointerA, std::string("zeroOperator")))
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <zeroOperator>\n", operatorNumber);
+		}
+
+		int nPx = mxGetScalar(mxGetProperty(pointerA, 0, "nPx"));
+
+		A = new flexZeroOperator<floatingType>(nPx, nPx, isMinus);
+	}
+	else if (checkClassType(pointerA, std::string("diagonalOperator")))
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <diagonalOperator>\n", operatorNumber);
+		}
+
+		//copy diagonal vector
+		auto diagElements = mxGetProperty(pointerA, 0, "diagonalElements");
+		double *tmpDiagonalVector = mxGetPr(diagElements);
+		std::vector<floatingType> tmpDiagonal(mxGetM(diagElements) * mxGetN(diagElements), static_cast<floatingType>(0));
+
+		for (int l = 0; l < mxGetM(diagElements) * mxGetN(diagElements); ++l)
+		{
+			tmpDiagonal[l] = static_cast<floatingType>(tmpDiagonalVector[l]);
+		}
+
+		A = new flexDiagonalOperator<floatingType>(tmpDiagonal, isMinus);
+	}
+	else if (checkClassType(pointerA, std::string("concatOperator")))
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <concatOperator>\n", operatorNumber);
+		}
+
+		std::string operationMatlab = mxArrayToString(mxGetProperty(pointerA, 0, "operation"));
+
+		mySign operation;
+
+		if (operationMatlab.compare("composition") == 0)
+		{
+			operation = COMPOSE;
+		}
+		else if (operationMatlab.compare("addition") == 0)
+		{
+			operation = PLUS;
+		}
+		else if (operationMatlab.compare("difference") == 0)
+		{
+			operation = MINUS;
+		}
+		else
+		{
+			mexErrMsgTxt("Unknown operation for concatOperator\n");
+		}
+
+		auto operator1 = transformMatlabToFlexOperator(mxGetProperty(pointerA, 0, "A"), verbose, operatorNumber);
+		auto operator2 = transformMatlabToFlexOperator(mxGetProperty(pointerA, 0, "B"), verbose, operatorNumber);
+
+		A = new flexConcatOperator<floatingType>(operator1, operator1, operation, isMinus);
+	}
+	else if (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == false)
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <superpixelOperator>\n", operatorNumber);
+		}
+
+		float factor = (float)mxGetScalar(mxGetProperty(pointerA, 0, "factor"));// factor that f is being upsized
+		//dimension of data f
+
+		auto targetDimensionStruct = mxGetProperty(pointerA, 0, "targetDimension");
+		double *targetDimensionInput = mxGetPr(targetDimensionStruct);
+		int targetDimensionSize = (int)(mxGetN(targetDimensionStruct) * mxGetM(targetDimensionStruct));
+		std::vector<int> targetDimension(targetDimensionSize, 0);
+		for (int l = 0; l < targetDimensionSize; ++l)
+		{
+			targetDimension[l] = (int)targetDimensionInput[l];
+		}
+
+		A = new flexSuperpixelOperator<floatingType>(targetDimension, factor, isMinus);
+	}
+	else if (checkSparse(pointerA) || (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == true))
+	{
+		if (verbose > 1)
+		{
+			printf("Operator %d is type <matrix>\n", operatorNumber);
+		}
+
+		//check if super pixel operator
+		if (checkClassType(pointerA, std::string("superpixelOperator")))
+		{
+			pointerA = mxGetProperty(pointerA, 0, "matrix");
+		}
+
+		#ifdef __CUDACC__
+		mwIndex  *ir, *jc;
+
+		jc = mxGetJc(pointerA);
+		ir = mxGetIr(pointerA);
+		double* pr = mxGetPr(pointerA);
+
+		//matlab stores in compressed column format
+		int numCols = mxGetN(pointerA);
+		int* colList = new int[numCols + 1];
+		for (int l = 0; l <= numCols; ++l)
+		{
+			colList[l] = jc[l];
+		}
+
+		int nnz = colList[numCols];
+
+		int* rowList = new int[nnz];
+		float* valList = new float[nnz];
+		for (int l = 0; l < nnz; ++l)
+		{
+			rowList[l] = ir[l];
+			valList[l] = pr[l];
+		}
+		A = new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList, false, isMinus);
+		#else
+		auto Atmp = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)), isMinus);
+		copyMatlabToFlexmatrix(pointerA, Atmp);
+
+		A = Atmp;
+		#endif
+	}
+	else
+	{
+		mexErrMsgTxt("Operator type not supported!\n");
+	}
+
+	return A;
+}
+
+
 
 void copyToVector(std::vector<floatingType> &vector,const double *input, int numElements)
 {

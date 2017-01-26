@@ -1,6 +1,3 @@
-
-
-
 #ifndef flexbox_H
 #define flexbox_H
 
@@ -15,10 +12,6 @@
 	#include "solver/flexSolverPrimalDual.h"
   #include "data/flexBoxDataCPU.h"
 #endif
-
-
-
-
 
 #include <vector>
 

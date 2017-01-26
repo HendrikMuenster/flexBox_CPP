@@ -54,7 +54,8 @@ enum mySign
 {
 	PLUS,
 	MINUS,
-	EQUALS
+	EQUALS,
+    COMPOSE
 };
 
 enum prox
@@ -81,7 +82,8 @@ enum linOp
 	matrixOp,
 	matrixGPUOp,
 	zeroOp,
-	superpixelOp
+	superpixelOp,
+    concatOp
 };
 
 
