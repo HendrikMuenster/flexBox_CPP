@@ -20,12 +20,11 @@ private:
     flexLinearOperator<T>* A;
     flexLinearOperator<T>* B;
     mySign s;
-	Tdata tmpVec1;
-	Tdata tmpVec2;
+	Tdata tmpVec;
 
 public:
 
-	flexConcatOperator(flexLinearOperator<T>* _A, flexLinearOperator<T>* _B, mySign _s, bool _minus) : A(_A), B(_B), s(_s), tmpVec1(_A->getNumRows()), tmpVec2(_A->getNumCols()), flexLinearOperator<T>(_A->getNumRows(), _B->getNumCols(), concatOp, _minus)
+	flexConcatOperator(flexLinearOperator<T>* _A, flexLinearOperator<T>* _B, mySign _s, bool _minus) : A(_A), B(_B), s(_s), tmpVec(_A->getNumCols()), flexLinearOperator<T>(_A->getNumRows(), _B->getNumCols(), concatOp, _minus)
 	{
 
 	}
@@ -44,7 +43,6 @@ public:
     
 	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		//printf("OpTP\n");
         switch (this->s)
         {
             case PLUS:
@@ -81,38 +79,40 @@ public:
                 {
                     //apply A first
 					#ifdef __CUDACC__
-						thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#else if
-						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
-					A->timesPlus(true, input, this->tmpVec2);
+					A->timesPlus(true, input, this->tmpVec); 
+					
                     if (this->isMinus)
                     {
-						B->timesMinus(true, this->tmpVec2, output);
+						B->timesMinus(true, this->tmpVec, output);
                     }
                     else
                     {
-						B->timesPlus(true, this->tmpVec2, output);
+						B->timesPlus(true, this->tmpVec, output);
                     }
                 }
                 else
                 {
                     //apply B first
 					#ifdef __CUDACC__
-						thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#else if
-						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
-					B->timesPlus(false, input, this->tmpVec2);
+					B->timesPlus(false, input, this->tmpVec);
+
                     if (this->isMinus)
                     {
-						A->timesMinus(false, this->tmpVec2, output);
+						A->timesMinus(false, this->tmpVec, output);
                     }
                     else
                     {
-						A->timesPlus(false, this->tmpVec2, output);
+						A->timesPlus(false, this->tmpVec, output);
                     }
                 }
                 break;
@@ -122,7 +122,6 @@ public:
 
 	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		//printf("OmTP\n");
         switch (this->s)
         {
             case PLUS:
@@ -159,38 +158,38 @@ public:
                 {
                     //apply A first
 					#ifdef __CUDACC__
-						thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#else if
-						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 					
-					A->timesPlus(true, input, tmpVec2);
+					A->timesPlus(true, input, tmpVec);
                     if (this->isMinus)
                     {
-						B->timesPlus(true, this->tmpVec2, output);
+						B->timesPlus(true, this->tmpVec, output);
                     }
                     else
                     {
-						B->timesMinus(true, this->tmpVec2, output);
+						B->timesMinus(true, this->tmpVec, output);
                     }
                 }
                 else
                 {
                     //apply B first
 					#ifdef __CUDACC__
-						thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T)0);
+						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#else if
-						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
-					B->timesPlus(false, input, this->tmpVec2);
+					B->timesPlus(false, input, this->tmpVec);
                     if (this->isMinus)
                     {
-						A->timesPlus(false, this->tmpVec2, output);
+						A->timesPlus(false, this->tmpVec, output);
                     }
                     else
                     {
-						A->timesMinus(false, this->tmpVec2, output);
+						A->timesMinus(false, this->tmpVec, output);
                     }
                 }
                 break;
@@ -206,10 +205,10 @@ public:
 
 	std::vector<T> getAbsRowSum(bool transposed)
 	{
-        std::vector<T> result;
+		std::vector<T> result;
         
         auto rowSumA = A->getAbsRowSum(transposed);
-        auto rowSumB = A->getAbsRowSum(transposed);
+        auto rowSumB = B->getAbsRowSum(transposed);
         
         switch (this->s)
         {
@@ -238,7 +237,7 @@ public:
                 T maxA = *std::max_element(rowSumA.begin(), rowSumA.end());
                 T maxB = *std::max_element(rowSumB.begin(), rowSumB.end());
                 T maxProd = maxA * maxB;
-                
+
                 switch (transposed)
                 {
                     case true:
@@ -264,12 +263,22 @@ public:
 	{
         Tdata result;
         
-        auto rowSumA = A->getAbsRowSum(transposed);
-        auto rowSumB = A->getAbsRowSum(transposed);
+		auto rowSumA = A->getAbsRowSumCUDA(transposed);
+		auto rowSumB = B->getAbsRowSumCUDA(transposed);
         
         switch (this->s)
         {
             case PLUS:
+			{
+				result.resize(rowSumA.size());
+
+				#pragma omp parallel for
+				for (int k = 0; k < result.size(); ++k)
+				{
+					result[k] = rowSumA[k] + rowSumB[k];
+				}
+				break;
+			}
             case MINUS:
             {
                 result.resize(rowSumA.size());
@@ -286,7 +295,7 @@ public:
                 T maxA = *thrust::max_element(rowSumA.begin(), rowSumA.end());
                 T maxB = *thrust::max_element(rowSumB.begin(), rowSumB.end());
                 T maxProd = maxA * maxB;
-                
+
                 switch (transposed)
                 {
                     case true:
@@ -303,7 +312,7 @@ public:
                 break;
             }
         }
-
+		
 		return result;
 	}
 	#endif

@@ -185,7 +185,7 @@ public:
 		}
 		else
 		{
-			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumCols(), this->getNumRows(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
+			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumRows(), this->getNumCols(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
 		}
 	}
 
@@ -213,7 +213,7 @@ public:
 		}
 		else
 		{
-			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumCols(), this->getNumRows(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
+			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumRows(), this->getNumCols(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
 		}
 	}
 
@@ -240,7 +240,7 @@ public:
 		}
 		else
 		{
-			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumCols(), this->getNumRows(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
+			cusparseScsrmv(this->handle, CUSPARSE_OPERATION_TRANSPOSE, this->getNumRows(), this->getNumCols(), nnz, &alpha, this->descrA, this->listValues, this->listRowEntries, this->listColIndices, ptrInput, &beta, ptrOutput);
 		}
 	}
 
@@ -285,16 +285,13 @@ public:
 	{
         std::vector<T> resultTmp;
 		
-        int numRowsVector = 0;
         if (transposed == false)
         {
             resultTmp.resize(this->getNumRows());
-            numRowsVector = this->getNumRows();
         }
         else
         {
             resultTmp.resize(this->getNumCols());
-            numRowsVector = this->getNumCols();
         }
         
 		//allocate memory
@@ -306,7 +303,7 @@ public:
 		cudaMemcpy(hostRowIndices, this->listRowEntries, (this->getNumRows() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
 		cudaMemcpy(hostColIndices, this->listColIndices, this->nnz * sizeof(int), cudaMemcpyDeviceToHost);
 
-        for (int row = 0; row < numRowsVector; row++)
+		for (int row = 0; row < this->getNumRows(); row++)
         {
             int starting_col_index = hostRowIndices[row];
             int stopping_col_index = hostRowIndices[row + 1];
@@ -327,7 +324,7 @@ public:
                 }
             }
         }
-        
+
         free(hostValues);
 		free(hostRowIndices);
 		free(hostColIndices);
@@ -336,7 +333,6 @@ public:
 
         thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
         
-
 		return result;
 	}
 };

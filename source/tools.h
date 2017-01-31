@@ -656,9 +656,9 @@ __global__ void dyp2dTransposedCUDA(T* output, const T* input, int w, int h, con
 	}
 }
 
-
+/*
 // cuda error checking
-/*std::string prev_file = "";
+std::string prev_file = "";
 int prev_line = 0;
 void cuda_check(std::string file, int line)
 {
@@ -685,18 +685,17 @@ void writeOutput(char* writeString)
 	std::ofstream out("log.txt");
 	out << endl << writeString << endl;
 	out.close();
-}*/
+}
 
-#if DO_CUDA_CHECK
-	#define CUDA_CHECK cuda_check(__FILE__,__LINE__)
-#else
-	#define CUDA_CHECK 0
+#define CUDA_CHECK cuda_check(__FILE__,__LINE__)
+//#if DO_CUDA_CHECK
+//	#define CUDA_CHECK cuda_check(__FILE__,__LINE__)
+//#else
+//	#define CUDA_CHECK 0
+//#endif
+*/
+
 #endif
-
-#endif
-
-//
-
 
 
 

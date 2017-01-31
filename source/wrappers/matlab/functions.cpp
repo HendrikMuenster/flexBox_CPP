@@ -437,7 +437,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			printf("Operator %d is type <identityOperator>\n", operatorNumber);
 		}
 
-		int nPx = mxGetScalar(mxGetProperty(pointerA, 0, "nPx"));
+		int nPx = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "nPx")));
 
 		A = new flexIdentityOperator<floatingType>(nPx, nPx, isMinus);
 	}
@@ -448,7 +448,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			printf("Operator %d is type <zeroOperator>\n", operatorNumber);
 		}
 
-		int nPx = mxGetScalar(mxGetProperty(pointerA, 0, "nPx"));
+		int nPx = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "nPx")));
 
 		A = new flexZeroOperator<floatingType>(nPx, nPx, isMinus);
 	}
@@ -502,7 +502,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 		auto operator1 = transformMatlabToFlexOperator(mxGetProperty(pointerA, 0, "A"), verbose, operatorNumber);
 		auto operator2 = transformMatlabToFlexOperator(mxGetProperty(pointerA, 0, "B"), verbose, operatorNumber);
 
-		A = new flexConcatOperator<floatingType>(operator1, operator1, operation, isMinus);
+		A = new flexConcatOperator<floatingType>(operator1, operator2, operation, isMinus);
 	}
 	else if (checkClassType(pointerA, std::string("superpixelOperator")) && isGPU == false)
 	{
