@@ -25,7 +25,7 @@ private:
 
 public:
 
-	flexConcatOperator(flexLinearOperator<T>* _A, flexLinearOperator<T>* _B, mySign _s, bool _minus) : A(_A), B(_A), s(_s), tmpVec1(_A->getNumRows()), tmpVec2(_A->getNumCols()), flexLinearOperator<T>(_A->getNumRows(), _B->getNumCols(), concatOp, _minus)
+	flexConcatOperator(flexLinearOperator<T>* _A, flexLinearOperator<T>* _B, mySign _s, bool _minus) : A(_A), B(_B), s(_s), tmpVec1(_A->getNumRows()), tmpVec2(_A->getNumCols()), flexLinearOperator<T>(_A->getNumRows(), _B->getNumCols(), concatOp, _minus)
 	{
 
 	}
@@ -80,29 +80,39 @@ public:
                 if (transposed)
                 {
                     //apply A first
-					thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T)0);
-					A->timesPlus(transposed, input, this->tmpVec1);
+					#ifdef __CUDACC__
+						thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#else if
+						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#endif
+
+					A->timesPlus(true, input, this->tmpVec2);
                     if (this->isMinus)
                     {
-						B->timesMinus(transposed, this->tmpVec1, output);
+						B->timesMinus(true, this->tmpVec2, output);
                     }
                     else
                     {
-						B->timesPlus(transposed, this->tmpVec1, output);
+						B->timesPlus(true, this->tmpVec2, output);
                     }
                 }
                 else
                 {
                     //apply B first
-					thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
-					B->timesPlus(transposed, input, this->tmpVec2);
+					#ifdef __CUDACC__
+						thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#else if
+						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#endif
+
+					B->timesPlus(false, input, this->tmpVec2);
                     if (this->isMinus)
                     {
-						A->timesMinus(transposed, this->tmpVec2, output);
+						A->timesMinus(false, this->tmpVec2, output);
                     }
                     else
                     {
-						A->timesPlus(transposed, this->tmpVec2, output);
+						A->timesPlus(false, this->tmpVec2, output);
                     }
                 }
                 break;
@@ -148,29 +158,39 @@ public:
                 if (transposed)
                 {
                     //apply A first
-					thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T)0);
-                    A->timesPlus(transposed, input, tmpVec1);
+					#ifdef __CUDACC__
+						thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#else if
+						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#endif
+					
+					A->timesPlus(true, input, tmpVec2);
                     if (this->isMinus)
                     {
-						B->timesPlus(transposed, this->tmpVec1, output);
+						B->timesPlus(true, this->tmpVec2, output);
                     }
                     else
                     {
-						B->timesMinus(transposed, this->tmpVec1, output);
+						B->timesMinus(true, this->tmpVec2, output);
                     }
                 }
                 else
                 {
                     //apply B first
-					thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
-					B->timesPlus(transposed, input, this->tmpVec2);
+					#ifdef __CUDACC__
+						thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T)0);
+					#else if
+						std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+					#endif
+
+					B->timesPlus(false, input, this->tmpVec2);
                     if (this->isMinus)
                     {
-						A->timesPlus(transposed, this->tmpVec2, output);
+						A->timesPlus(false, this->tmpVec2, output);
                     }
                     else
                     {
-						A->timesMinus(transposed, this->tmpVec2, output);
+						A->timesMinus(false, this->tmpVec2, output);
                     }
                 }
                 break;
