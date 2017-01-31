@@ -437,7 +437,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			printf("Operator %d is type <identityOperator>\n", operatorNumber);
 		}
 
-		int nPx = mxGetScalar(mxGetProperty(pointerA, 0, "nPx"));
+		int nPx = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "nPx")));
 
 		A = new flexIdentityOperator<floatingType>(nPx, nPx, isMinus);
 	}
@@ -448,7 +448,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			printf("Operator %d is type <zeroOperator>\n", operatorNumber);
 		}
 
-		int nPx = mxGetScalar(mxGetProperty(pointerA, 0, "nPx"));
+		int nPx = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "nPx")));
 
 		A = new flexZeroOperator<floatingType>(nPx, nPx, isMinus);
 	}

@@ -80,7 +80,11 @@ public:
                 if (transposed)
                 {
                     //apply A first
+#ifdef __CUDACC__
 					thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T)0);
+#else
+					std::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T) 0);
+#endif
 					A->timesPlus(transposed, input, this->tmpVec1);
                     if (this->isMinus)
                     {
@@ -94,7 +98,11 @@ public:
                 else
                 {
                     //apply B first
+#ifdef __CUDACC__
 					thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+#else
+					std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T) 0);
+#endif
 					B->timesPlus(transposed, input, this->tmpVec2);
                     if (this->isMinus)
                     {
@@ -148,8 +156,12 @@ public:
                 if (transposed)
                 {
                     //apply A first
-					thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T)0);
-                    A->timesPlus(transposed, input, tmpVec1);
+#ifdef __CUDACC__
+					thrust::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T) 0);
+#else
+					std::fill(this->tmpVec1.begin(), this->tmpVec1.end(), (T) 0);
+#endif
+                    A->timesPlus(transposed, input, this->tmpVec1);
                     if (this->isMinus)
                     {
 						B->timesPlus(transposed, this->tmpVec1, output);
@@ -162,7 +174,11 @@ public:
                 else
                 {
                     //apply B first
-					thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T)0);
+#ifdef __CUDACC__
+					thrust::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T) 0);
+#else
+					std::fill(this->tmpVec2.begin(), this->tmpVec2.end(), (T) 0);
+#endif
 					B->timesPlus(transposed, input, this->tmpVec2);
                     if (this->isMinus)
                     {
