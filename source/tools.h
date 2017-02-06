@@ -86,7 +86,12 @@ enum linOp
     concatOp
 };
 
-
+enum gradientType
+{
+	forward,
+	backward,
+	central
+};
 
 template < typename T >
 T myAbs(T x)

@@ -410,13 +410,17 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			printf("Operator %d is type <gradientOperator>\n", operatorNumber);
 		}
 
-		char *gradientType = mxArrayToString(mxGetProperty(pointerA, 0, "type"));
+		char *gradientTypeString = mxArrayToString(mxGetProperty(pointerA, 0, "type"));
 		int gradientDirection = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "gradDirection"))) - 1; //substract one!
 
-		int gradientTypeInt = 0;
-		if (strcmp(gradientType, "backward") == 0)
+		gradientType gradT = forward;
+		if (strcmp(gradientTypeString, "backward") == 0)
 		{
-			//gradientTypeInt = 1;
+			gradT = backward;
+		}
+		else if (strcmp(gradientTypeString, "central") == 0)
+		{
+			gradT = central;
 		}
 
 		auto inputDimensionMatlab = mxGetProperty(pointerA, 0, "inputDimension");
@@ -428,7 +432,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			tmpDiagonal[l] = static_cast<int>(inputDimensionMatlabPtr[l]);
 		}
 
-		A = new flexGradientOperator<floatingType>(tmpDiagonal, gradientDirection, gradientTypeInt, isMinus);
+		A = new flexGradientOperator<floatingType>(tmpDiagonal, gradientDirection, gradT, isMinus);
 	}
 	else if (checkClassType(pointerA, std::string("identityOperator")))
 	{

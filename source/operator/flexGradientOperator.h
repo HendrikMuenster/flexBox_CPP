@@ -16,33 +16,22 @@ class flexGradientOperator : public flexLinearOperator<T>
 
 private:
 	std::vector<int> inputDimension;
-
-	int* inputDimensionPtr;
 	int gradDirection;
-	int type;
-	bool transposed;
+	gradientType type;
 	int numberDimensions;
 
 public:
 
-	//type:
-	// 0 = forward
-	// 1 = backward
-	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, int aType, bool _minus) : flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp, _minus)
-	{
-
-		this->gradDirection = aGradDirection;
-		this->type = aType;
-		this->numberDimensions = static_cast<int>(AInputDimension.size());
-
-		this->inputDimension = AInputDimension;
-		this->inputDimensionPtr = this->inputDimension.data();
-
-	};
+	//type: forward, backward, central
+	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, gradientType aType, bool _minus) : 
+		inputDimension(AInputDimension), 
+		gradDirection(aGradDirection),
+		type(aType),
+		numberDimensions(static_cast<int>(AInputDimension.size())), flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp, _minus)
+	{};
 
 	flexGradientOperator<T>* copy()
 	{
-
 		std::vector<int> dimsCopy;
 		dimsCopy.resize(this->inputDimension.size());
 
@@ -269,6 +258,22 @@ public:
             s = PLUS;
             s2 = SIGN_PLUS;
         }
+		
+		// flip sign and transposed
+		if (this->type == backward)
+		{
+			transposed = !transposed;
+			if (s == MINUS)
+			{
+				s = PLUS;
+				s2 = SIGN_PLUS;
+			}
+			else
+			{
+				s = MINUS;
+				s2 = SIGN_MINUS;
+			}
+		}
 
 		if (this->inputDimension.size() == 2)
 		{
@@ -341,6 +346,22 @@ public:
             s = PLUS;
             s2 = SIGN_PLUS;
         }
+		
+		// flip sign and transposed
+		if (this->type == backward)
+		{
+			transposed = !transposed;
+			if (s == MINUS)
+			{
+				s = PLUS;
+				s2 = SIGN_PLUS;
+			}
+			else
+			{
+				s = MINUS;
+				s2 = SIGN_MINUS;
+			}
+		}
 
 		if (this->inputDimension.size() == 2)
 		{
