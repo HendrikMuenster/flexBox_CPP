@@ -63,6 +63,7 @@ set(SOURCES_IDE_PROX
   prox/flexProxDualL1Aniso.h
   prox/flexProxDualL1Iso.h
   prox/flexProxDualL2.h
+  prox/flexProxDualLabeling.h
 )
 
 #solver
@@ -84,6 +85,12 @@ set(SOURCES_IDE_MATLAB
   wrappers/matlab/functions.cu
 )
 
+#main files
+set(SOURCES_MAIN
+  "flexBox.h"
+  "tools.h"
+)
+
 #group for visual studio
 source_group("data" FILES ${SOURCES_IDE_DATA})
 source_group("operator" FILES ${SOURCES_IDE_OP})
@@ -93,7 +100,7 @@ source_group("term" FILES ${SOURCES_IDE_TERM})
 source_group("matlab" FILES ${SOURCES_IDE_MATLAB})
 
 #combine
-set(SOURCES_IDE ${SOURCES_IDE_DATA} ${SOURCES_IDE_OP} ${SOURCES_IDE_PROX} ${SOURCES_IDE_SOLV} ${SOURCES_IDE_TERM} ${SOURCES_IDE_MATLAB})
+set(SOURCES_IDE ${SOURCES_IDE_DATA} ${SOURCES_IDE_OP} ${SOURCES_IDE_PROX} ${SOURCES_IDE_SOLV} ${SOURCES_IDE_TERM} ${SOURCES_IDE_MATLAB} ${SOURCES_MAIN})
 
 ##########################
 #   END FILES/INCUDES    #
