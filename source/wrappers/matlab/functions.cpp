@@ -67,7 +67,7 @@
 #include "prox/flexProxDualFrobenius.h"
 #include "prox/flexProxDualBoxConstraint.h"
 #include "prox/flexProxDualInnerProduct.h"
-
+#include "prox/flexProxDualLabeling.h"
 
 
 
@@ -302,6 +302,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			myProx = new flexProxDualInnerProduct<floatingType>();
 		}
+		else if (checkProx(classPointer,"labelingProxDual"))
+		{
+			myProx = new flexProxDualLabeling<floatingType>();
+		}
 		else
 		{
 			mexPrintf("Prox not found");
@@ -413,7 +417,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 		char *gradientTypeString = mxArrayToString(mxGetProperty(pointerA, 0, "type"));
 		int gradientDirection = static_cast<int>(mxGetScalar(mxGetProperty(pointerA, 0, "gradDirection"))) - 1; //substract one!
 
-		gradientType gradT = forward;
+		gradientType gradT = gradientType::forward;
 		if (strcmp(gradientTypeString, "backward") == 0)
 		{
 			gradT = backward;
