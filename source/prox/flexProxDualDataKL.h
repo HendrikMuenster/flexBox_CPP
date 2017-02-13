@@ -47,7 +47,7 @@ public:
 				#pragma omp parallel for
 				for (int j = 0; j < numElements; j++)
 				{
-					ptrY[j] = (T)0.5 * ((T)1 + ptrYtilde[j] - std::sqrt(myPow2<T>(ptrYtilde[j] - (T)1) + (T)4 * ptrSigma[j] * ptrF[j]));
+					ptrY[j] = (T)0.5 * (alpha + ptrYtilde[j] - std::sqrt(std::pow(ptrYtilde[j] + alpha, (int)2) + (T)4 * (alpha * ptrSigma[j] * ptrF[j] - alpha * ptrYtilde[j])));
 				}
 			}
 		#endif
