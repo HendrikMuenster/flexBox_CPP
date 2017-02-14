@@ -90,8 +90,8 @@ int main()
 	//add dualized regularizer
 	operatorList.clear();
 	//add gradient for x and y direction as operators
-	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 0, 0, false));
-	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 1, 0, false));
+	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 0, gradientType::forward, false));
+	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 1, gradientType::forward, false));
 
 	flexProx<floatingType>* myProx2 = new flexProxDualL1Iso<floatingType>();
 	mainObject.addDual(new flexTermDual<floatingType>(myProx2, weightRegularizer, 1, operatorList), correspondingPrimals);
