@@ -50,6 +50,31 @@ public:
 		const T alpha;
         const T epsiAlpha;
 	};
+
+	struct flexProxDualHuberDim3Functor
+	{
+		__host__ __device__
+		flexProxDualHuberDim3Functor(T _epsi, T _alpha) : epsi(_epsi), alpha(_alpha), epsiAlpha(epsi / alpha){}
+
+		template <typename Tuple>
+		__host__ __device__
+		void operator()(Tuple t)
+		{
+			T huberFactor1 = (T)1 / ((T)1 + thrust::get<6>(t) * epsiAlpha);
+			T huberFactor2 = (T)1 / ((T)1 + thrust::get<7>(t) * epsiAlpha);
+			T huberFactor3 = (T)1 / ((T)1 + thrust::get<8>(t) * epsiAlpha);
+
+			T norm = max((T)1, sqrt( pow(thrust::get<3>(t)*huberFactor1,(int)2) + pow(thrust::get<4>(t)*huberFactor2,(int)2) + pow(thrust::get<5>(t)*huberFactor3,(int)2)) / alpha);
+
+			thrust::get<0>(t) = thrust::get<3>(t) * huberFactor1 / norm;
+			thrust::get<1>(t) = thrust::get<4>(t) * huberFactor2 / norm;
+			thrust::get<2>(t) = thrust::get<5>(t) * huberFactor3 / norm;
+		}
+
+		const T epsi;
+		const T alpha;
+		const T epsiAlpha;
+	};
     #endif
 
 	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
@@ -62,10 +87,17 @@ public:
 
                 thrust::for_each(startIterator,endIterator,flexProxDualHuberDim2Functor(this->huberEpsilon,alpha));
 			}
-            else
+			else if (dualNumbers.size() == 3) 
             {
-                printf("Alert! Huber prox not implemented in CUDA for dim!=2\n");
+				auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->y[dualNumbers[1]].begin(), data->y[dualNumbers[2]].begin(), data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[1]].begin(), data->yTilde[dualNumbers[2]].begin(), data->sigmaElt[dualNumbers[0]].begin(), data->sigmaElt[dualNumbers[1]].begin(), data->sigmaElt[dualNumbers[2]].begin()));
+				auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].end(),   data->y[dualNumbers[1]].end(),	 data->y[dualNumbers[2]].end(),	  data->yTilde[dualNumbers[0]].end(),   data->yTilde[dualNumbers[1]].end(),   data->yTilde[dualNumbers[2]].end(),   data->sigmaElt[dualNumbers[0]].end(),   data->sigmaElt[dualNumbers[1]].end(),   data->sigmaElt[dualNumbers[2]].end()));
+
+				thrust::for_each(startIterator, endIterator, flexProxDualHuberDim3Functor(this->huberEpsilon, alpha));
             }
+			else
+			{
+				printf("Alert! Huber prox not implemented in CUDA for dim!={2,3}\n");
+			}
 		#else
 			if (dualNumbers.size() == 1)
 			{

@@ -34,7 +34,7 @@ public:
 		__host__ __device__
         void operator()(Tuple t)
 		{
-			thrust::get<0>(t) = min(this->alpha, max(-this->alpha,thrust::get<1>(t) - alpha * thrust::get<2>(t) * thrust::get<3>(t)));
+			thrust::get<0>(t) = min(this->alpha, max(-this->alpha,thrust::get<1>(t) - this->alpha * thrust::get<2>(t) * thrust::get<3>(t)));
 		}
 
 		T alpha;
