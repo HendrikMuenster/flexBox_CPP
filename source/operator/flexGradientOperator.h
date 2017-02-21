@@ -622,6 +622,28 @@ public:
 	//
 	//
 
+	void updateValue(T* ptr, mySign s, T value)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			*ptr += value;
+			break;
+		}
+		case MINUS:
+		{
+			*ptr -= value;
+			break;
+		}
+		case EQUALS:
+		{
+			*ptr = value;
+			break;
+		}
+		}
+	}
+
 	void dxp3d(const Tdata &input, Tdata &output, mySign s)
 	{
 		int sizeZ = this->inputDimension[2];
@@ -637,24 +659,7 @@ public:
 				{
 					const int tmpIndex = this->index3DtoLinear(i, j, k);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex] += input[tmpIndex + 1] - input[tmpIndex];
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex] -= input[tmpIndex + 1] - input[tmpIndex];
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex] = input[tmpIndex + 1] - input[tmpIndex];
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex], s, input[tmpIndex + 1] - input[tmpIndex]);
 				}
 			}
 		}
@@ -676,24 +681,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j + 1, k);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, input[tmpIndex2] - input[tmpIndex1]);
 				}
 			}
 		}
@@ -715,24 +703,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j, k + 1);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, input[tmpIndex2] - input[tmpIndex1]);
 				}
 			}
 		}
@@ -751,26 +722,9 @@ public:
 			{
 				for (int i = 1; i < sizeX; ++i)
 				{
-					int tmpIndex = this->index3DtoLinear(i, j, k);
-
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - 1]);
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - 1]);
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - 1]);
-						break;
-					}
-					}
+					int tmpIndex = this->index3DtoLinear(i, j, k); 
+					
+					this->updateValue(&output[tmpIndex], s, -(input[tmpIndex] - input[tmpIndex - 1]));
 				}
 			}
 		}
@@ -784,27 +738,8 @@ public:
 				const int index2 = this->index3DtoLinear(this->inputDimension[0] - 1, j, k);
 				const int index3 = this->index3DtoLinear(this->inputDimension[0] - 2, j, k);
 
-				switch (s)
-				{
-				case PLUS:
-				{
-					output[index1] += -input[index1];
-					output[index2] += input[index3];
-					break;
-				}
-				case MINUS:
-				{
-					output[index1] -= -input[index1];
-					output[index2] -= input[index3];
-					break;
-				}
-				case EQUALS:
-				{
-					output[index1] = -input[index1];
-					output[index2] = input[index3];
-					break;
-				}
-				}
+				this->updateValue(&output[index1], s, -input[index1]);
+				this->updateValue(&output[index2], s, input[index3]);
 			}
 		}
 	}
@@ -825,24 +760,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j - 1, k);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, -(input[tmpIndex1] - input[tmpIndex2]));
 				}
 			}
 		}
@@ -856,27 +774,8 @@ public:
 				const int index2 = this->index3DtoLinear(i, this->inputDimension[1] - 1, k);
 				const int index3 = this->index3DtoLinear(i, this->inputDimension[1] - 2, k);
 
-				switch (s)
-				{
-				case PLUS:
-				{
-					output[index1] += -input[index1];
-					output[index2] += input[index3];
-					break;
-				}
-				case MINUS:
-				{
-					output[index1] -= -input[index1];
-					output[index2] -= input[index3];
-					break;
-				}
-				case EQUALS:
-				{
-					output[index1] = -input[index1];
-					output[index2] = input[index3];
-					break;
-				}
-				}
+				this->updateValue(&output[index1], s, -input[index1]);
+				this->updateValue(&output[index2], s, input[index3]);
 			}
 		}
 	}
@@ -897,24 +796,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j, k - 1);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, -(input[tmpIndex1] - input[tmpIndex2]));
 				}
 			}
 		}
@@ -928,27 +810,8 @@ public:
 				const int index2 = this->index3DtoLinear(i, j, this->inputDimension[2] - 1);
 				const int index3 = this->index3DtoLinear(i, j, this->inputDimension[2] - 2);
 
-				switch (s)
-				{
-				case PLUS:
-				{
-					output[index1] += -input[index1];
-					output[index2] += input[index3];
-					break;
-				}
-				case MINUS:
-				{
-					output[index1] -= -input[index1];
-					output[index2] -= input[index3];
-					break;
-				}
-				case EQUALS:
-				{
-					output[index1] = -input[index1];
-					output[index2] = input[index3];
-					break;
-				}
-				}
+				this->updateValue(&output[index1], s, -input[index1]);
+				this->updateValue(&output[index2], s, input[index3]);
 			}
 		}
 	}

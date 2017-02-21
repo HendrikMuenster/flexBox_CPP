@@ -52,8 +52,6 @@
 
 #include "flexBox.h"
 
-//primal
-#include "term/flexTermPrimal.h"
 #include "term/flexTermDual.h"
 
 //prox
@@ -164,47 +162,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		copyToVector(tmpVector, mxGetPr(mxGetCell(x,i)), numberOfElementsVector);
 
 		mainObject.setPrimal(i, tmpVector);
-	}
-
-
-	// copy primal terms
-	mxArray *primals = mxGetProperty(prhs[0],0,"primals");
-	mxArray *pcp = mxGetProperty(prhs[0],0,"PcP");  //numbers of primal variables corresponding to primal terms
-
-	int numPrimalTerms = (int)mxGetN(primals)*(int)mxGetM(primals);
-	for (int i=0;i < numPrimalTerms; ++i)
-	{
-		//weight
-		float alpha = (float)mxGetScalar(mxGetProperty(mxGetCell(primals,i),0,"factor"));
-
-		if (verbose > 0)
-		{
-			mexPrintf("Primal term %i is of type %s with alpha = %f\n",i,mxGetClassName(mxGetCell(primals,i)),alpha);
-		}
-
-		double *input_correspondingPrimals = mxGetPr( mxGetCell(pcp,i) );
-
-		std::vector<int> _correspondingPrimals;
-		for (int j = 0; j < mxGetN(mxGetCell(pcp,i)) * mxGetM(mxGetCell(pcp,i)); ++j)
-		{
-			//decrease number by 1 because C++ internal counter starts at 0
-			_correspondingPrimals.push_back((int)input_correspondingPrimals[j] - 1);
-			if (verbose > 1)
-			{
-				printf("Primal term %d corresponding primal var %d\n",i,(int)input_correspondingPrimals[j] - 1);
-			}
-		}
-
-		if (strcmp(mxGetClassName(mxGetCell(primals,i)), "emptyDataTerm") == 0)
-		{
-			//add primal term
-			mainObject.addPrimal(new flexTermPrimal<floatingType>(1, alpha, primalEmptyProx), _correspondingPrimals);
-		}
-		else
-		{
-			mexPrintf("Primal term %s not supported!\n",mxGetClassName(mxGetCell(primals,i)));
-			mexErrMsgTxt("Aborting");
-		}
 	}
 
 	// copy primal terms

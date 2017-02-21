@@ -10,13 +10,9 @@ private:
 	//Params
 	T theta;
 
-	//List of primal terms is list of pointers to terms
-	std::vector<flexTermPrimal<T>*> termsPrimal;
 	//List of dual terms is list of pointers to terms
 	std::vector<flexTermDual<T>*> termsDual;
 
-	//List of primal variables corresponding to primal terms
-	std::vector<std::vector<int> > pcp;
 	//List of primal variables corresponding to dual terms
 	std::vector<std::vector<int> > dcp;
 	//List of dual variables corresponding to dual terms
@@ -30,11 +26,6 @@ public:
 
 	~flexSolverPrimalDual()
 	{
-		for (int i = (int)termsPrimal.size() - 1; i >= 0; --i)
-		{
-			delete termsPrimal[i];
-		}
-
 		for (int i = (int)termsDual.size() - 1; i >= 0; --i)
 		{
 			delete termsDual[i];
@@ -99,13 +90,6 @@ public:
 				ptrTau[j] = (T)1 / myMax<T>(0.001f, ptrTau[j]);
 			}
 		}
-	}
-
-	void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals)
-	{
-		this->termsPrimal.push_back(_primalPart);
-
-		this->pcp.push_back(_correspondingPrimals);
 	}
 
 	void addDual(flexBoxData<T> *data, flexTermDual<T>* aDualPart, std::vector<int> aCorrespondingPrimals)
@@ -201,13 +185,15 @@ public:
 		//timer.end(); printf("Time for vectorScalarSet(data->xTilde[i], (T)0); was: %f\n", timer.elapsed());
 
 		//timer.reset();
+		//xTilde is K^ty
 		for (int i = 0; i < (int)termsDual.size(); ++i)
 		{
 			this->xTilde(data, termsDual[i], dcd[i], dcp[i]);
 		}
-		// set tildeX = xOld - tau * tildeX
+		// set x = xOld - tau * tildeX
 		for (int i = 0; i < data->xTilde.size(); ++i)
 		{
+			T* ptrX = data->x[i].data();
 			T* ptrXtilde = data->xTilde[i].data();
 			T* ptrXold = data->xOld[i].data();
 			T* ptrTau = data->tauElt[i].data();
@@ -217,17 +203,11 @@ public:
 			#pragma omp parallel for
 			for (int k = 0; k < numElements; ++k)
 			{
-				ptrXtilde[k] = ptrXold[k] - ptrTau[k] * ptrXtilde[k];
+				ptrX[k] = ptrXold[k] - ptrTau[k] * ptrXtilde[k];
 			}
 		}
 		//timer.end(); printf("Time for this->xTilde was: %f\n", timer.elapsed());
 
-		//timer.reset();
-		for (int i = 0; i < (int)termsPrimal.size(); ++i)
-		{
-			termsPrimal[i]->applyProx(data, pcp[i]);
-		}
-		//timer.end(); printf("Time for termsPrimal[i]->applyProx(data, tau, pcp[i]); was: %f\n", timer.elapsed());
 
 		//do overrelaxation
 		//timer.reset();

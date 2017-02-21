@@ -6,7 +6,6 @@
 //flexBox
 #include "tools.h"
 #include "flexBox.h"
-#include "flexTermPrimal.h"
 #include "flexLinearOperator.h"
 #include "flexIdentityOperator.h"
 #include "flexGradientOperator.h"
@@ -64,8 +63,6 @@ int main()
 	//add empty term for primal var, because we want to solve the fully dualized problem
 	std::vector<int> correspondingPrimals;
 	correspondingPrimals.push_back(0);
-
-	mainObject.addPrimal(new flexTermPrimal<floatingType>(1, 1, primalEmptyProx), correspondingPrimals);
 
 	//add dualized data term:
 	std::vector<flexLinearOperator<floatingType>*> operatorList;
