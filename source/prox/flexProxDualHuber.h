@@ -167,7 +167,7 @@ public:
 				{
 					T huberFactor = (T)1 / ((T)1 + ptrSigma[i] * epsiAlpha);
 
-					T yTmp = huberFactor / std::max((T)1, huberFactor * std::sqrt(std::pow(ptrYtilde0[i], (int)2) + std::pow(ptrYtilde1[i], (int)2) + std::pow(ptrYtilde2[i], (int)2)) / alpha);
+					T yTmp = huberFactor / std::max((T)1, huberFactor * std::sqrt(pow2(ptrYtilde0[i]) + pow2(ptrYtilde1[i]) + pow2(ptrYtilde2[i])) / alpha);
 
 					ptrY0[i] = ptrYtilde0[i] * yTmp;
 					ptrY1[i] = ptrYtilde1[i] * yTmp;

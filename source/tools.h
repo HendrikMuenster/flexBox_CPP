@@ -111,12 +111,10 @@ T myMax(T a, T b)
 	return a < b ? b : a;
 }
 
-template < typename T >
-float myPow2(float x)
+double pow2(double x)
 {
 	return x * x;
 }
-
 float pow2(float x)
 {
 	return x * x;
