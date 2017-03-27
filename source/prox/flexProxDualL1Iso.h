@@ -134,7 +134,7 @@ public:
 				#pragma omp parallel for
 				for (int i = 0; i < numElements; i++)
 				{
-					T yTmp = (T)1 / std::max((T)1, std::sqrt(std::pow(ptrYtilde0[i], (int)2) + std::pow(ptrYtilde1[i], (int)2)) / alpha);
+					T yTmp = (T)1 / std::max((T)1, std::sqrt(ptrYtilde0[i] * ptrYtilde0[i] + ptrYtilde1[i] * ptrYtilde1[i]) / alpha);
 
 					ptrY0[i] = ptrYtilde0[i] * yTmp;
 					ptrY1[i] = ptrYtilde1[i] * yTmp;

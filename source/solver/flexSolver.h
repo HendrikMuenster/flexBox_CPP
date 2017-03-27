@@ -25,9 +25,7 @@ public:
 	}
 
 	virtual void init(flexBoxData<T> *data) = 0;
-
-	virtual void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals) = 0;
-
+	
 	virtual void addDual(flexBoxData<T> *data, flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals) = 0;
 
 	virtual void doIteration(flexBoxData<T> *data) = 0;

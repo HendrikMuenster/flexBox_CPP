@@ -2,7 +2,6 @@
 #define flexbox_H
 
 #include "term/flexTermDual.h"
-#include "term/flexTermPrimal.h"
 
 #ifdef __CUDACC__
 	#include "solver/flexSolverPrimalDualCuda.h"
@@ -115,11 +114,6 @@ class flexBox
 			dims.push_back(_dims);
 
 			return getNumPrimalVars() - 1;
-		}
-
-		void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals)
-		{
-			solver->addPrimal(_primalPart, _correspondingPrimals);
 		}
 
 		void addDual(flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals)

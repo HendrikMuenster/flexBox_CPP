@@ -78,7 +78,6 @@ set(SOURCES_IDE_SOLV
 #term
 set(SOURCES_IDE_TERM
   term/flexTermDual.h
-  term/flexTermPrimal.h
 )
 
 #matlab

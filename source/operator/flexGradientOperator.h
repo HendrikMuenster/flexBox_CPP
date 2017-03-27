@@ -4,6 +4,582 @@
 #include <vector>
 #include "flexLinearOperator.h"
 
+#ifdef __CUDACC__
+//
+// 2d kernels
+//
+template<typename T>
+__global__ void dxp2dCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, mySign s)
+{
+	const size_t x = threadIdx.x + blockIdx.x * blockDim.x;
+	const size_t y = threadIdx.y + blockIdx.y * blockDim.y;
+
+	if (x >= sizeX || y >= sizeY)
+		return;
+
+	const size_t tmpIndex = x + y * sizeX;
+
+	if (x < sizeX - 1)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += input[tmpIndex + 1] - input[tmpIndex];
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= input[tmpIndex + 1] - input[tmpIndex];
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = input[tmpIndex + 1] - input[tmpIndex];
+				break;
+			}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dxp2dTransposedCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, mySign s)
+{
+	const size_t x = threadIdx.x + blockIdx.x * blockDim.x;
+	const size_t y = threadIdx.y + blockIdx.y * blockDim.y;
+
+	if (x >= sizeX || y >= sizeY)
+		return;
+
+	const size_t tmpIndex = x + y * sizeX;
+
+	if (x < sizeX - 1 && x > 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - 1]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - 1]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - 1]);
+				break;
+			}
+		}
+	}
+	else if (x == 0)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += -(input[tmpIndex]);
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= -(input[tmpIndex]);
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = -(input[tmpIndex]);
+			break;
+		}
+		}
+	}
+	else
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += (input[tmpIndex - 1]);
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= (input[tmpIndex - 1]);
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = (input[tmpIndex - 1]);
+			break;
+		}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dyp2dCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, mySign s)
+{
+	const size_t x = threadIdx.x + blockIdx.x * blockDim.x;
+	const size_t y = threadIdx.y + blockIdx.y * blockDim.y;
+
+	if (x >= sizeX || y >= sizeY)
+		return;
+
+	const size_t tmpIndex = x + y * sizeX;
+
+	if (y < sizeY - 1)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += input[tmpIndex + sizeX] - input[tmpIndex];
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= input[tmpIndex + sizeX] - input[tmpIndex];
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = input[tmpIndex + sizeX] - input[tmpIndex];
+			break;
+		}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dyp2dTransposedCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, mySign s)
+{
+	const size_t x = threadIdx.x + blockIdx.x * blockDim.x;
+	const size_t y = threadIdx.y + blockIdx.y * blockDim.y;
+
+	if (x >= sizeX || y >= sizeY)
+		return;
+
+	const size_t tmpIndex = x + y * sizeX;
+
+	if (y < sizeY - 1 && y > 0)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - sizeX]);
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - sizeX]);
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - sizeX]);
+			break;
+		}
+		}
+	}
+	else if (y == 0)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += -(input[tmpIndex]);
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= -(input[tmpIndex]);
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = -(input[tmpIndex]);
+			break;
+		}
+		}
+	}
+	else
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += (input[tmpIndex - sizeX]);
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= (input[tmpIndex - sizeX]);
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = (input[tmpIndex - sizeX]);
+			break;
+		}
+		}
+	}
+}
+
+//
+// 3d kernels
+// 
+
+__device__
+int getGlobalIdx_3D_3D(){
+	int blockId = blockIdx.x + blockIdx.y * gridDim.x
+		+ gridDim.x * gridDim.y * blockIdx.z;
+	int threadId = blockId * (blockDim.x * blockDim.y * blockDim.z)
+		+ (threadIdx.z * (blockDim.x * blockDim.y))
+		+ (threadIdx.y * blockDim.x) + threadIdx.x;
+	return threadId;
+}
+
+template<typename T>
+__global__ void dxp3dCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, const size_t sizeZ, mySign s)
+{
+	const size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+	const size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+	const size_t z = blockDim.z * blockIdx.z + threadIdx.z;
+
+	const size_t tmpIndex = x + sizeX * y + sizeX * sizeY * z;
+
+	if (x >= sizeX || y >= sizeY || z >= sizeZ)
+		return;
+
+	if (x < sizeX - 1)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			output[tmpIndex] += input[tmpIndex + 1] - input[tmpIndex];
+			break;
+		}
+		case MINUS:
+		{
+			output[tmpIndex] -= input[tmpIndex + 1] - input[tmpIndex];
+			break;
+		}
+		case EQUALS:
+		{
+			output[tmpIndex] = input[tmpIndex + 1] - input[tmpIndex];
+			break;
+		}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dxp3dTransposedCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, const size_t sizeZ, mySign s)
+{
+	const size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+	const size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+	const size_t z = blockDim.z * blockIdx.z + threadIdx.z;
+
+	const size_t tmpIndex = x + sizeX * y + sizeX * sizeY * z;
+
+	if (x >= sizeX || y >= sizeY || z >= sizeZ)
+		return;
+
+	if (x < sizeX - 1 && x > 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - 1]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - 1]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - 1]);
+				break;
+			}
+		}
+	}
+	else if (x == 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex]);
+				break;
+			}
+		}
+	}
+	else
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += (input[tmpIndex - 1]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= (input[tmpIndex - 1]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = (input[tmpIndex - 1]);
+				break;
+			}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dyp3dCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, const size_t sizeZ, mySign s)
+{
+	const size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+	const size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+	const size_t z = blockDim.z * blockIdx.z + threadIdx.z;
+
+	const size_t tmpIndex = x + sizeX * y + sizeX * sizeY * z;
+
+	if (x >= sizeX || y >= sizeY || z >= sizeZ)
+		return;
+	
+	if (y < sizeY - 1)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += input[tmpIndex + sizeX] - input[tmpIndex];
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= input[tmpIndex + sizeX] - input[tmpIndex];
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = input[tmpIndex + sizeX] - input[tmpIndex];
+				break;
+			}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dyp3dTransposedCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, const size_t sizeZ, mySign s)
+{
+	const size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+	const size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+	const size_t z = blockDim.z * blockIdx.z + threadIdx.z;
+
+	const size_t tmpIndex = x + sizeX * y + sizeX * sizeY * z;
+
+	if (x >= sizeX || y >= sizeY || z >= sizeZ)
+		return;
+	
+	if (y < sizeY - 1 && y > 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - sizeX]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - sizeX]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - sizeX]);
+				break;
+			}
+		}
+	}
+	else if (y == 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex]);
+				break;
+			}
+		}
+	}
+	else
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += (input[tmpIndex - sizeX]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= (input[tmpIndex - sizeX]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = (input[tmpIndex - sizeX]);
+				break;
+			}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dzp3dCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, const size_t sizeZ, mySign s)
+{
+	const size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+	const size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+	const size_t z = blockDim.z * blockIdx.z + threadIdx.z;
+
+	const size_t tmpIndex = x + sizeX * y + sizeX * sizeY * z;
+
+	if (x >= sizeX || y >= sizeY || z >= sizeZ)
+		return;
+	
+	if (z < sizeZ - 1)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += input[tmpIndex + sizeX * sizeY] - input[tmpIndex];
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= input[tmpIndex + sizeX * sizeY] - input[tmpIndex];
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = input[tmpIndex + sizeX * sizeY] - input[tmpIndex];
+				break;
+			}
+		}
+	}
+}
+
+template<typename T>
+__global__ void dzp3dTransposedCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, const size_t sizeZ, mySign s)
+{
+	const size_t x = blockDim.x * blockIdx.x + threadIdx.x;
+	const size_t y = blockDim.y * blockIdx.y + threadIdx.y;
+	const size_t z = blockDim.z * blockIdx.z + threadIdx.z;
+
+	const size_t tmpIndex = x + sizeX * y + sizeX * sizeY * z;
+
+	if (x >= sizeX || y >= sizeY || z >= sizeZ)
+		return;
+	
+	if (z < sizeZ - 1 && z > 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - sizeX * sizeY]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - sizeX * sizeY]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - sizeX * sizeY]);
+				break;
+			}
+		}
+	}
+	else if (z == 0)
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += -(input[tmpIndex]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= -(input[tmpIndex]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = -(input[tmpIndex]);
+				break;
+			}
+		}
+	}
+	else
+	{
+		switch (s)
+		{
+			case PLUS:
+			{
+				output[tmpIndex] += (input[tmpIndex - sizeX * sizeY]);
+				break;
+			}
+			case MINUS:
+			{
+				output[tmpIndex] -= (input[tmpIndex - sizeX * sizeY]);
+				break;
+			}
+			case EQUALS:
+			{
+				output[tmpIndex] = (input[tmpIndex - sizeX * sizeY]);
+				break;
+			}
+		}
+	}
+}
+
+#endif
+
 template<typename T>
 class flexGradientOperator : public flexLinearOperator<T>
 {
@@ -40,17 +616,33 @@ public:
 		return new flexGradientOperator<T>(dimsCopy, this->gradDirection, this->type, this->isMinus);
 	}
 
-	//apply linear operator to vector
-	void times(bool transposed, const Tdata &input, Tdata &output)
-	{
-
-	}
-
 	//
 	//
 	//  3d cases
 	//
 	//
+
+	void updateValue(T* ptr, mySign s, T value)
+	{
+		switch (s)
+		{
+		case PLUS:
+		{
+			*ptr += value;
+			break;
+		}
+		case MINUS:
+		{
+			*ptr -= value;
+			break;
+		}
+		case EQUALS:
+		{
+			*ptr = value;
+			break;
+		}
+		}
+	}
 
 	void dxp3d(const Tdata &input, Tdata &output, mySign s)
 	{
@@ -67,24 +659,7 @@ public:
 				{
 					const int tmpIndex = this->index3DtoLinear(i, j, k);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex] += input[tmpIndex + 1] - input[tmpIndex];
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex] -= input[tmpIndex + 1] - input[tmpIndex];
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex] = input[tmpIndex + 1] - input[tmpIndex];
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex], s, input[tmpIndex + 1] - input[tmpIndex]);
 				}
 			}
 		}
@@ -106,24 +681,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j + 1, k);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, input[tmpIndex2] - input[tmpIndex1]);
 				}
 			}
 		}
@@ -145,24 +703,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j, k + 1);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = input[tmpIndex2] - input[tmpIndex1];
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, input[tmpIndex2] - input[tmpIndex1]);
 				}
 			}
 		}
@@ -181,26 +722,9 @@ public:
 			{
 				for (int i = 1; i < sizeX; ++i)
 				{
-					int tmpIndex = this->index3DtoLinear(i, j, k);
-
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex] += -(input[tmpIndex] - input[tmpIndex - 1]);
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex] -= -(input[tmpIndex] - input[tmpIndex - 1]);
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex] = -(input[tmpIndex] - input[tmpIndex - 1]);
-						break;
-					}
-					}
+					int tmpIndex = this->index3DtoLinear(i, j, k); 
+					
+					this->updateValue(&output[tmpIndex], s, -(input[tmpIndex] - input[tmpIndex - 1]));
 				}
 			}
 		}
@@ -214,27 +738,8 @@ public:
 				const int index2 = this->index3DtoLinear(this->inputDimension[0] - 1, j, k);
 				const int index3 = this->index3DtoLinear(this->inputDimension[0] - 2, j, k);
 
-				switch (s)
-				{
-				case PLUS:
-				{
-					output[index1] += -input[index1];
-					output[index2] += input[index3];
-					break;
-				}
-				case MINUS:
-				{
-					output[index1] -= -input[index1];
-					output[index2] -= input[index3];
-					break;
-				}
-				case EQUALS:
-				{
-					output[index1] = -input[index1];
-					output[index2] = input[index3];
-					break;
-				}
-				}
+				this->updateValue(&output[index1], s, -input[index1]);
+				this->updateValue(&output[index2], s, input[index3]);
 			}
 		}
 	}
@@ -255,24 +760,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j - 1, k);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, -(input[tmpIndex1] - input[tmpIndex2]));
 				}
 			}
 		}
@@ -286,27 +774,8 @@ public:
 				const int index2 = this->index3DtoLinear(i, this->inputDimension[1] - 1, k);
 				const int index3 = this->index3DtoLinear(i, this->inputDimension[1] - 2, k);
 
-				switch (s)
-				{
-				case PLUS:
-				{
-					output[index1] += -input[index1];
-					output[index2] += input[index3];
-					break;
-				}
-				case MINUS:
-				{
-					output[index1] -= -input[index1];
-					output[index2] -= input[index3];
-					break;
-				}
-				case EQUALS:
-				{
-					output[index1] = -input[index1];
-					output[index2] = input[index3];
-					break;
-				}
-				}
+				this->updateValue(&output[index1], s, -input[index1]);
+				this->updateValue(&output[index2], s, input[index3]);
 			}
 		}
 	}
@@ -327,24 +796,7 @@ public:
 					const int tmpIndex1 = this->index3DtoLinear(i, j, k);
 					const int tmpIndex2 = this->index3DtoLinear(i, j, k - 1);
 
-					switch (s)
-					{
-					case PLUS:
-					{
-						output[tmpIndex1] += -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case MINUS:
-					{
-						output[tmpIndex1] -= -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					case EQUALS:
-					{
-						output[tmpIndex1] = -(input[tmpIndex1] - input[tmpIndex2]);
-						break;
-					}
-					}
+					this->updateValue(&output[tmpIndex1], s, -(input[tmpIndex1] - input[tmpIndex2]));
 				}
 			}
 		}
@@ -358,27 +810,8 @@ public:
 				const int index2 = this->index3DtoLinear(i, j, this->inputDimension[2] - 1);
 				const int index3 = this->index3DtoLinear(i, j, this->inputDimension[2] - 2);
 
-				switch (s)
-				{
-				case PLUS:
-				{
-					output[index1] += -input[index1];
-					output[index2] += input[index3];
-					break;
-				}
-				case MINUS:
-				{
-					output[index1] -= -input[index1];
-					output[index2] -= input[index3];
-					break;
-				}
-				case EQUALS:
-				{
-					output[index1] = -input[index1];
-					output[index2] = input[index3];
-					break;
-				}
-				}
+				this->updateValue(&output[index1], s, -input[index1]);
+				this->updateValue(&output[index2], s, input[index3]);
 			}
 		}
 	}
@@ -570,182 +1003,8 @@ public:
 		}
 	}
 
-
-	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
+	void doTimesCPU(bool transposed, const Tdata &input, Tdata &output, mySign s)
 	{
-        #ifdef __CUDACC__
-			dim3 block2d = dim3(32, 16, 1);
-			dim3 grid2d = dim3((this->inputDimension[0] + block2d.x - 1) / block2d.x, (this->inputDimension[1] + block2d.y - 1) / block2d.y, 1);
-
-			T* ptrOutput = thrust::raw_pointer_cast(output.data());
-			const T* ptrInput = thrust::raw_pointer_cast(input.data());
-		#endif
-		
-        mySign s;
-        int s2;
-		
-		if (this->isMinus)
-        {
-            s = MINUS;
-            s2 = SIGN_MINUS;
-		}
-        else
-        {
-            s = PLUS;
-            s2 = SIGN_PLUS;
-        }
-		
-		// flip sign and transposed
-		if (this->type == backward)
-		{
-			transposed = !transposed;
-			if (s == MINUS)
-			{
-				s = PLUS;
-				s2 = SIGN_PLUS;
-			}
-			else
-			{
-				s = MINUS;
-				s2 = SIGN_MINUS;
-			}
-		}
-
-		if (this->inputDimension.size() == 2)
-		{
-			if (this->gradDirection == 0)
-			{
-				if (transposed == false)
-				{
-					#ifdef __CUDACC__
-						dxp2dCUDA << <grid2d, block2d >> >(ptrOutput,ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-					#else
-						this->dxp2d(input,output,s);
-					#endif
-				}
-				else
-				{
-					#ifdef __CUDACC__
-						dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-					#else
-						this->dxp2dTransposed(input, output, s);
-					#endif
-				}
-			}
-			else if (this->gradDirection == 1)
-			{
-				if (transposed == false)
-				{
-					#ifdef __CUDACC__
-						dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-					#else
-						this->dyp2d(input, output, s);
-					#endif
-				}
-				else
-				{
-					#ifdef __CUDACC__
-						dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-					#else
-						this->dyp2dTransposed(input, output, s);
-					#endif
-				}
-			}
-		}
-		else if (this->inputDimension.size() == 3)
-		{
-			if (this->gradDirection == 0)
-			{
-				if (transposed == false)
-				{
-#ifdef __CUDACC__
-//					dxp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-#else
-					this->dxp3d(input, output, s);
-#endif
-				}
-				else
-				{
-#ifdef __CUDACC__
-//					dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-#else
-					this->dxp3dTransposed(input, output, s);
-#endif
-				}
-			}
-			else if (this->gradDirection == 1)
-			{
-				if (transposed == false)
-				{
-#ifdef __CUDACC__
-//					dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-#else
-					this->dyp3d(input, output, s);
-#endif
-				}
-				else
-				{
-#ifdef __CUDACC__
-//					dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-#else
-					this->dyp3dTransposed(input, output, s);
-#endif
-				}
-			}
-			else if (this->gradDirection == 2)
-			{
-				if (transposed == false)
-				{
-#ifdef __CUDACC__
-					//					dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-#else
-					this->dzp3d(input, output, s);
-#endif
-				}
-				else
-				{
-#ifdef __CUDACC__
-					//					dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
-#else
-					this->dzp3dTransposed(input, output, s);
-#endif
-				}
-			}
-		}
-		else
-		{
-			printf("Gradient not implemented for dim!={2,3}\n");
-			//todo
-		}
-	}
-
-	void doTimesMinusCPU(bool transposed, const Tdata &input, Tdata &output)
-	{
-		mySign s;
-
-		if (this->isMinus)
-		{
-			s = MINUS;
-		}
-		else
-		{
-			s = PLUS;
-		}
-
-		// flip sign and transposed
-		if (this->type == backward)
-		{
-			transposed = !transposed;
-			if (s == MINUS)
-			{
-				s = PLUS;
-			}
-			else
-			{
-				s = MINUS;
-			}
-		}
-
 		if (this->inputDimension.size() == 2)
 		{
 			if (this->gradDirection == 0)
@@ -815,39 +1074,26 @@ public:
 	}
 
 	#ifdef __CUDACC__
-	void doTimesMinusCUDA(bool transposed, const Tdata &input, Tdata &output)
+	void doTimesCUDA(bool transposed, const Tdata &input, Tdata &output, mySign s)
 	{
+		size_t sizeX = this->inputDimension[0];
+		size_t sizeY = 1;
+		size_t sizeZ = 1;
 
-		dim3 block2d = dim3(32, 16, 1);
-		dim3 grid2d = dim3((this->inputDimension[0] + block2d.x - 1) / block2d.x, (this->inputDimension[1] + block2d.y - 1) / block2d.y, 1);
+		if (this->inputDimension.size() > 1)
+		{
+			sizeY = this->inputDimension[1];
+		}
+		if (this->inputDimension.size() > 2)
+		{
+			sizeZ = this->inputDimension[2];
+		}
+
+		dim3 block = dim3(32,16,1);
+		dim3 grid = dim3((sizeX + block.x - 1) / block.x, (sizeY + block.y - 1) / block.y, (sizeZ + block.z - 1) / block.z);
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
 		const T* ptrInput = thrust::raw_pointer_cast(input.data());
-
-		int s2;
-
-		if (this->isMinus)
-		{
-			s2 = SIGN_MINUS;
-		}
-		else
-		{
-			s2 = SIGN_PLUS;
-		}
-
-		// flip sign and transposed
-		if (this->type == backward)
-		{
-			transposed = !transposed;
-			if (s == MINUS)
-			{
-				s2 = SIGN_PLUS;
-			}
-			else
-			{
-				s2 = SIGN_MINUS;
-			}
-		}
 
 		if (this->inputDimension.size() == 2)
 		{
@@ -855,22 +1101,22 @@ public:
 			{
 				if (transposed == false)
 				{
-					dxp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dxp2dCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s);
 				}
 				else
 				{
-					dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dxp2dTransposedCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s);
 				}
 			}
 			else if (this->gradDirection == 1)
 			{
 				if (transposed == false)
 				{
-					dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dyp2dCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s);
 				}
 				else
 				{
-					dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dyp2dTransposedCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s);
 				}
 			}
 		}
@@ -880,33 +1126,33 @@ public:
 			{
 				if (transposed == false)
 				{
-					//					dxp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dxp3dCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], this->inputDimension[2], s);
 				}
 				else
 				{
-					//					dxp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dxp3dTransposedCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], this->inputDimension[2], s);
 				}
 			}
 			else if (this->gradDirection == 1)
 			{
 				if (transposed == false)
 				{
-					//					dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dyp3dCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], this->inputDimension[2], s);
 				}
 				else
 				{
-					//					dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dyp3dTransposedCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], this->inputDimension[2], s);
 				}
 			}
 			else if (this->gradDirection == 2)
 			{
 				if (transposed == false)
 				{
-					//					dyp2dCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dzp3dCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], this->inputDimension[2], s);
 				}
 				else
 				{
-					//					dyp2dTransposedCUDA << <grid2d, block2d >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], s2);
+					dzp3dTransposedCUDA << <grid, block >> >(ptrOutput, ptrInput, this->inputDimension[0], this->inputDimension[1], this->inputDimension[2], s);
 				}
 			}
 		}
@@ -918,13 +1164,51 @@ public:
 	}
 	#endif
 
+	void doTimes(bool transposed, const Tdata &input, Tdata &output, mySign s)
+	{
+		if (this->isMinus && s == PLUS)
+		{
+			s = MINUS;
+		}
+		else if (this->isMinus && s == MINUS)
+		{
+			s = PLUS;
+		}
+
+		// flip sign and transposed
+		if (this->type == backward)
+		{
+			transposed = !transposed;
+			if (s == MINUS)
+			{
+				s = PLUS;
+			}
+			else
+			{
+				s = MINUS;
+			}
+		}
+
+		#ifdef __CUDACC__
+			this->doTimesCUDA(transposed, input, output, s);
+		#else
+			this->doTimesCPU(transposed, input, output, s);
+		#endif
+	}
+
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
+	{
+		this->doTimes(transposed, input, output, PLUS);
+	}
+
 	void timesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		#ifdef __CUDACC__
-		this->doTimesMinusCUDA(transposed,input, output);
-		#else
-		this->doTimesMinusCPU(transposed, input, output);
-		#endif
+		this->doTimes(transposed, input, output, MINUS);
+	}
+
+	void times(bool transposed, const Tdata &input, Tdata &output)
+	{
+		this->doTimes(transposed, input, output, EQUALS);
 	}
 
 	T getMaxRowSumAbs(bool transposed)

@@ -12,13 +12,9 @@ private:
 	//Params
 	T theta;
 
-	//List of primal terms is list of pointers to terms
-	std::vector<flexTermPrimal<T>*> termsPrimal;
 	//List of dual terms is list of pointers to terms
 	std::vector<flexTermDual<T>*> termsDual;
 
-    //List of primal variables corresponding to primal terms
-	std::vector<std::vector<int> > pcp;
 	//List of primal variables corresponding to dual terms
 	std::vector<std::vector<int> > dcp;
 	//List of dual variables corresponding to dual terms
@@ -34,11 +30,6 @@ public:
 	~flexSolverPrimalDualCuda()
 	{
 		if (VERBOSE > 0) printf("Destructor flexSolverPrimalDualCuda solver\n!");
-
-		for (int i = termsPrimal.size() - 1; i >= 0; --i)
-		{
-			delete termsPrimal[i];
-		}
 
 		for (int i = termsDual.size() - 1; i >= 0; --i)
 		{
@@ -88,13 +79,6 @@ public:
 		{
             thrust::transform(data->tauElt[i].begin(), data->tauElt[i].end(), data->tauElt[i].begin(), (T)1 / (0.00001 + _1) );
 		}
-	}
-
-	void addPrimal(flexTermPrimal<T>* _primalPart, std::vector<int> _correspondingPrimals)
-	{
-		termsPrimal.push_back(_primalPart);
-
-		pcp.push_back(_correspondingPrimals);
 	}
 
 	void addDual(flexBoxData<T> *data,flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals)
@@ -184,7 +168,7 @@ public:
         __host__ __device__
         void operator()(Tuple t)
         {
-            thrust::get<0>(t) = thrust::get<1>(t) - thrust::get<2>(t) * thrust::get<0>(t);
+            thrust::get<0>(t) = thrust::get<2>(t) - thrust::get<3>(t) * thrust::get<1>(t);
         }
     };
 
@@ -224,23 +208,15 @@ public:
         //timer.end(); printf("Time for this->xTilde was: %f\n", timer.elapsed());
 
         //timer.reset();
-		// set tildeX = xOld - tau * tildeX
+		// set x = xOld - tau * tildeX
 		for (int primalNum = 0; primalNum < data->xTilde.size(); ++primalNum)
 		{
             thrust::for_each(
-                thrust::make_zip_iterator(thrust::make_tuple(data->xTilde[primalNum].begin(), data->xOld[primalNum].begin(), data->tauElt[primalNum].begin())),
-                thrust::make_zip_iterator(thrust::make_tuple(data->xTilde[primalNum].end(),   data->xOld[primalNum].end(),   data->tauElt[primalNum].end())),
+				thrust::make_zip_iterator(thrust::make_tuple(data->x[primalNum].begin(), data->xTilde[primalNum].begin(), data->xOld[primalNum].begin(), data->tauElt[primalNum].begin())),
+				thrust::make_zip_iterator(thrust::make_tuple(data->x[primalNum].end(),   data->xTilde[primalNum].end(), data->xOld[primalNum].end(), data->tauElt[primalNum].end())),
 			xTildeFunctor());
 		}
         //timer.end(); printf("Time for this->xTilde2 was: %f\n", timer.elapsed());
-
-
-		//timer.reset();
-		for (int primalNum = 0; primalNum < (int)termsPrimal.size(); ++primalNum)
-		{
-			termsPrimal[primalNum]->applyProx(data, pcp[primalNum]);
-		}
-		//timer.end(); printf("Time for termsPrimal[i]->applyProx(data, tau, pcp[i]); was: %f\n", timer.elapsed());
 
 		//do overrelaxation
 		//timer.reset();
@@ -249,8 +225,6 @@ public:
             thrust::transform(data->x[primalNum].begin(), data->x[primalNum].end(),data->xOld[primalNum].begin(), data->xBar[primalNum].begin(), _1 + _1 - _2);
 		}
         //timer.end(); printf("Time for overrelax was: %f\n", timer.elapsed());
-
-        //printf("\n\n\nNewIt\n\n\n");
 	}
 
 	void yError(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
