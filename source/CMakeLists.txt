@@ -6,6 +6,8 @@ set (FlexBox_VERSION_MINOR 4)
 #TODO: add support for older cmake versions (matlab_add_mex)?
 #TODO: CUDA: specific archs f.ex. -arch=compute_50 (auto-detect graphics card cmake 3.7?)
 #TODO: add /MP for visual studio parallel builds
+#TODO: find way to include -g argument for mex
+#TODO: -DMATLAB_MEX
 
 ##########################
 #        OPTIONS         #
@@ -85,10 +87,10 @@ set(SOURCES_IDE_MATLAB
   wrappers/matlab/functions.cu
 )
 
-#main files
-set(SOURCES_MAIN
-  "flexBox.h"
-  "tools.h"
+#misc
+set(SOURCES_IDE_MISC
+  flexBox.h
+  tools.h
 )
 
 #group for visual studio
@@ -98,9 +100,10 @@ source_group("prox" FILES ${SOURCES_IDE_PROX})
 source_group("solver" FILES ${SOURCES_IDE_SOLV})
 source_group("term" FILES ${SOURCES_IDE_TERM})
 source_group("matlab" FILES ${SOURCES_IDE_MATLAB})
+source_group("misc" FILES ${SOURCES_IDE_MISC})
 
 #combine
-set(SOURCES_IDE ${SOURCES_IDE_DATA} ${SOURCES_IDE_OP} ${SOURCES_IDE_PROX} ${SOURCES_IDE_SOLV} ${SOURCES_IDE_TERM} ${SOURCES_IDE_MATLAB} ${SOURCES_MAIN})
+set(SOURCES_IDE ${SOURCES_IDE_DATA} ${SOURCES_IDE_OP} ${SOURCES_IDE_PROX} ${SOURCES_IDE_SOLV} ${SOURCES_IDE_TERM} ${SOURCES_IDE_MATLAB} ${SOURCES_IDE_MISC})
 
 ##########################
 #   END FILES/INCUDES    #
