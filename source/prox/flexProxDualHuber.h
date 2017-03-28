@@ -109,16 +109,14 @@ public:
 
 				int numElements = (int)data->yTilde[dualNumbers[0]].size();
 
-                T epsiAlpha = this->huberEpsilon / alpha;
-
 				#pragma omp parallel for
 				for (int i = 0; i < numElements; i++)
 				{
-					T huberFactor = (T)1 / ((T)1.0 + ptrSigma[i] * epsiAlpha);
+					T huberFactor = alpha / (alpha + ptrSigma[i] * this->huberEpsilon);
 
-					T yTmp = (T)1 / myMax<T>((T)1, fabs(ptrYtilde0[i] * huberFactor) / alpha);
+					T yTmp = huberFactor / myMax<T>((T)1, huberFactor*std::abs(ptrYtilde0[i]) / alpha);
 
-					ptrY0[i] = ptrYtilde0[i] * huberFactor * yTmp;
+					ptrY0[i] = ptrYtilde0[i] * yTmp;
 				}
 			}
 			else if (dualNumbers.size() == 2)
@@ -133,17 +131,15 @@ public:
 
 				int numElements = (int)data->yTilde[dualNumbers[0]].size();
 
-                T epsiAlpha = this->huberEpsilon / alpha;
-
 				#pragma omp parallel for
 				for (int i = 0; i < numElements; i++)
 				{
-					T huberFactor = (T)1 / ((T)1.0 + ptrSigma[i] * epsiAlpha);
+					T huberFactor = alpha / (alpha + ptrSigma[i] * this->huberEpsilon);
 
-					T yTmp = (T)1 / myMax<T>((T)1, sqrtf(pow2(ptrYtilde0[i] * huberFactor) + pow2(ptrYtilde1[i] * huberFactor)) / alpha);
+					T yTmp = huberFactor / myMax<T>((T)1, huberFactor*std::sqrt(pow2(ptrYtilde0[i]) + pow2(ptrYtilde1[i])) / alpha);
 
-					ptrY0[i] = ptrYtilde0[i] * huberFactor * yTmp;
-					ptrY1[i] = ptrYtilde1[i] * huberFactor * yTmp;
+					ptrY0[i] = ptrYtilde0[i] * yTmp;
+					ptrY1[i] = ptrYtilde1[i] * yTmp;
 				}
 			}
 			else if (dualNumbers.size() == 3)
@@ -160,12 +156,10 @@ public:
 
 				int numElements = (int)data->yTilde[dualNumbers[0]].size();
 
-                T epsiAlpha = this->huberEpsilon / alpha;
-
 				#pragma omp parallel for
 				for (int i = 0; i < numElements; i++)
 				{
-					T huberFactor = (T)1 / ((T)1 + ptrSigma[i] * epsiAlpha);
+					T huberFactor = alpha / (alpha + ptrSigma[i] * this->huberEpsilon);
 
 					T yTmp = huberFactor / std::max((T)1, huberFactor * std::sqrt(pow2(ptrYtilde0[i]) + pow2(ptrYtilde1[i]) + pow2(ptrYtilde2[i])) / alpha);
 
