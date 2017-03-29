@@ -13,7 +13,7 @@ private:
 	T theta;
 
 	//List of dual terms is list of pointers to terms
-	std::vector<flexTermDual<T>*> termsDual;
+	std::vector<flexTerm<T>*> termsDual;
 
 	//List of primal variables corresponding to dual terms
 	std::vector<std::vector<int> > dcp;
@@ -81,7 +81,7 @@ public:
 		}
 	}
 
-	void addDual(flexBoxData<T> *data,flexTermDual<T>* _dualPart, std::vector<int> _correspondingPrimals)
+	void addTerm(flexBoxData<T> *data,flexTerm<T>* _dualPart, std::vector<int> _correspondingPrimals)
 	{
 		termsDual.push_back(_dualPart);
 
@@ -110,7 +110,7 @@ public:
         }
     };
 
-	void yTilde(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void yTilde(flexBoxData<T>* data, flexTerm<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
         //printf("\n");
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
@@ -137,7 +137,7 @@ public:
 		}
 	}
 
-	void xTilde(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void xTilde(flexBoxData<T>* data, flexTerm<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
         //printf("Xtilde\n");
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
@@ -227,7 +227,7 @@ public:
         //timer.end(); printf("Time for overrelax was: %f\n", timer.elapsed());
 	}
 
-	void yError(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void yError(flexBoxData<T>* data, flexTerm<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{
@@ -247,7 +247,7 @@ public:
 		}
 	}
 
-	void xError(flexBoxData<T>* data, flexTermDual<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
+	void xError(flexBoxData<T>* data, flexTerm<T>* dualTerm, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
 		for (int i = 0; i < (int)dualNumbers.size(); ++i)
 		{

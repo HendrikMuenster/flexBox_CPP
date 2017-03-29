@@ -1,12 +1,12 @@
-#ifndef flexTermDual_H
-#define flexTermDual_H
+#ifndef flexTerm_H
+#define flexTerm_H
 
 #include "operator/flexLinearOperator.h"
 #include "prox/flexProx.h"
 #include "data/flexBoxData.h"
 
 template<typename T>
-class flexTermDual
+class flexTerm
 {
 
 #ifdef __CUDACC__
@@ -26,12 +26,12 @@ public:
 	flexProx<T>* myProx;
     std::vector<Tdata> fList;
 
-    flexTermDual(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList) : flexTermDual(aMyProx,aAlpha,numberPrimals,aOperatorList, std::vector<std::vector<T>>(0))
+	flexTerm(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList) : flexTerm(aMyProx, aAlpha, numberPrimals, aOperatorList, std::vector<std::vector<T>>(0))
 	{
 
 	}
 
-    flexTermDual(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList, std::vector<std::vector<T>> aFList) : myProx(aMyProx), alpha(aAlpha), numberPrimals(numberPrimals), numberVars((int)aOperatorList.size() / numberPrimals), p(aMyProx->getProx())
+	flexTerm(flexProx<T>* aMyProx, T aAlpha, int numberPrimals, std::vector<flexLinearOperator<T>* > aOperatorList, std::vector<std::vector<T>> aFList) : myProx(aMyProx), alpha(aAlpha), numberPrimals(numberPrimals), numberVars((int)aOperatorList.size() / numberPrimals), p(aMyProx->getProx())
     {
         fList.resize(aFList.size());
 
@@ -58,7 +58,7 @@ public:
         return this->operatorList[num]->getNumRows();
     }
 
-	~flexTermDual()
+	~flexTerm()
 	{
 		delete myProx;
 

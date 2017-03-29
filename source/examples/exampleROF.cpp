@@ -82,7 +82,7 @@ int main()
 	fList.push_back(f);
 
 	flexProx<floatingType>* myProx = new flexProxDualDataL2<floatingType>();
-	mainObject.addDual(new flexTermDual<floatingType>(myProx, weightDataTerm, static_cast<int>(correspondingPrimals.size()), operatorList, fList), correspondingPrimals);
+	mainObject.addTerm(new flexTerm<floatingType>(myProx, weightDataTerm, static_cast<int>(correspondingPrimals.size()), operatorList, fList), correspondingPrimals);
 
 	//add dualized regularizer
 	operatorList.clear();
@@ -91,7 +91,7 @@ int main()
 	operatorList.push_back(new flexGradientOperator<floatingType>(mainObject.getDims(0), 1, gradientType::forward, false));
 
 	flexProx<floatingType>* myProx2 = new flexProxDualL1Iso<floatingType>();
-	mainObject.addDual(new flexTermDual<floatingType>(myProx2, weightRegularizer, 1, operatorList), correspondingPrimals);
+	mainObject.addTerm(new flexTerm<floatingType>(myProx2, weightRegularizer, 1, operatorList), correspondingPrimals);
 
 	mainObject.runAlgorithm();
 

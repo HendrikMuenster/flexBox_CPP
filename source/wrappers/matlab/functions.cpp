@@ -52,7 +52,7 @@
 
 #include "flexBox.h"
 
-#include "term/flexTermDual.h"
+#include "term/flexTerm.h"
 
 //prox
 #include "prox/flexProxDualDataL1.h"
@@ -282,7 +282,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			copyToVector(fList[k], mxGetPr(fListInputElement), (int)mxGetN(fListInputElement) * (int)mxGetM(fListInputElement));
 		}
 
-		mainObject.addDual(new flexTermDual<floatingType>(myProx, alpha,(int)_correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
+		mainObject.addTerm(new flexTerm<floatingType>(myProx, alpha, (int)_correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
 	}
 
 	// copy content for dual vars from MATLAB
