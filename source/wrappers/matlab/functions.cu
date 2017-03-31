@@ -177,7 +177,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		//weight
 		float alpha = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"factor"));
 
-		if (verbose > 0)
+		if (verbose > 1)
 		{
 			mexPrintf("Dual term %i is of type %s with alpha = %f\n",i,mxGetClassName(mxGetCell(duals,i)),alpha);
 		}
@@ -190,7 +190,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			//decrease number by 1 because C++ internal counter starts at 0
 			_correspondingPrimals.push_back((int)input_correspondingPrimals[j] - 1);
 
-			if (verbose > 0)
+			if (verbose > 1)
 			{
 				printf("Dual term #%d corresponds to primal var #%d\n",i,(int)input_correspondingPrimals[j] - 1);
 			}
