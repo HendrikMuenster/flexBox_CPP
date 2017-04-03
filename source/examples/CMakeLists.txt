@@ -17,7 +17,7 @@ if(CUDA_FOUND)
     include_directories(${INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
     #TODO: use maximum compatibility fallback, dont use fpic on windows systems
-    set(CUDA_NVCC_FLAGS --std=c++11 -arch=compute_50 -code=sm_50)
+    set(CUDA_NVCC_FLAGS --std=c++11 ${FLEXBOX_NVCC_FLAGS})
     cuda_add_executable(${FILE_NAME} ${SAMPLE_FILE})
     target_link_libraries(${FILE_NAME} ${X11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 

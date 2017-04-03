@@ -151,8 +151,8 @@ if(USE_OPENMP)
 
 endif(USE_OPENMP)
 
-#includes FindMatlab (from cmake v3.7)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+#include own modules
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 
 #Matlab
 if(BUILD_MATLAB)
@@ -170,13 +170,16 @@ if(USE_CUDA)
 
   if(NOT CUDA_FOUND)
     message (STATUS "Couldn't find CUDA. Building without...")
-  endif()
+  else()
+    if(CUDA_VERSION VERSION_LESS "3.2")
+      message (STATUS "At least CUDA 3.2 is needed. Only found: " ${CUDA_VERSION} ". Building without...")
+      set(CUDA_FOUND OFF)
+    endif()
 
-  if(CUDA_VERSION VERSION_LESS "3.2")
-    message (STATUS "At least CUDA 3.2 is needed. Only found: " ${CUDA_VERSION} ". Building without...")
-    set(CUDA_FOUND OFF)
-  endif()
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/FlexBoxCudaFlags.cmake)
+    FLEXBOX_CUDA_SELECT_NVCC_ARCH_FLAGS(FLEXBOX_NVCC_FLAGS)
 
+  endif()
 endif(USE_CUDA)
 
 #EXAMPLES
@@ -192,11 +195,27 @@ target_include_directories(flexBoxLib INTERFACE ${INCLUDE_DIRS})
 
 add_custom_target(IDE SOURCES ${SOURCES_IDE})
 
-# Matlab target if Matlab was found
+
+
+
+# Matlab target
 if(Matlab_FOUND)
   add_subdirectory(${WRAPPERS_DIR}/matlab)
 endif(Matlab_FOUND)
 
+#Examples target
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(BUILD_EXAMPLES)
+
+
+
+
+
+
+
+
+
+
+
+

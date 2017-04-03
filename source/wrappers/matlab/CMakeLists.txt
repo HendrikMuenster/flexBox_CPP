@@ -5,7 +5,7 @@ if(CUDA_FOUND)
   include_directories(${Matlab_INCLUDE_DIRS})
   include_directories(${INCLUDE_DIRS})
   #TODO: use maximum compatibility fallback, dont use fpic on windows systems
-  set(CUDA_NVCC_FLAGS --std=c++11 -Xcompiler -fPIC -arch=compute_50 -code=sm_50)
+  set(CUDA_NVCC_FLAGS --std=c++11 -Xcompiler -fPIC ${FLEXBOX_NVCC_FLAGS})
   cuda_compile(cuda_generated functions.cu SHARED)
   matlab_add_mex(NAME Matlab
         SRC ${cuda_generated}
@@ -14,13 +14,13 @@ if(CUDA_FOUND)
   )
   
   if(MSVC)
- 	configure_file(project.def ${CMAKE_CURRENT_BINARY_DIR}/project.def COPYONLY)
+    configure_file(project.def ${CMAKE_CURRENT_BINARY_DIR}/project.def COPYONLY)
     get_target_property(existing_link_flags Matlab LINK_FLAGS)
-	if (existing_link_flags STREQUAL "existing_link_flags-NOTFOUND")
-		set(existing_link_flags "")
-	endif()
+    if (existing_link_flags STREQUAL "existing_link_flags-NOTFOUND")
+      set(existing_link_flags "")
+    endif()
+    
     set(new_link_flags "${existing_link_flags} /DEF:project.def")
-		
     set_target_properties(Matlab PROPERTIES LINK_FLAGS ${new_link_flags})
   endif()
   
