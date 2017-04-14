@@ -5,9 +5,6 @@
 #include "flexLinearOperator.h"
 
 #ifdef __CUDACC__
-//
-// 2d kernels
-//
 template<typename T>
 __global__ void dxp2dCUDA(T* output, const T* input, const size_t sizeX, const size_t sizeY, mySign s)
 {
@@ -228,9 +225,6 @@ __global__ void dyp2dTransposedCUDA(T* output, const T* input, const size_t size
 	}
 }
 
-//
-// 3d kernels
-// 
 
 __device__
 int getGlobalIdx_3D_3D(){
@@ -365,7 +359,7 @@ __global__ void dyp3dCUDA(T* output, const T* input, const size_t sizeX, const s
 
 	if (x >= sizeX || y >= sizeY || z >= sizeZ)
 		return;
-	
+
 	if (y < sizeY - 1)
 	{
 		switch (s)
@@ -400,7 +394,7 @@ __global__ void dyp3dTransposedCUDA(T* output, const T* input, const size_t size
 
 	if (x >= sizeX || y >= sizeY || z >= sizeZ)
 		return;
-	
+
 	if (y < sizeY - 1 && y > 0)
 	{
 		switch (s)
@@ -477,7 +471,7 @@ __global__ void dzp3dCUDA(T* output, const T* input, const size_t sizeX, const s
 
 	if (x >= sizeX || y >= sizeY || z >= sizeZ)
 		return;
-	
+
 	if (z < sizeZ - 1)
 	{
 		switch (s)
@@ -512,7 +506,7 @@ __global__ void dzp3dTransposedCUDA(T* output, const T* input, const size_t size
 
 	if (x >= sizeX || y >= sizeY || z >= sizeZ)
 		return;
-	
+
 	if (z < sizeZ - 1 && z > 0)
 	{
 		switch (s)
@@ -580,6 +574,7 @@ __global__ void dzp3dTransposedCUDA(T* output, const T* input, const size_t size
 
 #endif
 
+//! represents a gradient operator
 template<typename T>
 class flexGradientOperator : public flexLinearOperator<T>
 {
@@ -598,12 +593,18 @@ private:
 
 public:
 
-	//type: forward, backward, central
-	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, gradientType aType, bool _minus) : 
-		inputDimension(AInputDimension), 
+	//! initializes the gradient operator
+	/*!
+		\param AInputDimension vector of dimensions
+		\param aGradDirection direction of gradient. 0 for first dimension and so on.
+		\param aType type of gradient. Possible values are forward, backward and central.
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexGradientOperator(std::vector<int> AInputDimension, int aGradDirection, gradientType aType, bool aMinus) :
+		inputDimension(AInputDimension),
 		gradDirection(aGradDirection),
 		type(aType),
-		numberDimensions(static_cast<int>(AInputDimension.size())), flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp, _minus)
+		numberDimensions(static_cast<int>(AInputDimension.size())), flexLinearOperator<T>(vectorProduct(AInputDimension), vectorProduct(AInputDimension), gradientOp, aMinus)
 	{};
 
 	flexGradientOperator<T>* copy()
@@ -667,7 +668,7 @@ public:
 
 	void dyp3d(const Tdata &input, Tdata &output, mySign s)
 	{
-		int sizeZ = this->inputDimension[2]; 
+		int sizeZ = this->inputDimension[2];
 		int sizeY = this->inputDimension[1] - 1;
 		int sizeX = this->inputDimension[0];
 
@@ -722,8 +723,8 @@ public:
 			{
 				for (int i = 1; i < sizeX; ++i)
 				{
-					int tmpIndex = this->index3DtoLinear(i, j, k); 
-					
+					int tmpIndex = this->index3DtoLinear(i, j, k);
+
 					this->updateValue(&output[tmpIndex], s, -(input[tmpIndex] - input[tmpIndex - 1]));
 				}
 			}

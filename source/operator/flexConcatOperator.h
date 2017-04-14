@@ -6,6 +6,7 @@
 #include "tools.h"
 #include "flexLinearOperator.h"
 
+//! represents a concatenation operator
 template<typename T>
 class flexConcatOperator : public flexLinearOperator<T>
 {
@@ -15,7 +16,7 @@ class flexConcatOperator : public flexLinearOperator<T>
 #else
 	typedef std::vector<T> Tdata;
 #endif
-    
+
 private:
     flexLinearOperator<T>* A;
     flexLinearOperator<T>* B;
@@ -24,7 +25,14 @@ private:
 
 public:
 
-	flexConcatOperator(flexLinearOperator<T>* _A, flexLinearOperator<T>* _B, mySign _s, bool _minus) : A(_A), B(_B), s(_s), tmpVec(_A->getNumCols()), flexLinearOperator<T>(_A->getNumRows(), _B->getNumCols(), concatOp, _minus)
+	//! initializes the concatenation operator
+	/*!
+		\param aA left hand side operator
+		\param aB right hand side operator
+		\param aS type of concatenation. Possible values are PLUS, SUBTRACT and COMPOSE.
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexConcatOperator(flexLinearOperator<T>* aA, flexLinearOperator<T>* aB, mySign aS, bool aMinus) : A(aA), B(aB), s(aS), tmpVec(aA->getNumCols()), flexLinearOperator<T>(aA->getNumRows(), aB->getNumCols(), concatOp, aMinus)
 	{
 
 	}
@@ -40,7 +48,7 @@ public:
 	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
 	}
-    
+
 	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
         switch (this->s)
@@ -84,8 +92,8 @@ public:
 						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
-					A->timesPlus(true, input, this->tmpVec); 
-					
+					A->timesPlus(true, input, this->tmpVec);
+
                     if (this->isMinus)
                     {
 						B->timesMinus(true, this->tmpVec, output);
@@ -162,7 +170,7 @@ public:
 					#else if
 						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
-					
+
 					A->timesPlus(true, input, tmpVec);
                     if (this->isMinus)
                     {
@@ -206,10 +214,10 @@ public:
 	std::vector<T> getAbsRowSum(bool transposed)
 	{
 		std::vector<T> result;
-        
+
         auto rowSumA = A->getAbsRowSum(transposed);
         auto rowSumB = B->getAbsRowSum(transposed);
-        
+
         switch (this->s)
         {
             case PLUS:
@@ -224,7 +232,7 @@ public:
             case MINUS:
             {
                 result.resize(rowSumA.size());
-                
+
                 #pragma omp parallel for
                 for (int k = 0; k < result.size(); ++k)
                 {
@@ -254,7 +262,7 @@ public:
                 break;
             }
         }
-        
+
 		return result;
 	}
 
@@ -262,10 +270,10 @@ public:
 	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
         Tdata result;
-        
+
 		auto rowSumA = A->getAbsRowSumCUDA(transposed);
 		auto rowSumB = B->getAbsRowSumCUDA(transposed);
-        
+
         switch (this->s)
         {
             case PLUS:
@@ -282,7 +290,7 @@ public:
             case MINUS:
             {
                 result.resize(rowSumA.size());
-                
+
                 #pragma omp parallel for
                 for (int k = 0; k < result.size(); ++k)
                 {
@@ -312,7 +320,7 @@ public:
                 break;
             }
         }
-		
+
 		return result;
 	}
 	#endif

@@ -3,6 +3,12 @@
 
 #include "flexBoxData.h"
 
+//! FlexBox data class if using the CUDA
+/*!
+	flexBoxDataCPU is an internal class for storing and maintaining data
+	for the optimization algorithm if using the CUDA version.
+	This class should not be used directly.
+*/
 template <class T>
 class flexBoxDataGPU : public flexBoxData<T>
 {

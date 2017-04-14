@@ -6,6 +6,7 @@
 #include "tools.h"
 #include "flexLinearOperator.h"
 
+//! represents an identiy operator
 template<typename T>
 class flexIdentityOperator : public flexLinearOperator<T>
 {
@@ -18,7 +19,13 @@ class flexIdentityOperator : public flexLinearOperator<T>
 
 public:
 
-	flexIdentityOperator(int _numRows, int _numCols, bool _minus) : flexLinearOperator<T>(_numRows, _numCols, identityOp, _minus){}
+	//! initializes the identiy operator
+	/*!
+		\param aNumRows number of rows
+		\param aNumCols number of cols
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexIdentityOperator(int aNumRows, int aNumCols, bool aMinus) : flexLinearOperator<T>(aNumRows, aNumCols, identityOp, aMinus) {}
 
 	flexIdentityOperator<T>* copy()
 	{
@@ -52,35 +59,7 @@ public:
 		}
 	}
 
-	void doTimesPlus(const Tdata &input, Tdata &output)
-	{
-		#ifdef __CUDACC__
-			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::plus<T>());
-		#else
-            int numElements = (int)input.size();
-            #pragma omp parallel for
-            for (int i = 0; i < numElements; ++i)
-            {
-                output[i] += input[i];
-            }
-		#endif
-	}
-
-	void doTimesMinus(const Tdata &input, Tdata &output)
-	{
-		#ifdef __CUDACC__
-			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::minus<T>());
-		#else
-            int numElements = (int)input.size();
-            #pragma omp parallel for
-            for (int i = 0; i < numElements; ++i)
-            {
-                output[i] -= input[i];
-            }
-		#endif
-	}
-
-	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
+		void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
 		if (this->isMinus)
 		{
@@ -124,6 +103,35 @@ public:
 		return result;
 	}
 	#endif
+
+private:
+	void doTimesPlus(const Tdata &input, Tdata &output)
+	{
+		#ifdef __CUDACC__
+			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::plus<T>());
+		#else
+            int numElements = (int)input.size();
+            #pragma omp parallel for
+            for (int i = 0; i < numElements; ++i)
+            {
+                output[i] += input[i];
+            }
+		#endif
+	}
+
+	void doTimesMinus(const Tdata &input, Tdata &output)
+	{
+		#ifdef __CUDACC__
+			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::minus<T>());
+		#else
+            int numElements = (int)input.size();
+            #pragma omp parallel for
+            for (int i = 0; i < numElements; ++i)
+            {
+                output[i] -= input[i];
+            }
+		#endif
+	}
 };
 
 #endif

@@ -14,31 +14,32 @@
 
 #include <vector>
 
+//! FlexBox main class
+/*!
+	flexBox gathers information about the problem size, modifies the algorithm parameters, runs the
+	optimization algorithm and returns the result.
+*/
 template <typename T>
 class flexBox
 {
 	typedef flexLinearOperator<T> linOpType;
 
-	private:
+private:
+	flexBoxData<T>* data;
+	flexSolver<T>* solver;
 
 	public:
-		T tol;
+		T tol; 							//!< stopping tolerance using the primal dual residual proposed by Goldstein, Esser and Baraniuk \cite goldstein2013adaptive. Default value is 1e-5.
+		int maxIterations; 	//!< maximum number of iterations if tol has not been reached. Default value is 10000. \sa tol
+		int checkError;			//!< number of steps after which to calculate the primal dual residual. Default value is 100.
+		int displayStatus;	//!< number of steps after which to print status information. Default value is 1000.
+		int verbose;				//!< controls the amount of information printed. Possible values are 0, 1 or 2. Default value is 0.
+		bool isMATLAB; 			//!< indicates whether flexBox is used via MALTAB. Default value is false.
 
-		//Maximum number of Iterations
-		int maxIterations;
-		int checkError;
-		int displayStatus;
-		int verbose;
+		std::vector<std::vector<int>> dims; //!< contains lists of dimensions of primal variables.
 
-		//List of dimensions
-		std::vector<std::vector<int>> dims;
-
-		flexBoxData<T>* data;
-		flexSolver<T>* solver;
-
-		bool isMATLAB; // indicates whether flexBox is used via MALTAB
-
-		flexBox(void)
+		//! initializes the main object setting default values for parameters. \sa tol maxIterations checkError displayStatus verbose isMATLAB
+		flexBox()
 		{
 			this->tol = static_cast<T>(1e-5);
 
@@ -65,46 +66,79 @@ class flexBox
 			delete solver;
 		}
 
+		//! returns the number of primal vars
+		/*!
+			\return number of primal vars
+		*/
 		int getNumPrimalVars() const
 		{
 			return data->getNumPrimalVars();
 		}
 
+		//! returns the number of dual vars
+		/*!
+			\return number of dual vars
+		*/
 		int getNumDualVars() const
 		{
 			return data->getNumDualVars();
 		}
 
+		//! returns the requested primal variable
+		/*!
+			\param i internal identifcation returned by addPrimalVar() \sa addPrimalVar()
+			\return primal variable identifed by i
+		*/
 		std::vector<T> getPrimal(int i)
 		{
 			return data->getPrimal(i);
 		}
 
+		//! returns the requested dual variable
+		/*!
+			\param i internal identifcation
+			\return dual variable identifed by i
+		*/
 		std::vector<T> getDual(int i)
 		{
 			return data->getDual(i);
 		}
 
+		//! set the primal variable identifed by i
+		/*!
+			\param i internal identifcation for variable
+			\param input data for primal variable
+		*/
 		void setPrimal(int i, std::vector<T> input)
 		{
 			data->setPrimal(i, input);
 		}
 
+		//! set the dual variable identifed by i
+		/*!
+			\param i internal identifcation for variable
+			\param input data for dual variable
+		*/
 		void setDual(int i, std::vector<T> input)
 		{
 			data->setDual(i, input);
 		}
 
-		void init()
-		{
-			solver->init();
-		}
-
+		//! returns the dimensions of primal vars identified by i
+		/*!
+			\param i internal identifcation for variable
+			\return dimension of primal variable
+		*/
 		std::vector<int> getDims(int i)
 		{
 			return dims.at(i);
 		}
 
+		//! adds a primal variable
+		/*!
+			\param dims dimension of variable
+			\return internal identifcation for variable
+		*/
 		int addPrimalVar(std::vector<int> _dims)
 		{
 			int numberOfElements = vectorProduct(_dims);
@@ -116,11 +150,17 @@ class flexBox
 			return getNumPrimalVars() - 1;
 		}
 
+		//! adds a Term
+		/*!
+			\param aTerm term to be added
+			\param aPrimala corresponding primal variables for term
+		*/
 		void addTerm(flexTerm<T>* aTerm, std::vector<int> aPrimals)
 		{
 			solver->addTerm(data, aTerm, aPrimals);
 		}
 
+		//! runs the optimization algorithm
 		void runAlgorithm()
 		{
 			solver->init(data);

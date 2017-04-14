@@ -4,6 +4,7 @@
 #include <vector>
 #include "flexLinearOperator.h"
 
+//! represents a diagonal operator
 template <typename T>
 class flexDiagonalOperator : public flexLinearOperator<T>
 {
@@ -18,8 +19,13 @@ private:
 	Tdata diagonalElements;
 public:
 
-	flexDiagonalOperator(std::vector<T> aDiagonalElements, bool _minus)
-	: flexLinearOperator<T>(static_cast<int>(aDiagonalElements.size()), static_cast<int>(aDiagonalElements.size()), diagonalOp, _minus)
+	//! initializes the concatenation operator for non-CUDA versions
+	/*!
+		\param aDiagonalElements vector of diagonal Elements
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexDiagonalOperator(std::vector<T> aDiagonalElements, bool aMinus)
+	: flexLinearOperator<T>(static_cast<int>(aDiagonalElements.size()), static_cast<int>(aDiagonalElements.size()), diagonalOp, aMinus)
 	{
 		this->diagonalElements.resize(aDiagonalElements.size());
 
@@ -32,7 +38,12 @@ public:
 	}
 
 	#ifdef __CUDACC__
-		flexDiagonalOperator(Tdata aDiagonalElements, bool _minus) : diagonalElements(aDiagonalElements), flexLinearOperator<T>(static_cast<int>(aDiagonalElements.size()), static_cast<int>(aDiagonalElements.size()), diagonalOp, _minus)
+		//! initializes the concatenation operator for CUDA versions
+		/*!
+			\param aDiagonalElements vector of diagonal Elements where Tdata is of type thrust::device_vector<T>
+			\param aMinus determines if operator is negated \sa isMinus
+		*/
+		flexDiagonalOperator(Tdata aDiagonalElements, bool aMinus) : diagonalElements(aDiagonalElements), flexLinearOperator<T>(static_cast<int>(aDiagonalElements.size()), static_cast<int>(aDiagonalElements.size()), diagonalOp, aMinus)
 		{
 
 		};
@@ -48,7 +59,7 @@ public:
     #ifdef __CUDACC__
     struct flexDiagonalOperatorFunctor
 	{
-		__host__ __device__ 
+		__host__ __device__
 		flexDiagonalOperatorFunctor(const mySign _s) : s(_s){}
 
 		template <typename Tuple>
@@ -74,52 +85,14 @@ public:
                 }
             }
 		}
-        
+
         mySign s;
 	};
     #endif
-	
-    void doTimesCPU(const Tdata &input, Tdata &output,const mySign s)
-	{
-        int numElements = (int)output.size();
-		
-		#pragma omp parallel for
-		for (int i = 0; i < numElements; ++i)
-		{
-			switch (s)
-			{
-				case PLUS:
-				{
-					output[i] += input[i] * this->diagonalElements[i];
-					break;
-				}
-				case MINUS:
-				{
-					output[i] -= input[i] * this->diagonalElements[i];
-					break;
-				}
-				case EQUALS:
-				{
-					output[i] = input[i] * this->diagonalElements[i];
-					break;
-				}
-			}
-		}
-    }
-	
-	void doTimes(const Tdata &input, Tdata &output,const mySign s)
-	{
-        #ifdef __CUDACC__
-            thrust::for_each(
-                thrust::make_zip_iterator(thrust::make_tuple(output.begin(), input.begin(), this->diagonalElements.begin())),
-                thrust::make_zip_iterator(thrust::make_tuple(output.end(),   input.end(),   this->diagonalElements.end())),
-			flexDiagonalOperatorFunctor(s));
-        #else
-            this->doTimesCPU(input,output,s);
-        #endif
-    }
-	
-	
+
+
+
+
 
 	//apply linear operator to vector
 	void times(bool transposed, const Tdata &input, Tdata &output)
@@ -184,6 +157,47 @@ public:
 		return diagonalElementsCopy;
 	}
 	#endif
+
+private:
+	void doTimesCPU(const Tdata &input, Tdata &output,const mySign s)
+	{
+        int numElements = (int)output.size();
+
+		#pragma omp parallel for
+		for (int i = 0; i < numElements; ++i)
+		{
+			switch (s)
+			{
+				case PLUS:
+				{
+					output[i] += input[i] * this->diagonalElements[i];
+					break;
+				}
+				case MINUS:
+				{
+					output[i] -= input[i] * this->diagonalElements[i];
+					break;
+				}
+				case EQUALS:
+				{
+					output[i] = input[i] * this->diagonalElements[i];
+					break;
+				}
+			}
+		}
+  }
+
+	void doTimes(const Tdata &input, Tdata &output,const mySign s)
+	{
+        #ifdef __CUDACC__
+            thrust::for_each(
+                thrust::make_zip_iterator(thrust::make_tuple(output.begin(), input.begin(), this->diagonalElements.begin())),
+                thrust::make_zip_iterator(thrust::make_tuple(output.end(),   input.end(),   this->diagonalElements.end())),
+			flexDiagonalOperatorFunctor(s));
+        #else
+            this->doTimesCPU(input,output,s);
+        #endif
+  }
 };
 
 #endif

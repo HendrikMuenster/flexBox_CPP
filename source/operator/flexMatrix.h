@@ -5,6 +5,7 @@
 
 #include <vector>
 
+//! represents a (non-CUDA) matrix
 template<typename T>
 class flexMatrix : public flexLinearOperator<T>
 {
@@ -21,9 +22,16 @@ private:
 	Tdata valueList;
 
 public:
-	flexMatrix(void) : indexList(), valueList(), rowToIndexList(), flexLinearOperator<T>(0, 0, matrixOp, false){};
+	//! initializes an empty matrix
+	flexMatrix() : indexList(), valueList(), rowToIndexList(), flexLinearOperator<T>(0, 0, matrixOp, false) {};
 
-	flexMatrix(int  _numRows, int  _numCols, bool _minus) : rowToIndexList(_numRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(_numRows, _numCols, matrixOp, _minus){};
+	//! initializes a matrix
+	/*!
+		\param aNumRows number of rows
+		\param aNumCols number of cols
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexMatrix(int  aNumRows, int aNumCols, bool aMinus) : rowToIndexList(aNumRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(aNumRows, aNumCols, matrixOp, aMinus){};
 
 	flexMatrix<T>* copy()
 	{
@@ -35,67 +43,13 @@ public:
 
 		return A;
 	}
-	
-    void doTimesCPU(bool transposed, const Tdata &input, Tdata &output,const mySign s)
-	{
-        if (transposed)
-		{
-            //todo: check if transposed multiplication can be parallelized
-            for (int i = 0; i < this->getNumRows(); ++i)
-            {
-                int indexNext = rowToIndexList[i + 1];
-                for (int index = rowToIndexList[i]; index < indexNext; ++index)
-                {
-                    switch (s)
-                    {
-                        case PLUS:
-                        {
-                            output[indexList[index]] += input[i] * valueList[index];
-                            break;
-                        }
-                        case MINUS:
-                        {
-                            output[indexList[index]] -= input[i] * valueList[index];
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-			#pragma omp parallel for
-			for (int i = 0; i < this->getNumRows(); ++i)
-			{
-				T rowsum = (T)0;
-				// initialize result
-				int indexNext = rowToIndexList[i + 1];
-				for (int index = rowToIndexList[i]; index < indexNext; ++index)
-				{
-					rowsum += input[indexList[index]] * valueList[index];
-				}
-                
-                switch (s)
-                {
-                    case PLUS:
-                    {
-                        output[i] += rowsum;
-                        break;
-                    }
-                    case MINUS:
-                    {
-                        output[i] -= rowsum;
-                        break;
-                    }
-                }
-			}
-        }
-    }
+
+
 
 
 	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
-        
+
 	}
 
 	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
@@ -122,8 +76,14 @@ public:
 		}
 	}
 
-	//this is the fast way to fill flexMatrix
-	void blockInsert(std::vector<int> &indexI,const  std::vector<int> &indexJ,const Tdata &indexVal)
+	//! inserts data into matrix
+	/*!
+		this is the fastest way to fill flexMatrix
+		\param indexI vector of row indices
+		\param indexJ vector of column indices
+		\param indexVal vector of data corresponding row and column indices
+	*/
+	void blockInsert(std::vector<int> &indexI, const std::vector<int> &indexJ, const Tdata &indexVal)
 	{
 		//clear matrix
 		//clear();
@@ -198,7 +158,7 @@ public:
 	T getMaxRowSumAbs(bool transposed)
 	{
 		std::vector<T> rowSum = this->getAbsRowSum(transposed);
-		
+
 		return *std::max_element(rowSum.begin(), rowSum.end());
 	}
 
@@ -208,7 +168,7 @@ public:
 		if (transposed)
 		{
 			std::vector<T> result(this->getNumCols());
-			
+
 			//todo check if omp is possible
 			for (int k = 0; k < this->getNumRows(); ++k)
 			{
@@ -217,13 +177,13 @@ public:
 					result[indexList[index]] += std::abs(valueList[index]);
 				}
 			}
-			
+
 			return result;
 		}
 		else
 		{
 			std::vector<T> result(this->getNumRows());
-			
+
 			#pragma omp parallel for
 			for (int k = 0; k < this->getNumRows(); ++k)
 			{
@@ -236,12 +196,15 @@ public:
 
 				result[k] = tmpSum;
 			}
-			
+
 			return result;
 		}
 	}
 
-
+	//! prints requested row
+	/*!
+		\param i row to be printed
+	*/
 	void printRow(int i)
 	{
 		for (int index = rowToIndexList[i]; index < rowToIndexList[i+1]; ++index)
@@ -252,6 +215,8 @@ public:
 		printf("\n");
 
 	}
+
+	//! prints the whole matrix
 	void printMatrix()
 	{
 		for (int i = 0; i < this->getNumRows(); i++)
@@ -269,6 +234,63 @@ public:
 		return result;
 	}
     #endif
+
+	private:
+		void doTimesCPU(bool transposed, const Tdata &input, Tdata &output,const mySign s)
+	{
+        if (transposed)
+		{
+            //todo: check if transposed multiplication can be parallelized
+            for (int i = 0; i < this->getNumRows(); ++i)
+            {
+                int indexNext = rowToIndexList[i + 1];
+                for (int index = rowToIndexList[i]; index < indexNext; ++index)
+                {
+                    switch (s)
+                    {
+                        case PLUS:
+                        {
+                            output[indexList[index]] += input[i] * valueList[index];
+                            break;
+                        }
+                        case MINUS:
+                        {
+                            output[indexList[index]] -= input[i] * valueList[index];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+			#pragma omp parallel for
+			for (int i = 0; i < this->getNumRows(); ++i)
+			{
+				T rowsum = (T)0;
+				// initialize result
+				int indexNext = rowToIndexList[i + 1];
+				for (int index = rowToIndexList[i]; index < indexNext; ++index)
+				{
+					rowsum += input[indexList[index]] * valueList[index];
+				}
+
+                switch (s)
+                {
+                    case PLUS:
+                    {
+                        output[i] += rowsum;
+                        break;
+                    }
+                    case MINUS:
+                    {
+                        output[i] -= rowsum;
+                        break;
+                    }
+                }
+			}
+        }
+    }
 };
 
 #endif

@@ -8,7 +8,12 @@
 	#include <thrust/device_vector.h>
 #endif
 
-
+//! FlexBox data class
+/*!
+	flexBoxData is an internal abstract class for storing and maintaining data
+	for the optimization algorithm used by the flexBox main class.
+	This class should not be used directly.
+*/
 template <typename T>
 class flexBoxData
 {

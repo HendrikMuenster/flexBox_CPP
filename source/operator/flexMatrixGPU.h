@@ -8,6 +8,7 @@
 
 #include "flexLinearOperator.h"
 
+//! represents a (CUDA) matrix
 template<typename T>
 class flexMatrixGPU : public flexLinearOperator<T>
 {
@@ -29,7 +30,17 @@ private:
 	int nnz;
 
 public:
-	flexMatrixGPU(int  aNumRows, int  aNumCols, int* rowList, int *colList, T* indexVal, bool formatCRS, bool _minus) : flexLinearOperator<T>(aNumRows, aNumCols, matrixGPUOp, _minus)
+	//! initializes a matrix
+	/*!
+		\param aNumRows number of rows
+		\param aNumCols number of cols
+		\param rowList array of row indices
+		\param colList array of column indices
+		\param indexVal array of data corresponding row and column indices
+		\param formatCRS determines if the input data is in compressed row storage
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexMatrixGPU(int  aNumRows, int  aNumCols, int* rowList, int* colList, T* indexVal, bool formatCRS, bool aMinus) : flexLinearOperator<T>(aNumRows, aNumCols, matrixGPUOp, aMinus)
 	{
 		//create sparse matrix
 		cusparseCreate(&this->handle);
@@ -173,7 +184,7 @@ public:
         {
             alpha = (T)1;
         }
-		
+
 		const T beta = (T)0;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -201,7 +212,7 @@ public:
         {
            alpha = (T)1;
         }
-		
+
 		const T beta = (T)1;
 
 		T* ptrOutput = thrust::raw_pointer_cast(output.data());
@@ -260,10 +271,16 @@ public:
 		return result;
 	}
 
+	//! prints requested row
+	/*!
+		\param i row to be printed
+	*/
 	void printRow(int i)
 	{
 
 	}
+
+	//! prints the whole matrix
 	void printMatrix()
 	{
 		T *hostValues = (T *)malloc(this->nnz * sizeof(T));
@@ -284,7 +301,7 @@ public:
 	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
         std::vector<T> resultTmp;
-		
+
         if (transposed == false)
         {
             resultTmp.resize(this->getNumRows());
@@ -293,7 +310,7 @@ public:
         {
             resultTmp.resize(this->getNumCols());
         }
-        
+
 		//allocate memory
 		T *hostValues = (T *)malloc(this->nnz * sizeof(T));
 		int *hostRowIndices = (int *)malloc((this->getNumRows() + 1) * sizeof(int));
@@ -328,11 +345,11 @@ public:
         free(hostValues);
 		free(hostRowIndices);
 		free(hostColIndices);
-        
+
 		Tdata result(resultTmp.size());
 
         thrust::copy(resultTmp.begin(), resultTmp.end(), result.begin());
-        
+
 		return result;
 	}
 };

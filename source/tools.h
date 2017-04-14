@@ -40,6 +40,9 @@ using std::cout;
 using std::endl;
 using std::string;
 
+/*! \file tools.h
+	file containing global definitions and functions
+*/
 
 static const int SIGN_PLUS = 0;
 static const int SIGN_MINUS = 1;
@@ -49,13 +52,13 @@ static const int SIGN_EQUALS = 2;
 #define CONST_ARRAY_SIZE 512
 #define BLOCK_SIZE (64)
 
-
+//! enum representing the type of concatenation
 enum mySign
 {
 	PLUS,
 	MINUS,
 	EQUALS,
-    COMPOSE
+  COMPOSE
 };
 
 enum prox
@@ -73,6 +76,7 @@ enum prox
 	dualInnerProductProx
 };
 
+//! enum representing the type of a linear operator
 enum linOp
 {
 	linearOp,
@@ -83,9 +87,10 @@ enum linOp
 	matrixGPUOp,
 	zeroOp,
 	superpixelOp,
-    concatOp
+  concatOp
 };
 
+//! enum representing the type of gradient
 enum gradientType
 {
 	forward,

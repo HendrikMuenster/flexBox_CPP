@@ -4,6 +4,7 @@
 #include <vector>
 #include "flexLinearOperator.h"
 
+//! represents a zero operator (empty matrix)
 template<typename T>
 class flexZeroOperator : public flexLinearOperator<T>
 {
@@ -15,7 +16,13 @@ class flexZeroOperator : public flexLinearOperator<T>
 #endif
 
 public:
-	flexZeroOperator(int aNumRows, int aNumCols, bool _minus) : flexLinearOperator<T>(aNumRows, aNumCols, zeroOp, _minus){};
+	//! initializes the zero operator
+	/*!
+		\param aNumRows number of rows
+		\param aNumCols number of columns
+		\param aMinus determines if operator is negated \sa isMinus
+	*/
+	flexZeroOperator(int aNumRows, int aNumCols, bool aMinus) : flexLinearOperator<T>(aNumRows, aNumCols, zeroOp, aMinus) {};
 
 	flexZeroOperator<T>* copy()
 	{
@@ -56,7 +63,7 @@ public:
 		{
 			result.resize(this->getNumCols());
 		}
-		
+
 		return result;
 	}
 	#endif
