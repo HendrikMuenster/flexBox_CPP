@@ -4,7 +4,7 @@
 This repository contains the C++ module for **FlexBox**. Please refer to the main repository for licensing and citation.
 
 The main repository can be found under
-https://github.com/HendrikMuenster/flexBox_CPP.
+https://github.com/HendrikMuenster/flexBox
 
 ## Authors
 * Hendrik Dirks ([hendrik.dirks@wwu.de](mailto:hendrik.dirks@wwu.de))*
@@ -47,4 +47,5 @@ env LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/local/cuda-7.5/lib
 
 
 ## Reporting Bugs
-In case you experience any problems, please create an issue at https://github.com/HendrikMuenster/flexBox_CPP/issues
+In case you experience any problems, please create an issue at
+https://github.com/HendrikMuenster/flexBox/issues or https://github.com/HendrikMuenster/flexBox_CPP/issues
