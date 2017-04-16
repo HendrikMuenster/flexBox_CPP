@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for an inner product data term
+/*!
+	\f$ \alpha \langle \cdot,f\rangle \f$
+*/
 template<typename T>
 class flexProxDualInnerProduct : public flexProx<T>
 {

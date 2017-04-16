@@ -61,6 +61,7 @@ enum mySign
   COMPOSE
 };
 
+//! enum representing the type of prox
 enum prox
 {
 	primalEmptyProx,
@@ -219,6 +220,12 @@ void vectorAddVectorTimesVector(std::vector<T> &result, const std::vector<T> &v1
 	}
 }
 
+//! class for timing execution times
+/*!
+	Timer is a class for measuring execution times of the primal dual algorithm.
+	It uses std::chrono and additionally cudaDeviceSynchronize() if
+	the CUDA version of FlexBox has been compiled.
+*/
 class Timer
 {
 public:
@@ -226,6 +233,7 @@ public:
 	{
 	};
 
+	//! resets or starts the timer
 	void reset()
 	{
 #ifdef __CUDACC__
@@ -235,6 +243,7 @@ public:
 		isStopped = false;
 	}
 
+	//! ends the timer
 	void end()
 	{
 #ifdef __CUDACC__
@@ -244,6 +253,11 @@ public:
 		isStopped = true;
 	}
 
+	//! returns the duration
+	/*!
+		returns the duration between reset() and end() in seconds (as double) or 0.0 if timer has not been stopped
+		\return duration in seconds
+	*/
 	double elapsed() const
 	{
 		if(isStopped)
@@ -280,6 +294,7 @@ private:
 		return x * x;
 	}
 
+	//! thrust functor for calculating the absolute value of vector
 	template < typename T >
 	struct myAbsGPU
 	{
@@ -341,6 +356,7 @@ private:
 		const T sigma;
 	};
 
+	//TODO: needed anymore?
 	/*GPU prox for KL data term */
 	template < typename T >
 	void vectorProjectKLdata(thrust::device_vector<T> &y, thrust::device_vector<T> &yTilde, thrust::device_vector<T> &f, T alpha, T sigma)
@@ -348,6 +364,7 @@ private:
 		thrust::transform(yTilde.begin(), yTilde.end(), f.begin(), y.begin(), KLprojectionDataGPU<T>(sigma));
 	}
 
+	//TODO: neeed anymore?
 	/*sets all elements in a vector to scalarValue*/
 	template < typename T >
 	void vectorScalarSet(thrust::device_vector<T> &v, T scalarValue)
@@ -373,6 +390,7 @@ private:
 		thrust::transform(v1.begin(), v1.end(), v2.begin(), v1.begin(), thrust::placeholders::_1 + thrust::placeholders::_2*thrust::placeholders::_2);
 	}
 
+	//! thrust functor for elemntwise multiplication of two vectors following a summation of the result on a third vector
 	struct vectorAddVectorTimesVectorGPU
 	{
 		__host__ __device__

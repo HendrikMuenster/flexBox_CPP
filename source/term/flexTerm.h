@@ -5,6 +5,11 @@
 #include "prox/flexProx.h"
 #include "data/flexBoxData.h"
 
+//! wrapper class for all usable terms
+/*!
+	flexTerm is a wrapper class for all terms, setting the correct proximal, storing
+	the needed operators and maintaining the used variables.
+*/
 template<typename T>
 class flexTerm
 {

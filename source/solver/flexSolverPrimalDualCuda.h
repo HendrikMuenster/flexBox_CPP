@@ -5,6 +5,12 @@
 
 using namespace thrust::placeholders;
 
+//! FlexBox solver class if using the CUDA version
+/*!
+	flexSolverPrimalDual is an internal class for running the primal dual algortihm
+	if using the CUDA version.
+	This class should not be used directly.
+*/
 template<typename T>
 class flexSolverPrimalDualCuda : public  flexSolver<T>
 {

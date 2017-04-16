@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for a Frobenius term
+/*!
+	\f$ \alpha\|\cdot\|_{F} \f$
+*/
 template<typename T>
 class flexProxDualFrobenius : public flexProx<T>
 {

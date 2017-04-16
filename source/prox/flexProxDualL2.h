@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for a L2 non-data term
+/*!
+	\f$ \frac{\alpha}{2} \|\cdot\|_2^2 \f$
+*/
 template<typename T>
 class flexProxDualL2 : public flexProx<T>
 {

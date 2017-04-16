@@ -3,6 +3,12 @@
 
 #include "flexSolver.h"
 
+//! FlexBox solver class if using the non-CUDA version
+/*!
+	flexSolverPrimalDual is an internal class for running the primal dual algortihm
+	if using the non-CUDA version.
+	This class should not be used directly.
+*/
 template<typename T>
 class flexSolverPrimalDual : public  flexSolver<T>
 {
@@ -100,7 +106,7 @@ public:
 		for (int i = 0; i < aDualPart->getNumberVars(); ++i)
 		{
 			data->addDualVar(aDualPart->dualVarLength(i));
-			
+
 			tmpDCD.push_back(data->getNumDualVars() - 1);
 		}
 

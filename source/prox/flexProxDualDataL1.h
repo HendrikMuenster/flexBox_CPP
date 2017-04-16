@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for a L1 data term
+/*!
+	\f$ \alpha\|\cdot-f\|_1 \f$
+*/
 template<typename T>
 class flexProxDualDataL1 : public flexProx<T>
 {

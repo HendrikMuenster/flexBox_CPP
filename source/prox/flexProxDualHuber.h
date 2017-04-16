@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for a Huber term
+/*!
+	\f$ \alpha \|\cdot\|_{H_\epsilon} \f$
+*/
 template<typename T>
 class flexProxDualHuber : public flexProx<T>
 {
@@ -17,9 +21,13 @@ private:
 	T huberEpsilon;
 public:
 
-	flexProxDualHuber(T _huberEpsilon) : flexProx<T>(dualHuberProx)
+	//! initializes the Huber prox
+	/*!
+		\param aHuberEpsilon represents the parameter of the Huber norm (equals \f$ H_\epsilon \f$)
+	*/
+	flexProxDualHuber(T aHuberEpsilon) : flexProx<T>(dualHuberProx)
 	{
-		huberEpsilon = _huberEpsilon;
+		huberEpsilon = aHuberEpsilon;
 	}
 
 	~flexProxDualHuber()
@@ -87,7 +95,7 @@ public:
 
                 thrust::for_each(startIterator,endIterator,flexProxDualHuberDim2Functor(this->huberEpsilon,alpha));
 			}
-			else if (dualNumbers.size() == 3) 
+			else if (dualNumbers.size() == 3)
             {
 				auto startIterator = thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->y[dualNumbers[1]].begin(), data->y[dualNumbers[2]].begin(), data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[1]].begin(), data->yTilde[dualNumbers[2]].begin(), data->sigmaElt[dualNumbers[0]].begin(), data->sigmaElt[dualNumbers[1]].begin(), data->sigmaElt[dualNumbers[2]].begin()));
 				auto endIterator =   thrust::make_zip_iterator( thrust::make_tuple(data->y[dualNumbers[0]].end(),   data->y[dualNumbers[1]].end(),	 data->y[dualNumbers[2]].end(),	  data->yTilde[dualNumbers[0]].end(),   data->yTilde[dualNumbers[1]].end(),   data->yTilde[dualNumbers[2]].end(),   data->sigmaElt[dualNumbers[0]].end(),   data->sigmaElt[dualNumbers[1]].end(),   data->sigmaElt[dualNumbers[2]].end()));

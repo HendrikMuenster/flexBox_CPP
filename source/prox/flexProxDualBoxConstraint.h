@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for a box constraint
+/*!
+	\f$ \delta_{\{\bar{u} : u_{1}\leq \bar{u}\leq u_{2} \}}(\cdot) \f$
+*/
 template <typename T>
 class flexProxDualBoxConstraint : public flexProx<T>
 {
@@ -18,10 +22,15 @@ private:
 	T maxVal;
 public:
 
-	flexProxDualBoxConstraint(T _minVal, T _maxVal) : flexProx<T>(dualBoxConstraintProx)
+	//! initializes the box constraint prox
+	/*!
+		\param aMinval lower bound (equals \f$u_1\f$)
+		\param aMaxVal upper bound (equals \f$u_2\f$)
+	*/
+	flexProxDualBoxConstraint(T aMinVal, T aMaxVal) : flexProx<T>(dualBoxConstraintProx)
 	{
-		minVal = _minVal;
-		maxVal = _maxVal;
+		minVal = aMinVal;
+		maxVal = aMaxVal;
 	}
 
 	~flexProxDualBoxConstraint()
@@ -33,7 +42,7 @@ public:
 	struct flexProxDualBoxConstraintFunctor
 	{
 		__host__ __device__
-		flexProxDualBoxConstraintFunctor(T _minVal, T _maxVal) : minVal(_minVal), maxVal(_maxVal){}
+		flexProxDualBoxConstraintFunctor(T aMinVal, T maxVal) : minVal(aMinVal), maxVal(maxVal){}
 
 		template <typename Tuple>
 		__host__ __device__

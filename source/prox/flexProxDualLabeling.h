@@ -16,8 +16,8 @@ __global__ void dualLabelingProxCUDA(T** listYPtr, T** listYTildePtr, T** listFP
 		return;
 
 
-	T tmpVector[MAX_NUMBER_LABELS]; 
-	T tmpVector2[MAX_NUMBER_LABELS]; 
+	T tmpVector[MAX_NUMBER_LABELS];
+	T tmpVector2[MAX_NUMBER_LABELS];
 
 	//copy from yTilde
 	for (int j = 0; j < numDualVars; j++)
@@ -77,10 +77,12 @@ __global__ void dualLabelingProxCUDA(T** listYPtr, T** listYTildePtr, T** listFP
 		listYPtr[dualNumbers[j]][i] = listYTildePtr[dualNumbers[j]][i] - listSigmaPtr[dualNumbers[j]][i] * max(tmpVector2[j] - tOpt, (T)0);
 	}
 }
-
 #endif
 
-
+//! represents prox for a labeling term
+/*!
+	\f$ \sum_i \langle u_i,f_i\rangle + \delta_{  \{\bar{u}_1,\ldots,\bar{u}_n : \bar{u}_i \geq 0, \sum_i u_i = 1 \}}(u_1,\ldots,u_n) \f$
+*/
 template<typename T>
 class flexProxDualLabeling : public flexProx<T>
 {
@@ -99,10 +101,10 @@ public:
 	{
 		if (VERBOSE > 0) printf("Destructor prox\n!");
 	}
-	
 
-	
-	
+
+
+
 
 	void applyProx(T alpha, flexBoxData<T>* data, const std::vector<int> &dualNumbers, const std::vector<int> &primalNumbers)
 	{
@@ -120,7 +122,7 @@ public:
 			thrust::device_vector<T*> listSigmaPtr(numDualVars);
 
 			thrust::device_vector<int> dualNumbersCUDA(dualNumbers);
-				
+
 			for (int j = 0; j < numDualVars; j++)
 			{
 				listYPtr[j] = thrust::raw_pointer_cast(data->y[dualNumbers[j]].data());
@@ -139,7 +141,7 @@ public:
 			dualLabelingProxCUDA << <(int)ceil(numElements / 512), 512 >> >(YPtr,YTildePtr,FPtr,SigmaPtr,dualNumbersCUDAPtr,numElements,numDualVars);
 		#else
 			int numElements = (int)data->yTilde[dualNumbers[0]].size();
-			
+
 			int numDualVars = (int)dualNumbers.size();
 
 			//create vector of pointers:
@@ -161,7 +163,7 @@ public:
 						tmpVector2[j] = tmpVector[j];
 					}
 
-					//sort y values 
+					//sort y values
 					std::sort(tmpVector.begin(), tmpVector.end());
 
 					sumY = (T)0;

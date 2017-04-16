@@ -3,6 +3,10 @@
 
 #include "flexProx.h"
 
+//! represents prox for a Kullback-Leibler divergence data term
+/*!
+	\f$ \alpha(\cdot-f+f\log\frac{f}{\cdot} + \delta_{\{\bar{u} : \bar{u}> 0 \}}(\cdot)) \f$
+*/
 template<typename T>
 class flexProxDualDataKL : public flexProx<T>
 {
