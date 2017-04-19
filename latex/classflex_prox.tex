@@ -1,0 +1,174 @@
+\hypertarget{classflex_prox}{}\section{flex\+Prox$<$ T $>$ Class Template Reference}
+\label{classflex_prox}\index{flex\+Prox$<$ T $>$@{flex\+Prox$<$ T $>$}}
+
+
+abstract base class for all proximals (prox)  
+
+
+
+
+{\ttfamily \#include $<$flex\+Prox.\+h$>$}
+
+Inheritance diagram for flex\+Prox$<$ T $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=12.000000cm]{classflex_prox}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classflex_prox_a6055dee6acc0a2eedebf11c6ee4b644b}{flex\+Prox} (\hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} aP)
+\begin{DoxyCompactList}\small\item\em initializes the prox \end{DoxyCompactList}\item 
+\hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} \hyperlink{classflex_prox_a86e900bae3979620dcc6de3a5da89c8e}{get\+Prox} ()
+\begin{DoxyCompactList}\small\item\em returns the type of prox \end{DoxyCompactList}\item 
+virtual void \hyperlink{classflex_prox_a6d3119bd368c4216ad264a1f6dc1d01f}{apply\+Prox} (T alpha, \hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data, const std\+::vector$<$ int $>$ \&dual\+Numbers, const std\+::vector$<$ int $>$ \&primal\+Numbers)=0
+\begin{DoxyCompactList}\small\item\em applies prox for non-\/data terms \end{DoxyCompactList}\item 
+virtual void \hyperlink{classflex_prox_aec433ffbf1a7586f26a2116c6b94bdd6}{apply\+Prox} (T alpha, \hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data, const std\+::vector$<$ int $>$ \&dual\+Numbers, const std\+::vector$<$ int $>$ \&primal\+Numbers, std\+::vector$<$ Tdata $>$ \&f\+List)=0
+\begin{DoxyCompactList}\small\item\em applies prox for data terms \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} \hyperlink{classflex_prox_a5e62beeddd95e33d0a55319a05f44855}{p}
+\begin{DoxyCompactList}\small\item\em type of prox \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Prox$<$ T $>$}
+
+abstract base class for all proximals (prox) 
+
+\hyperlink{classflex_prox}{flex\+Prox} combines the interface for all usable proximals (prox) 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classflex_prox_a6055dee6acc0a2eedebf11c6ee4b644b}\label{classflex_prox_a6055dee6acc0a2eedebf11c6ee4b644b}} 
+\index{flex\+Prox@{flex\+Prox}!flex\+Prox@{flex\+Prox}}
+\index{flex\+Prox@{flex\+Prox}!flex\+Prox@{flex\+Prox}}
+\subsubsection{\texorpdfstring{flex\+Prox()}{flexProx()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_prox}{flex\+Prox}$<$ T $>$\+::\hyperlink{classflex_prox}{flex\+Prox} (\begin{DoxyParamCaption}\item[{\hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox}}]{aP }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+initializes the prox 
+
+
+\begin{DoxyParams}{Parameters}
+{\em aP} & type of prox \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classflex_prox_a6d3119bd368c4216ad264a1f6dc1d01f}\label{classflex_prox_a6d3119bd368c4216ad264a1f6dc1d01f}} 
+\index{flex\+Prox@{flex\+Prox}!apply\+Prox@{apply\+Prox}}
+\index{apply\+Prox@{apply\+Prox}!flex\+Prox@{flex\+Prox}}
+\subsubsection{\texorpdfstring{apply\+Prox()}{applyProx()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+virtual void \hyperlink{classflex_prox}{flex\+Prox}$<$ T $>$\+::apply\+Prox (\begin{DoxyParamCaption}\item[{T}]{alpha,  }\item[{\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$}]{data,  }\item[{const std\+::vector$<$ int $>$ \&}]{dual\+Numbers,  }\item[{const std\+::vector$<$ int $>$ \&}]{primal\+Numbers }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+applies prox for non-\/data terms 
+
+the function body should be empty if implemented prox is a data prox 
+\begin{DoxyParams}{Parameters}
+{\em alpha} & weight of term \\
+\hline
+{\em data} & data object \\
+\hline
+{\em dual\+Numbers} & vector of internal identifactions of dual numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em primal\+Numbers} & vector of internal identifactions of primal numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+
+Implemented in \hyperlink{classflex_prox_dual_labeling_a29e89f413ea586b9390da273141c823b}{flex\+Prox\+Dual\+Labeling$<$ T $>$}, \hyperlink{classflex_prox_dual_huber_af1e80a4361cda51e2b51aceeb69c6b79}{flex\+Prox\+Dual\+Huber$<$ T $>$}, \hyperlink{classflex_prox_dual_l1_iso_afbf9d355a5c633355233f6b7d6026465}{flex\+Prox\+Dual\+L1\+Iso$<$ T $>$}, \hyperlink{classflex_prox_dual_frobenius_a08de45a25d007ea87379641d027fd228}{flex\+Prox\+Dual\+Frobenius$<$ T $>$}, \hyperlink{classflex_prox_dual_box_constraint_a53df35f535f7df3da4e24f6190be2f7f}{flex\+Prox\+Dual\+Box\+Constraint$<$ T $>$}, \hyperlink{classflex_prox_dual_data_l1_a8ebb08fae14a70bc6ed15b6d75b67705}{flex\+Prox\+Dual\+Data\+L1$<$ T $>$}, \hyperlink{classflex_prox_dual_l2_ad4574da3855bad6596c8a3fda028c933}{flex\+Prox\+Dual\+L2$<$ T $>$}, \hyperlink{classflex_prox_dual_l1_aniso_afef01f75247ba5a8990c5b77a7ab89f0}{flex\+Prox\+Dual\+L1\+Aniso$<$ T $>$}, \hyperlink{classflex_prox_dual_inner_product_ac12298c520f5e8e81724e330e8dae6a3}{flex\+Prox\+Dual\+Inner\+Product$<$ T $>$}, \hyperlink{classflex_prox_dual_data_k_l_ad6314cbdf307759e3176e26b3efba7c6}{flex\+Prox\+Dual\+Data\+K\+L$<$ T $>$}, and \hyperlink{classflex_prox_dual_data_l2_ae3ee176dc6c05e8fba0df96c73b10464}{flex\+Prox\+Dual\+Data\+L2$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_prox_aec433ffbf1a7586f26a2116c6b94bdd6}\label{classflex_prox_aec433ffbf1a7586f26a2116c6b94bdd6}} 
+\index{flex\+Prox@{flex\+Prox}!apply\+Prox@{apply\+Prox}}
+\index{apply\+Prox@{apply\+Prox}!flex\+Prox@{flex\+Prox}}
+\subsubsection{\texorpdfstring{apply\+Prox()}{applyProx()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+virtual void \hyperlink{classflex_prox}{flex\+Prox}$<$ T $>$\+::apply\+Prox (\begin{DoxyParamCaption}\item[{T}]{alpha,  }\item[{\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$}]{data,  }\item[{const std\+::vector$<$ int $>$ \&}]{dual\+Numbers,  }\item[{const std\+::vector$<$ int $>$ \&}]{primal\+Numbers,  }\item[{std\+::vector$<$ Tdata $>$ \&}]{f\+List }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+applies prox for data terms 
+
+the function body should be empty if implemented prox is a non-\/data prox 
+\begin{DoxyParams}{Parameters}
+{\em alpha} & weight of term \\
+\hline
+{\em data} & data object \\
+\hline
+{\em dual\+Numbers} & vector of internal identifactions of dual numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em primal\+Numbers} & vector of internal identifactions of primal numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em f\+List} & data part of term \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classflex_prox_dual_huber_a4ce1a386510236fb80213dec59430ac4}{flex\+Prox\+Dual\+Huber$<$ T $>$}, \hyperlink{classflex_prox_dual_l1_iso_a5cd236c5d3e58b9424b1021694c44590}{flex\+Prox\+Dual\+L1\+Iso$<$ T $>$}, \hyperlink{classflex_prox_dual_frobenius_a24695ced8a80693606e1654b04bd068f}{flex\+Prox\+Dual\+Frobenius$<$ T $>$}, \hyperlink{classflex_prox_dual_labeling_a224460146ef61af8b939e4a961cbe776}{flex\+Prox\+Dual\+Labeling$<$ T $>$}, \hyperlink{classflex_prox_dual_box_constraint_a417cfa67f4bffbfc102de872a3456990}{flex\+Prox\+Dual\+Box\+Constraint$<$ T $>$}, \hyperlink{classflex_prox_dual_l2_aef49de69c4d5e6baafbecbab934c17ce}{flex\+Prox\+Dual\+L2$<$ T $>$}, \hyperlink{classflex_prox_dual_l1_aniso_aff8e46fb892387898d54516f0df3c080}{flex\+Prox\+Dual\+L1\+Aniso$<$ T $>$}, \hyperlink{classflex_prox_dual_data_k_l_aa02947fd71697cdb7d6d7e0d617fdfc3}{flex\+Prox\+Dual\+Data\+K\+L$<$ T $>$}, \hyperlink{classflex_prox_dual_data_l1_a3487ee84a12852486a1639d3b9dea735}{flex\+Prox\+Dual\+Data\+L1$<$ T $>$}, \hyperlink{classflex_prox_dual_data_l2_a0d7a54201b01863a9a76f6fc2d52cf22}{flex\+Prox\+Dual\+Data\+L2$<$ T $>$}, and \hyperlink{classflex_prox_dual_inner_product_aa2444bfc4ad1c4ce77e9204bd9f85f69}{flex\+Prox\+Dual\+Inner\+Product$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_prox_a86e900bae3979620dcc6de3a5da89c8e}\label{classflex_prox_a86e900bae3979620dcc6de3a5da89c8e}} 
+\index{flex\+Prox@{flex\+Prox}!get\+Prox@{get\+Prox}}
+\index{get\+Prox@{get\+Prox}!flex\+Prox@{flex\+Prox}}
+\subsubsection{\texorpdfstring{get\+Prox()}{getProx()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} \hyperlink{classflex_prox}{flex\+Prox}$<$ T $>$\+::get\+Prox (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the type of prox 
+
+\begin{DoxyReturn}{Returns}
+type of prox 
+\end{DoxyReturn}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classflex_prox_a5e62beeddd95e33d0a55319a05f44855}\label{classflex_prox_a5e62beeddd95e33d0a55319a05f44855}} 
+\index{flex\+Prox@{flex\+Prox}!p@{p}}
+\index{p@{p}!flex\+Prox@{flex\+Prox}}
+\subsubsection{\texorpdfstring{p}{p}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+const \hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} \hyperlink{classflex_prox}{flex\+Prox}$<$ T $>$\+::p}
+
+
+
+type of prox 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Prox.\+h\end{DoxyCompactItemize}
