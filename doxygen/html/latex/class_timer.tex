@@ -1,0 +1,48 @@
+\hypertarget{class_timer}{}\section{Timer Class Reference}
+\label{class_timer}\index{Timer@{Timer}}
+
+
+class for timing execution times  
+
+
+
+
+{\ttfamily \#include $<$tools.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_timer_a9020542d73357a4eef512eefaf57524b}\label{class_timer_a9020542d73357a4eef512eefaf57524b}} 
+void \hyperlink{class_timer_a9020542d73357a4eef512eefaf57524b}{reset} ()
+\begin{DoxyCompactList}\small\item\em resets or starts the timer \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_timer_accef2f2b25869fbca2947a56b494d2a0}\label{class_timer_accef2f2b25869fbca2947a56b494d2a0}} 
+void \hyperlink{class_timer_accef2f2b25869fbca2947a56b494d2a0}{end} ()
+\begin{DoxyCompactList}\small\item\em ends the timer \end{DoxyCompactList}\item 
+double \hyperlink{class_timer_a6a89a613c2af9b0d1e5f7e4ba9e46c54}{elapsed} () const
+\begin{DoxyCompactList}\small\item\em returns the duration \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+class for timing execution times 
+
+\hyperlink{class_timer}{Timer} is a class for measuring execution times of the primal dual algorithm. It uses std\+::chrono and additionally cuda\+Device\+Synchronize() if the C\+U\+DA version of Flex\+Box has been compiled. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_timer_a6a89a613c2af9b0d1e5f7e4ba9e46c54}\label{class_timer_a6a89a613c2af9b0d1e5f7e4ba9e46c54}} 
+\index{Timer@{Timer}!elapsed@{elapsed}}
+\index{elapsed@{elapsed}!Timer@{Timer}}
+\subsubsection{\texorpdfstring{elapsed()}{elapsed()}}
+{\footnotesize\ttfamily double Timer\+::elapsed (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the duration 
+
+returns the duration between \hyperlink{class_timer_a9020542d73357a4eef512eefaf57524b}{reset()} and \hyperlink{class_timer_accef2f2b25869fbca2947a56b494d2a0}{end()} in seconds (as double) or 0.\+0 if timer has not been stopped \begin{DoxyReturn}{Returns}
+duration in seconds 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tools_8h}{tools.\+h}\end{DoxyCompactItemize}

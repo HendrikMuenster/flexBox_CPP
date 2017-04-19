@@ -1,0 +1,271 @@
+\hypertarget{classflex_box}{}\section{flex\+Box$<$ T $>$ Class Template Reference}
+\label{classflex_box}\index{flex\+Box$<$ T $>$@{flex\+Box$<$ T $>$}}
+
+
+Flex\+Box main class.  
+
+
+
+
+{\ttfamily \#include $<$flex\+Box.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classflex_box_aa325ce1968dc664c0e8e37bdefc25247}{flex\+Box} ()
+\begin{DoxyCompactList}\small\item\em initializes the main object setting default values for parameters. \end{DoxyCompactList}\item 
+int \hyperlink{classflex_box_a367b7a1fe57fd898ef7ad4159ed14a62}{get\+Num\+Primal\+Vars} () const
+\begin{DoxyCompactList}\small\item\em returns the number of primal vars \end{DoxyCompactList}\item 
+int \hyperlink{classflex_box_ab6c7512dee891983f60e0f3a63bff8b5}{get\+Num\+Dual\+Vars} () const
+\begin{DoxyCompactList}\small\item\em returns the number of dual vars \end{DoxyCompactList}\item 
+std\+::vector$<$ T $>$ \hyperlink{classflex_box_ae1c5100eec86603d23d5116ba8d93e9d}{get\+Primal} (int i)
+\begin{DoxyCompactList}\small\item\em returns the requested primal variable \end{DoxyCompactList}\item 
+std\+::vector$<$ T $>$ \hyperlink{classflex_box_a72828fae47030668e63637f232ed2beb}{get\+Dual} (int i)
+\begin{DoxyCompactList}\small\item\em returns the requested dual variable \end{DoxyCompactList}\item 
+void \hyperlink{classflex_box_aacb08dc862943d6bb24353a62e2c9341}{set\+Primal} (int i, std\+::vector$<$ T $>$ input)
+\begin{DoxyCompactList}\small\item\em set the primal variable identifed by i \end{DoxyCompactList}\item 
+void \hyperlink{classflex_box_a77e4f589d87b7c34170778c9abbea3b3}{set\+Dual} (int i, std\+::vector$<$ T $>$ input)
+\begin{DoxyCompactList}\small\item\em set the dual variable identifed by i \end{DoxyCompactList}\item 
+std\+::vector$<$ int $>$ \hyperlink{classflex_box_a4007f118251e0d9787b373709b498785}{get\+Dims} (int i)
+\begin{DoxyCompactList}\small\item\em returns the dimensions of primal vars identified by i \end{DoxyCompactList}\item 
+int \hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var} (std\+::vector$<$ int $>$ \+\_\+dims)
+\begin{DoxyCompactList}\small\item\em adds a primal variable \end{DoxyCompactList}\item 
+void \hyperlink{classflex_box_a4cba554c506d130824ace967bae82ac3}{add\+Term} (\hyperlink{classflex_term}{flex\+Term}$<$ T $>$ $\ast$a\+Term, std\+::vector$<$ int $>$ a\+Primals)
+\begin{DoxyCompactList}\small\item\em adds a Term \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_box_a796367904304f13a82c9fe729c4924d9}\label{classflex_box_a796367904304f13a82c9fe729c4924d9}} 
+void \hyperlink{classflex_box_a796367904304f13a82c9fe729c4924d9}{run\+Algorithm} ()
+\begin{DoxyCompactList}\small\item\em runs the optimization algorithm \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classflex_box_acd4f987e22eb761cff9f6c98592808b4}\label{classflex_box_acd4f987e22eb761cff9f6c98592808b4}} 
+T \hyperlink{classflex_box_acd4f987e22eb761cff9f6c98592808b4}{tol}
+\begin{DoxyCompactList}\small\item\em stopping tolerance using the primal dual residual proposed by Goldstein, Esser and Baraniuk {\bfseries [goldstein2013adaptive]}. Default value is 1e-\/5. \end{DoxyCompactList}\item 
+int \hyperlink{classflex_box_aa20a8abc40427d7a4b8c709f1e38318d}{max\+Iterations}
+\begin{DoxyCompactList}\small\item\em maximum number of iterations if tol has not been reached. Default value is 10000. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_box_a28507da8c03b9875319a2dd38e28cb4a}\label{classflex_box_a28507da8c03b9875319a2dd38e28cb4a}} 
+int \hyperlink{classflex_box_a28507da8c03b9875319a2dd38e28cb4a}{check\+Error}
+\begin{DoxyCompactList}\small\item\em number of steps after which to calculate the primal dual residual. Default value is 100. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_box_a0714316abd9498d53328da1f76f2a306}\label{classflex_box_a0714316abd9498d53328da1f76f2a306}} 
+int \hyperlink{classflex_box_a0714316abd9498d53328da1f76f2a306}{display\+Status}
+\begin{DoxyCompactList}\small\item\em number of steps after which to print status information. Default value is 1000. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_box_aec255fffc4f4356a781be89fee0ed08f}\label{classflex_box_aec255fffc4f4356a781be89fee0ed08f}} 
+int \hyperlink{classflex_box_aec255fffc4f4356a781be89fee0ed08f}{verbose}
+\begin{DoxyCompactList}\small\item\em controls the amount of information printed. Possible values are 0, 1 or 2. Default value is 0. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_box_a8d280f8e287a339fc93ae7683b70456d}\label{classflex_box_a8d280f8e287a339fc93ae7683b70456d}} 
+bool \hyperlink{classflex_box_a8d280f8e287a339fc93ae7683b70456d}{is\+M\+A\+T\+L\+AB}
+\begin{DoxyCompactList}\small\item\em indicates whether \hyperlink{classflex_box}{flex\+Box} is used via M\+A\+L\+T\+AB. Default value is false. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_box_aa22360c61e78b237e51596fa533618e1}\label{classflex_box_aa22360c61e78b237e51596fa533618e1}} 
+std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \hyperlink{classflex_box_aa22360c61e78b237e51596fa533618e1}{dims}
+\begin{DoxyCompactList}\small\item\em contains lists of dimensions of primal variables. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Box$<$ T $>$}
+
+Flex\+Box main class. 
+
+\hyperlink{classflex_box}{flex\+Box} gathers information about the problem size, modifies the algorithm parameters, runs the optimization algorithm and returns the result. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classflex_box_aa325ce1968dc664c0e8e37bdefc25247}\label{classflex_box_aa325ce1968dc664c0e8e37bdefc25247}} 
+\index{flex\+Box@{flex\+Box}!flex\+Box@{flex\+Box}}
+\index{flex\+Box@{flex\+Box}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{flex\+Box()}{flexBox()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+\hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::\hyperlink{classflex_box}{flex\+Box} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+initializes the main object setting default values for parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box_acd4f987e22eb761cff9f6c98592808b4}{tol} \hyperlink{classflex_box_aa20a8abc40427d7a4b8c709f1e38318d}{max\+Iterations} \hyperlink{classflex_box_a28507da8c03b9875319a2dd38e28cb4a}{check\+Error} \hyperlink{classflex_box_a0714316abd9498d53328da1f76f2a306}{display\+Status} \hyperlink{classflex_box_aec255fffc4f4356a781be89fee0ed08f}{verbose} \hyperlink{classflex_box_a8d280f8e287a339fc93ae7683b70456d}{is\+M\+A\+T\+L\+AB} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}\label{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}} 
+\index{flex\+Box@{flex\+Box}!add\+Primal\+Var@{add\+Primal\+Var}}
+\index{add\+Primal\+Var@{add\+Primal\+Var}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{add\+Primal\+Var()}{addPrimalVar()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+int \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::add\+Primal\+Var (\begin{DoxyParamCaption}\item[{std\+::vector$<$ int $>$}]{\+\_\+dims }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+adds a primal variable 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dims} & dimension of variable \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+internal identifcation for variable 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classflex_box_a4cba554c506d130824ace967bae82ac3}\label{classflex_box_a4cba554c506d130824ace967bae82ac3}} 
+\index{flex\+Box@{flex\+Box}!add\+Term@{add\+Term}}
+\index{add\+Term@{add\+Term}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{add\+Term()}{addTerm()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::add\+Term (\begin{DoxyParamCaption}\item[{\hyperlink{classflex_term}{flex\+Term}$<$ T $>$ $\ast$}]{a\+Term,  }\item[{std\+::vector$<$ int $>$}]{a\+Primals }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+adds a Term 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+Term} & term to be added \\
+\hline
+{\em a\+Primala} & corresponding primal variables for term \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classflex_box_a4007f118251e0d9787b373709b498785}\label{classflex_box_a4007f118251e0d9787b373709b498785}} 
+\index{flex\+Box@{flex\+Box}!get\+Dims@{get\+Dims}}
+\index{get\+Dims@{get\+Dims}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{get\+Dims()}{getDims()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+std\+::vector$<$int$>$ \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::get\+Dims (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the dimensions of primal vars identified by i 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & internal identifcation for variable \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+dimension of primal variable 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classflex_box_a72828fae47030668e63637f232ed2beb}\label{classflex_box_a72828fae47030668e63637f232ed2beb}} 
+\index{flex\+Box@{flex\+Box}!get\+Dual@{get\+Dual}}
+\index{get\+Dual@{get\+Dual}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{get\+Dual()}{getDual()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+std\+::vector$<$T$>$ \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::get\+Dual (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the requested dual variable 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & internal identifcation \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+dual variable identifed by i 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classflex_box_ab6c7512dee891983f60e0f3a63bff8b5}\label{classflex_box_ab6c7512dee891983f60e0f3a63bff8b5}} 
+\index{flex\+Box@{flex\+Box}!get\+Num\+Dual\+Vars@{get\+Num\+Dual\+Vars}}
+\index{get\+Num\+Dual\+Vars@{get\+Num\+Dual\+Vars}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{get\+Num\+Dual\+Vars()}{getNumDualVars()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+int \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::get\+Num\+Dual\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the number of dual vars 
+
+\begin{DoxyReturn}{Returns}
+number of dual vars 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classflex_box_a367b7a1fe57fd898ef7ad4159ed14a62}\label{classflex_box_a367b7a1fe57fd898ef7ad4159ed14a62}} 
+\index{flex\+Box@{flex\+Box}!get\+Num\+Primal\+Vars@{get\+Num\+Primal\+Vars}}
+\index{get\+Num\+Primal\+Vars@{get\+Num\+Primal\+Vars}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{get\+Num\+Primal\+Vars()}{getNumPrimalVars()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+int \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::get\+Num\+Primal\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the number of primal vars 
+
+\begin{DoxyReturn}{Returns}
+number of primal vars 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classflex_box_ae1c5100eec86603d23d5116ba8d93e9d}\label{classflex_box_ae1c5100eec86603d23d5116ba8d93e9d}} 
+\index{flex\+Box@{flex\+Box}!get\+Primal@{get\+Primal}}
+\index{get\+Primal@{get\+Primal}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{get\+Primal()}{getPrimal()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+std\+::vector$<$T$>$ \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::get\+Primal (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the requested primal variable 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & internal identifcation returned by \hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var()} \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var()} 
+\end{DoxySeeAlso}
+\begin{DoxyReturn}{Returns}
+primal variable identifed by i 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classflex_box_a77e4f589d87b7c34170778c9abbea3b3}\label{classflex_box_a77e4f589d87b7c34170778c9abbea3b3}} 
+\index{flex\+Box@{flex\+Box}!set\+Dual@{set\+Dual}}
+\index{set\+Dual@{set\+Dual}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{set\+Dual()}{setDual()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::set\+Dual (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{std\+::vector$<$ T $>$}]{input }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+set the dual variable identifed by i 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & internal identifcation for variable \\
+\hline
+{\em input} & data for dual variable \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classflex_box_aacb08dc862943d6bb24353a62e2c9341}\label{classflex_box_aacb08dc862943d6bb24353a62e2c9341}} 
+\index{flex\+Box@{flex\+Box}!set\+Primal@{set\+Primal}}
+\index{set\+Primal@{set\+Primal}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{set\+Primal()}{setPrimal()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::set\+Primal (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{std\+::vector$<$ T $>$}]{input }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+set the primal variable identifed by i 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & internal identifcation for variable \\
+\hline
+{\em input} & data for primal variable \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classflex_box_aa20a8abc40427d7a4b8c709f1e38318d}\label{classflex_box_aa20a8abc40427d7a4b8c709f1e38318d}} 
+\index{flex\+Box@{flex\+Box}!max\+Iterations@{max\+Iterations}}
+\index{max\+Iterations@{max\+Iterations}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{max\+Iterations}{maxIterations}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+int \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::max\+Iterations}
+
+
+
+maximum number of iterations if tol has not been reached. Default value is 10000. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box_acd4f987e22eb761cff9f6c98592808b4}{tol} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Box.\+h\end{DoxyCompactItemize}

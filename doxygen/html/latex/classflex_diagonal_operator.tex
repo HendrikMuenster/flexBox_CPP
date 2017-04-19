@@ -1,0 +1,262 @@
+\hypertarget{classflex_diagonal_operator}{}\section{flex\+Diagonal\+Operator$<$ T $>$ Class Template Reference}
+\label{classflex_diagonal_operator}\index{flex\+Diagonal\+Operator$<$ T $>$@{flex\+Diagonal\+Operator$<$ T $>$}}
+
+
+represents a diagonal operator  
+
+
+
+
+{\ttfamily \#include $<$flex\+Diagonal\+Operator.\+h$>$}
+
+Inheritance diagram for flex\+Diagonal\+Operator$<$ T $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classflex_diagonal_operator}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bfseries flex\+Diagonal\+Operator\+Functor}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classflex_diagonal_operator_affc1bfd1944ccf07c179ae3d4855f7af}{flex\+Diagonal\+Operator} (std\+::vector$<$ T $>$ a\+Diagonal\+Elements, bool a\+Minus)
+\begin{DoxyCompactList}\small\item\em initializes the concatenation operator for non-\/\+C\+U\+DA versions \end{DoxyCompactList}\item 
+\hyperlink{classflex_diagonal_operator_a9e39335b75df3ac690aa3899f4a1a5e4}{flex\+Diagonal\+Operator} (Tdata a\+Diagonal\+Elements, bool a\+Minus)
+\begin{DoxyCompactList}\small\item\em initializes the concatenation operator for C\+U\+DA versions \end{DoxyCompactList}\item 
+\hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$ $\ast$ \hyperlink{classflex_diagonal_operator_aeca7325de5eaface63363e9710034128}{copy} ()
+\begin{DoxyCompactList}\small\item\em copies the linear operator \end{DoxyCompactList}\item 
+void \hyperlink{classflex_diagonal_operator_a701d4741eb75d3e63fd47b936b46fb8c}{times} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector \end{DoxyCompactList}\item 
+void \hyperlink{classflex_diagonal_operator_ab8b9999592b97c6189f7f2c5d3bd47af}{times\+Plus} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector and adds its result to y \end{DoxyCompactList}\item 
+void \hyperlink{classflex_diagonal_operator_ac579880d56e9703a5fcb6cafbf9fe338}{times\+Minus} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector and substracts its result from y \end{DoxyCompactList}\item 
+std\+::vector$<$ T $>$ \hyperlink{classflex_diagonal_operator_ad53cb526b55141a1d0519a023572cf58}{get\+Abs\+Row\+Sum} (bool transposed)
+\begin{DoxyCompactList}\small\item\em returns a vector of sum of absolute values per row used for preconditioning \end{DoxyCompactList}\item 
+T \hyperlink{classflex_diagonal_operator_aa9c144ae23fbcbcdcd14cc779182896a}{get\+Max\+Row\+Sum\+Abs} (bool transposed)
+\begin{DoxyCompactList}\small\item\em returns the maximum sum of absolute values per row used for preconditioning \end{DoxyCompactList}\item 
+thrust\+::device\+\_\+vector$<$ T $>$ \hyperlink{classflex_diagonal_operator_a71cdb6ea6b8b7ceabaf538a180c8dcf4}{get\+Abs\+Row\+Sum\+C\+U\+DA} (bool transposed)
+\begin{DoxyCompactList}\small\item\em same function as \hyperlink{classflex_diagonal_operator_ad53cb526b55141a1d0519a023572cf58}{get\+Abs\+Row\+Sum()} but implemented in C\+U\+DA \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Diagonal\+Operator$<$ T $>$}
+
+represents a diagonal operator 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classflex_diagonal_operator_affc1bfd1944ccf07c179ae3d4855f7af}\label{classflex_diagonal_operator_affc1bfd1944ccf07c179ae3d4855f7af}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{flex\+Diagonal\+Operator()}{flexDiagonalOperator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::\hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator} (\begin{DoxyParamCaption}\item[{std\+::vector$<$ T $>$}]{a\+Diagonal\+Elements,  }\item[{bool}]{a\+Minus }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+initializes the concatenation operator for non-\/\+C\+U\+DA versions 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+Diagonal\+Elements} & vector of diagonal Elements \\
+\hline
+{\em a\+Minus} & determines if operator is negated \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_linear_operator_a7f986517e10aee21099ec7692b77905d}{is\+Minus} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classflex_diagonal_operator_a9e39335b75df3ac690aa3899f4a1a5e4}\label{classflex_diagonal_operator_a9e39335b75df3ac690aa3899f4a1a5e4}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{flex\+Diagonal\+Operator()}{flexDiagonalOperator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::\hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator} (\begin{DoxyParamCaption}\item[{Tdata}]{a\+Diagonal\+Elements,  }\item[{bool}]{a\+Minus }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+initializes the concatenation operator for C\+U\+DA versions 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+Diagonal\+Elements} & vector of diagonal Elements where Tdata is of type thrust\+::device\+\_\+vector$<$\+T$>$ \\
+\hline
+{\em a\+Minus} & determines if operator is negated \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_linear_operator_a7f986517e10aee21099ec7692b77905d}{is\+Minus} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classflex_diagonal_operator_aeca7325de5eaface63363e9710034128}\label{classflex_diagonal_operator_aeca7325de5eaface63363e9710034128}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!copy@{copy}}
+\index{copy@{copy}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$T$>$$\ast$ \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+copies the linear operator 
+
+\begin{DoxyReturn}{Returns}
+copy of linear operator 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_a7cc1425677cc30fcbd092ffd28d508c9}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_diagonal_operator_ad53cb526b55141a1d0519a023572cf58}\label{classflex_diagonal_operator_ad53cb526b55141a1d0519a023572cf58}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!get\+Abs\+Row\+Sum@{get\+Abs\+Row\+Sum}}
+\index{get\+Abs\+Row\+Sum@{get\+Abs\+Row\+Sum}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{get\+Abs\+Row\+Sum()}{getAbsRowSum()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+std\+::vector$<$T$>$ \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::get\+Abs\+Row\+Sum (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+returns a vector of sum of absolute values per row used for preconditioning 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_ad6caa7b09e6e3c401cadef61b8e2307e}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_diagonal_operator_a71cdb6ea6b8b7ceabaf538a180c8dcf4}\label{classflex_diagonal_operator_a71cdb6ea6b8b7ceabaf538a180c8dcf4}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!get\+Abs\+Row\+Sum\+C\+U\+DA@{get\+Abs\+Row\+Sum\+C\+U\+DA}}
+\index{get\+Abs\+Row\+Sum\+C\+U\+DA@{get\+Abs\+Row\+Sum\+C\+U\+DA}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{get\+Abs\+Row\+Sum\+C\+U\+D\+A()}{getAbsRowSumCUDA()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+thrust\+::device\+\_\+vector$<$T$>$ \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::get\+Abs\+Row\+Sum\+C\+U\+DA (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+same function as \hyperlink{classflex_diagonal_operator_ad53cb526b55141a1d0519a023572cf58}{get\+Abs\+Row\+Sum()} but implemented in C\+U\+DA 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_a0a0a431d43f4f9d36cbee0d31ba5a29b}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_diagonal_operator_aa9c144ae23fbcbcdcd14cc779182896a}\label{classflex_diagonal_operator_aa9c144ae23fbcbcdcd14cc779182896a}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!get\+Max\+Row\+Sum\+Abs@{get\+Max\+Row\+Sum\+Abs}}
+\index{get\+Max\+Row\+Sum\+Abs@{get\+Max\+Row\+Sum\+Abs}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{get\+Max\+Row\+Sum\+Abs()}{getMaxRowSumAbs()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+T \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::get\+Max\+Row\+Sum\+Abs (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+returns the maximum sum of absolute values per row used for preconditioning 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+maximum sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_afcb74697385ccb7c8d29870d7034c12a}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_diagonal_operator_a701d4741eb75d3e63fd47b936b46fb8c}\label{classflex_diagonal_operator_a701d4741eb75d3e63fd47b936b46fb8c}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!times@{times}}
+\index{times@{times}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{times()}{times()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::times (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector 
+
+equals $ y = Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a883982edf3be857815d2095e53f76e75}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_diagonal_operator_ac579880d56e9703a5fcb6cafbf9fe338}\label{classflex_diagonal_operator_ac579880d56e9703a5fcb6cafbf9fe338}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!times\+Minus@{times\+Minus}}
+\index{times\+Minus@{times\+Minus}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{times\+Minus()}{timesMinus()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::times\+Minus (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector and substracts its result from y 
+
+equals $ y = y - Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a62708874e134a649c8445df333079c69}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_diagonal_operator_ab8b9999592b97c6189f7f2c5d3bd47af}\label{classflex_diagonal_operator_ab8b9999592b97c6189f7f2c5d3bd47af}} 
+\index{flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}!times\+Plus@{times\+Plus}}
+\index{times\+Plus@{times\+Plus}!flex\+Diagonal\+Operator@{flex\+Diagonal\+Operator}}
+\subsubsection{\texorpdfstring{times\+Plus()}{timesPlus()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_diagonal_operator}{flex\+Diagonal\+Operator}$<$ T $>$\+::times\+Plus (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector and adds its result to y 
+
+equals $ y = y + Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a3f2978ad1c5eae8cd4ae16deb2337416}{flex\+Linear\+Operator$<$ T $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Diagonal\+Operator.\+h\end{DoxyCompactItemize}

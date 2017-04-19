@@ -1,0 +1,45 @@
+\hypertarget{classflex_solver}{}\section{flex\+Solver$<$ T $>$ Class Template Reference}
+\label{classflex_solver}\index{flex\+Solver$<$ T $>$@{flex\+Solver$<$ T $>$}}
+
+
+Flex\+Box solver class.  
+
+
+
+
+{\ttfamily \#include $<$flex\+Solver.\+h$>$}
+
+Inheritance diagram for flex\+Solver$<$ T $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classflex_solver}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classflex_solver_a072d7af0f075d53b2efb6a119fbc6280}\label{classflex_solver_a072d7af0f075d53b2efb6a119fbc6280}} 
+virtual void {\bfseries init} (\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data)=0
+\item 
+\mbox{\Hypertarget{classflex_solver_ad496971c4d875162b0ce7c675232956e}\label{classflex_solver_ad496971c4d875162b0ce7c675232956e}} 
+virtual void {\bfseries add\+Term} (\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data, \hyperlink{classflex_term}{flex\+Term}$<$ T $>$ $\ast$\+\_\+dual\+Part, std\+::vector$<$ int $>$ \+\_\+corresponding\+Primals)=0
+\item 
+\mbox{\Hypertarget{classflex_solver_a61ba0cf7b87a326c5360b334b5e48f25}\label{classflex_solver_a61ba0cf7b87a326c5360b334b5e48f25}} 
+virtual void {\bfseries do\+Iteration} (\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data)=0
+\item 
+\mbox{\Hypertarget{classflex_solver_a0ba40198cc0c2f46c81c1981a505f7e9}\label{classflex_solver_a0ba40198cc0c2f46c81c1981a505f7e9}} 
+virtual T {\bfseries calculate\+Error} (\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data)=0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Solver$<$ T $>$}
+
+Flex\+Box solver class. 
+
+\hyperlink{classflex_solver}{flex\+Solver} is an internal abstract class for running the primal dual algortihm used by the \hyperlink{classflex_box}{flex\+Box} main class. This class should not be used directly. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Solver.\+h\end{DoxyCompactItemize}
