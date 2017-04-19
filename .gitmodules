@@ -1,0 +1,3 @@
+[submodule "doxygen/html"]
+	path = doxygen/html
+	url = https://github.com/HendrikMuenster/flexBox_CPP
