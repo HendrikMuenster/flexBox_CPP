@@ -1,5 +1,3 @@
-#TODO: install target vs configurable files for data files
-
 configure_file(
   sampleFiles.h.in
   sampleFiles.h
@@ -9,6 +7,7 @@ if(CUDA_FOUND)
 
   set(SAMPLE_SRCS_CUDA
     exampleROF.cu
+    exampleSegmentation.cu
   )
 
   foreach(SAMPLE_FILE ${SAMPLE_SRCS_CUDA})
@@ -29,6 +28,7 @@ else()
 
   set(SAMPLE_SRCS_CPP
     exampleROF.cpp
+    exampleSegmentation.cpp
   )
   foreach(SAMPLE_FILE ${SAMPLE_SRCS_CPP})
 
