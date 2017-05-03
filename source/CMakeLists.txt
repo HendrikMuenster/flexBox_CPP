@@ -3,12 +3,6 @@ project(FlexBox)
 set (FlexBox_VERSION_MAJOR 1)
 set (FlexBox_VERSION_MINOR 4)
 
-#TODO: add support for older cmake versions (matlab_add_mex)?
-#TODO: CUDA: specific archs f.ex. -arch=compute_50 (auto-detect graphics card cmake 3.7?)
-#TODO: add /MP for visual studio parallel builds
-#TODO: find way to include -g argument for mex
-#TODO: -DMATLAB_MEX
-
 ##########################
 #        OPTIONS         #
 ##########################
@@ -207,15 +201,3 @@ endif(Matlab_FOUND)
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(BUILD_EXAMPLES)
-
-
-
-
-
-
-
-
-
-
-
-

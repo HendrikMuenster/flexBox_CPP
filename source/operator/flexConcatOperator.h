@@ -205,7 +205,7 @@ public:
         }
 	}
 
-    //todo
+	//TODO
 	T getMaxRowSumAbs(bool transposed)
 	{
 		return static_cast<T>(1);

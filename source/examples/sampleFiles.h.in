@@ -1,4 +1,3 @@
-/* TODO: change this, because it's ugly */
 struct files
 {
   const char* imgA        = "@CMAKE_CURRENT_SOURCE_DIR@/img/a.bmp";

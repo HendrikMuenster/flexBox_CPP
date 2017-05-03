@@ -255,19 +255,16 @@ public:
 		}
 	}
 
+	//TODO: implement. 1 is just placeholder
 	T getMaxRowSumAbs(bool transposed)
 	{
-		//todo
-
 		return 1;
 	}
 
-    //dummy, this function is not used in a CUDA setting
+  //dummy, this function is not used in a CUDA setting
 	std::vector<T> getAbsRowSum(bool transposed)
 	{
-        std::vector<T> result(1);
-
-
+    std::vector<T> result(1);
 		return result;
 	}
 
