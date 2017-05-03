@@ -341,30 +341,6 @@ private:
 		return thrust::reduce(v.begin(), v.end(), (T)0, thrust::plus<T>());
 	}
 
-
-	/*GPU prox for KL data term (functor)*/
-	//main.y{dualNumber} = min(1,0.5*(1 + main.yTilde{dualNumber} - sqrt( (main.yTilde{dualNumber}-1).^2 + 4*main.params.sigma{dualNumber}*obj.f(:) )));
-	template < typename T >
-	struct KLprojectionDataGPU
-	{
-		__host__ __device__
-		KLprojectionDataGPU(T sigma) : sigma((T)4.0 * sigma){};
-
-		__host__ __device__
-		T operator()(T x, T y) const { return (T)0.5 * ((T)1.0 + x - std::sqrt( myPow2GPU(x - (T)1.0) + sigma * y)); }
-	private:
-		const T sigma;
-	};
-
-	//TODO: needed anymore?
-	/*GPU prox for KL data term */
-	template < typename T >
-	void vectorProjectKLdata(thrust::device_vector<T> &y, thrust::device_vector<T> &yTilde, thrust::device_vector<T> &f, T alpha, T sigma)
-	{
-		thrust::transform(yTilde.begin(), yTilde.end(), f.begin(), y.begin(), KLprojectionDataGPU<T>(sigma));
-	}
-
-	//TODO: neeed anymore?
 	/*sets all elements in a vector to scalarValue*/
 	template < typename T >
 	void vectorScalarSet(thrust::device_vector<T> &v, T scalarValue)
