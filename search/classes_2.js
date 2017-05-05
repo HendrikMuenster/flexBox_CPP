@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['myabsgpu',['myAbsGPU',['../structmy_abs_g_p_u.html',1,'']]]
+  ['timer',['Timer',['../class_timer.html',1,'']]]
 ];

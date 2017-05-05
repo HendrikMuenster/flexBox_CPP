@@ -103,7 +103,7 @@ adds a primal variable
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-internal identifcation for variable 
+internal identifcation for variable. Id starts at zero is is incremented by one if a new primal variable is added. 
 \end{DoxyReturn}
 \mbox{\Hypertarget{classflex_box_a4cba554c506d130824ace967bae82ac3}\label{classflex_box_a4cba554c506d130824ace967bae82ac3}} 
 \index{flex\+Box@{flex\+Box}!add\+Term@{add\+Term}}
@@ -136,9 +136,12 @@ returns the dimensions of primal vars identified by i
 
 
 \begin{DoxyParams}{Parameters}
-{\em i} & internal identifcation for variable \\
+{\em i} & internal identifcation for variable. Id starts at zero is is incremented by one if a new primal variable is added. \\
 \hline
 \end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var()} 
+\end{DoxySeeAlso}
 \begin{DoxyReturn}{Returns}
 dimension of primal variable 
 \end{DoxyReturn}
@@ -155,7 +158,7 @@ returns the requested dual variable
 
 
 \begin{DoxyParams}{Parameters}
-{\em i} & internal identifcation \\
+{\em i} & internal identifcation of dual variable. Id starts at zero is is incremented by one if a new dual variable is added. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -202,7 +205,7 @@ returns the requested primal variable
 
 
 \begin{DoxyParams}{Parameters}
-{\em i} & internal identifcation returned by \hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var()} \\
+{\em i} & internal identifcation of primal variable returned by \hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var()}. Id starts at zero is is incremented by one if a new primal variable is added. \\
 \hline
 \end{DoxyParams}
 \begin{DoxySeeAlso}{See also}
@@ -224,7 +227,7 @@ set the dual variable identifed by i
 
 
 \begin{DoxyParams}{Parameters}
-{\em i} & internal identifcation for variable \\
+{\em i} & internal identifcation for variable. Id starts at zero is is incremented by one if a new dual variable is added. \\
 \hline
 {\em input} & data for dual variable \\
 \hline
@@ -242,8 +245,14 @@ set the primal variable identifed by i
 
 
 \begin{DoxyParams}{Parameters}
-{\em i} & internal identifcation for variable \\
+{\em i} & internal identifcation for variable. Id starts at zero is is incremented by one if a new primal variable is added. \\
 \hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box_a659aac107b85ecf64c9fd1aaa465a98d}{add\+Primal\+Var()} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
 {\em input} & data for primal variable \\
 \hline
 \end{DoxyParams}

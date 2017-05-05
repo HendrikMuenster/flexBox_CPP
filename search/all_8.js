@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['klprojectiondatagpu',['KLprojectionDataGPU',['../struct_k_lprojection_data_g_p_u.html',1,'']]]
+  ['linop',['linOp',['../tools_8h.html#a3fc67a2f9370c09fecbd90da67687d36',1,'tools.h']]]
 ];

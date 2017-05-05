@@ -83,7 +83,7 @@ Inheritance diagram for flexSuperpixelOperator&lt; T &gt;:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a810ff259aed4c17eed5b6c731bb59b3b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classflex_superpixel_operator.html#a810ff259aed4c17eed5b6c731bb59b3b">flexSuperpixelOperator</a> (std::vector&lt; int &gt; aTargetDimension, T aUpsamplingFactor, bool aMinus)</td></tr>
-<tr class="memdesc:a810ff259aed4c17eed5b6c731bb59b3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">initializes the superpixel operator  <a href="#a810ff259aed4c17eed5b6c731bb59b3b">More...</a><br /></td></tr>
+<tr class="memdesc:a810ff259aed4c17eed5b6c731bb59b3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">initializes the superpixel operator. Downsamples image of size aUpsamplingFactor * aTargetDimension to size aTargetDimension  <a href="#a810ff259aed4c17eed5b6c731bb59b3b">More...</a><br /></td></tr>
 <tr class="separator:a810ff259aed4c17eed5b6c731bb59b3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0e066735127a3b39958c6719fe03156"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classflex_superpixel_operator.html">flexSuperpixelOperator</a>&lt; T &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classflex_superpixel_operator.html#ab0e066735127a3b39958c6719fe03156">copy</a> ()</td></tr>
 <tr class="memdesc:ab0e066735127a3b39958c6719fe03156"><td class="mdescLeft">&#160;</td><td class="mdescRight">copies the linear operator  <a href="#ab0e066735127a3b39958c6719fe03156">More...</a><br /></td></tr>
@@ -186,11 +186,11 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>initializes the superpixel operator </p>
+<p>initializes the superpixel operator. Downsamples image of size aUpsamplingFactor * aTargetDimension to size aTargetDimension </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">aTargetDimension</td><td>TODO </td></tr>
-    <tr><td class="paramname">aUpsamplingFactor</td><td>TODO </td></tr>
+    <tr><td class="paramname">aTargetDimension</td><td>target dimension of downsampled image </td></tr>
+    <tr><td class="paramname">aUpsamplingFactor</td><td>aUpsamplingFactor * aTargetDimension is original image size </td></tr>
     <tr><td class="paramname">aMinus</td><td>determines if operator is negated </td></tr>
   </table>
   </dd>

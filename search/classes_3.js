@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['timer',['Timer',['../class_timer.html',1,'']]]
+  ['vectoraddvectortimesvectorgpu',['vectorAddVectorTimesVectorGPU',['../structvector_add_vector_times_vector_g_p_u.html',1,'']]]
 ];

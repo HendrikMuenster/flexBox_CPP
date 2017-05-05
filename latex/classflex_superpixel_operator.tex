@@ -19,7 +19,7 @@ Inheritance diagram for flex\+Superpixel\+Operator$<$ T $>$\+:\begin{figure}[H]
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{classflex_superpixel_operator_a810ff259aed4c17eed5b6c731bb59b3b}{flex\+Superpixel\+Operator} (std\+::vector$<$ int $>$ a\+Target\+Dimension, T a\+Upsampling\+Factor, bool a\+Minus)
-\begin{DoxyCompactList}\small\item\em initializes the superpixel operator \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em initializes the superpixel operator. Downsamples image of size a\+Upsampling\+Factor $\ast$ a\+Target\+Dimension to size a\+Target\+Dimension \end{DoxyCompactList}\item 
 \hyperlink{classflex_superpixel_operator}{flex\+Superpixel\+Operator}$<$ T $>$ $\ast$ \hyperlink{classflex_superpixel_operator_ab0e066735127a3b39958c6719fe03156}{copy} ()
 \begin{DoxyCompactList}\small\item\em copies the linear operator \end{DoxyCompactList}\item 
 void \hyperlink{classflex_superpixel_operator_afa075c0858c693342646250225f7c425}{times} (bool transposed, const Tdata \&input, Tdata \&output)
@@ -55,13 +55,13 @@ downsamples data of size upsampling\+Factor $\ast$ target\+Dimension size to tar
 
 
 
-initializes the superpixel operator 
+initializes the superpixel operator. Downsamples image of size a\+Upsampling\+Factor $\ast$ a\+Target\+Dimension to size a\+Target\+Dimension 
 
 
 \begin{DoxyParams}{Parameters}
-{\em a\+Target\+Dimension} & T\+O\+DO \\
+{\em a\+Target\+Dimension} & target dimension of downsampled image \\
 \hline
-{\em a\+Upsampling\+Factor} & T\+O\+DO \\
+{\em a\+Upsampling\+Factor} & a\+Upsampling\+Factor $\ast$ a\+Target\+Dimension is original image size \\
 \hline
 {\em a\+Minus} & determines if operator is negated \\
 \hline
