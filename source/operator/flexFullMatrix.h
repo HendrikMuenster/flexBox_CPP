@@ -21,7 +21,7 @@ private:
 
 public:
 	//! initializes an empty matrix
-	flexFullMatrix() : valueList() flexLinearOperator<T>(0, 0, matrixOp, false) {};
+	flexFullMatrix() : valueList(), flexLinearOperator<T>(0, 0, matrixOp, false) {};
 
 	//! initializes a matrix
 	/*!
