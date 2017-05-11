@@ -23,10 +23,10 @@ private:
 	T upsamplingFactor;
 public:
 
-	//! initializes the superpixel operator
+	//! initializes the superpixel operator. Downsamples image of size aUpsamplingFactor * aTargetDimension to size aTargetDimension
 	/*!
-		\param aTargetDimension TODO
-		\param aUpsamplingFactor TODO
+		\param aTargetDimension target dimension of downsampled image
+		\param aUpsamplingFactor aUpsamplingFactor * aTargetDimension is original image size
 		\param aMinus determines if operator is negated \sa isMinus
 	*/
 	flexSuperpixelOperator(std::vector<int> aTargetDimension, T aUpsamplingFactor, bool aMinus) : flexLinearOperator<T>((int)(vectorProduct(aTargetDimension)), (int)(vectorProduct(aTargetDimension)*aUpsamplingFactor*aUpsamplingFactor), superpixelOp, aMinus)

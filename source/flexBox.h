@@ -86,7 +86,7 @@ private:
 
 		//! returns the requested primal variable
 		/*!
-			\param i internal identifcation returned by addPrimalVar() \sa addPrimalVar()
+			\param i internal identifcation of primal variable returned by addPrimalVar(). Id starts at zero is is incremented by one if a new primal variable is added. \sa addPrimalVar()
 			\return primal variable identifed by i
 		*/
 		std::vector<T> getPrimal(int i)
@@ -96,7 +96,7 @@ private:
 
 		//! returns the requested dual variable
 		/*!
-			\param i internal identifcation
+			\param i internal identifcation of dual variable. Id starts at zero is is incremented by one if a new dual variable is added.
 			\return dual variable identifed by i
 		*/
 		std::vector<T> getDual(int i)
@@ -106,7 +106,7 @@ private:
 
 		//! set the primal variable identifed by i
 		/*!
-			\param i internal identifcation for variable
+			\param i internal identifcation for variable. Id starts at zero is is incremented by one if a new primal variable is added. \sa addPrimalVar()
 			\param input data for primal variable
 		*/
 		void setPrimal(int i, std::vector<T> input)
@@ -116,7 +116,7 @@ private:
 
 		//! set the dual variable identifed by i
 		/*!
-			\param i internal identifcation for variable
+			\param i internal identifcation for variable. Id starts at zero is is incremented by one if a new dual variable is added.
 			\param input data for dual variable
 		*/
 		void setDual(int i, std::vector<T> input)
@@ -126,7 +126,7 @@ private:
 
 		//! returns the dimensions of primal vars identified by i
 		/*!
-			\param i internal identifcation for variable
+			\param i internal identifcation for variable. Id starts at zero is is incremented by one if a new primal variable is added. \sa addPrimalVar()
 			\return dimension of primal variable
 		*/
 		std::vector<int> getDims(int i)
@@ -137,7 +137,7 @@ private:
 		//! adds a primal variable
 		/*!
 			\param dims dimension of variable
-			\return internal identifcation for variable
+			\return internal identifcation for variable. Id starts at zero is is incremented by one if a new primal variable is added.
 		*/
 		int addPrimalVar(std::vector<int> _dims)
 		{

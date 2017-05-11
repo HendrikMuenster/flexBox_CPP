@@ -34,16 +34,28 @@ In order to use the stand-alone version the following requirements should be met
 
 ### Quick start
 ```
-cd flexBox_CPP/
-cmake ../
+cd flexBox_CPP
+mkdir build
+cd build
+cmake -D <variable1>=<value1> ../  #modify as desired see table below
 make
-make install
+make install                      #recommended but optional
 ```
+The install target copies the compiled MEX-file and executables to build/bin.
 
-## FAQ
-You may have to preload libraries. To do so, simply start Matlab with:
-env LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/local/cuda-7.5/lib64/libcudart.so.7.5 /usr/local/cuda-7.5/lib64/libcusparse.so.7.5" matlab
+| CMake Variable  | Default Value   | Description                     |
+| --------------- | :-------------: | ------------------------------- |
+| BUILD_MATLAB    | ON              | compiles MEX-interface if ON    |
+| BUILD_EXAMPLES  | ON              | compiles C++ stand-alone if ON  |
+| USE_OPENMP      | OFF             | enables OpenMP support if ON    |
+| USE_CUDA        | OFF             | enables CUDA support if ON      |
 
+## Usage
+We recommend to look at the provided examples in the folder examples/.
+In the examples we use the [CImg Library](https://http://cimg.eu/) to process images.
+
+The Doxygen documentation for the C++ module is available under the following link:
+https://hendrikmuenster.github.io/flexBox_CPP/
 
 
 ## Reporting Bugs

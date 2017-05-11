@@ -1070,7 +1070,7 @@ public:
 		else
 		{
 			printf("Gradient not implemented for dim!={2,3}\n");
-			//todo
+			//TODO: implement gradient for dim!={2,3} for CPU version
 		}
 	}
 
@@ -1160,7 +1160,7 @@ public:
 		else
 		{
 			printf("Gradient not implemented for dim!={2,3}\n");
-			//todo
+			//TODO: implement gradient for dim!={2,3} for GPU version
 		}
 	}
 	#endif
