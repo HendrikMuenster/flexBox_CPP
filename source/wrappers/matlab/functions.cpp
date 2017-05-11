@@ -46,6 +46,8 @@
 #include "operator/flexZeroOperator.h"
 #include "operator/flexDiagonalOperator.h"
 #include "operator/flexMatrix.h"
+#include "operator/flexMatrixLogical.h"
+#include "operator/flexFullMatrix.h"
 #include "operator/flexGradientOperator.h"
 #include "operator/flexSuperpixelOperator.h"
 #include "operator/flexConcatOperator.h"
@@ -86,9 +88,14 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 void copyToVector(std::vector<floatingType> &vector, const double *input, int numElements);
 bool checkClassType(mxArray *object, const std::string& className);
 bool checkSparse(mxArray *object);
-bool checkProx(mxArray *inputClass,const char* proxName);
+bool checkFullMatrix(mxArray *object);
+bool checkProx(mxArray *inputClass, const char* proxName);
 
+void copyMatlabToFlexFullMatrix(const mxArray *input, flexFullMatrix<floatingType> *output);
 void copyMatlabToFlexmatrix(const mxArray *input, flexMatrix<floatingType> *output);
+void copyMatlabToFlexLogicalMatrix(const mxArray *input, flexMatrixLogical<floatingType> *output);
+
+
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -535,6 +542,22 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 		A = Atmp;
 		#endif
 	}
+	else if (mxIsLogical(pointerA))
+	{
+		auto Atmp = new flexMatrixLogical<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), isMinus);
+
+		copyMatlabToFlexLogicalMatrix(pointerA, Atmp);
+
+		A = Atmp;
+	}
+	else if (checkFullMatrix(pointerA))
+	{
+		auto Atmp = new flexFullMatrix<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), isMinus);
+
+		copyMatlabToFlexFullMatrix(pointerA, Atmp);
+
+		A = Atmp;
+	}
 	else
 	{
 		mexErrMsgTxt("Operator type not supported!\n");
@@ -595,6 +618,24 @@ bool checkSparse(mxArray *object)
 	}
 }
 
+bool checkFullMatrix(mxArray *object)
+{
+	mxArray *output[1], *input[1];
+
+	input[0] = object;
+
+	mexCallMATLAB(1, output, 1, input, "ismatrix");
+
+	if (mxGetScalar(output[0]) > 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 bool checkProx(mxArray *inputClass, const char* proxName)
 {
 	mxArray *output[1], *input[1];
@@ -616,6 +657,54 @@ bool checkProx(mxArray *inputClass, const char* proxName)
 	return false;
 }
 
+void copyMatlabToFlexFullMatrix(const mxArray *input, flexFullMatrix<floatingType> *output)
+{
+	double* values = mxGetPr(input);
+
+	for (int i = 0; i < mxGetM(input)*mxGetN(input); ++i)
+	{
+		output->insertElement(i, values[i]);
+	}
+}
+
+void copyMatlabToFlexLogicalMatrix(const mxArray *input, flexMatrixLogical<floatingType> *output)
+{
+	bool* values = mxGetLogicals(input);
+
+	/*std::vector<int> indexI(0, 0);
+	std::vector<int> indexJ(0, 0);
+
+	for (int j = 0; j < mxGetN(input); ++j)
+	{
+		for (int i = 0; i < mxGetM(input); ++i)
+		{
+			if (values[i + j*mxGetM(input)])
+			{
+				indexI.push_back(i);
+				indexJ.push_back(j);
+			}
+		}
+	}
+
+	output->blockInsert(indexI, indexJ);*/
+
+	int sizeM = mxGetM(input);
+	int sizeN = mxGetN(input);
+
+	for (int i = 0; i < sizeM; ++i)
+	{
+		int numElements = 0;
+		for (int j = 0; j < sizeN; ++j)
+		{
+			if (values[i + j*sizeM])
+			{
+				output->indexList.push_back(j);
+				++numElements;
+			}
+		}
+		output->rowToIndexList[i + 1] = output->rowToIndexList[i] + numElements;
+	}
+}
 
 void copyMatlabToFlexmatrix(const mxArray *input, flexMatrix<floatingType> *output)
 {

@@ -47,6 +47,8 @@ set(SOURCES_IDE_OP
   operator/flexIdentityOperator.h
   operator/flexLinearOperator.h
   operator/flexMatrix.h
+  operator/flexFullMatrix.h
+  operator/flexMatrixLogical.h
   operator/flexMatrixGPU.h
   operator/flexSuperpixelOperator.h
   operator/flexZeroOperator.h

@@ -31,7 +31,7 @@ public:
 		\param aNumCols number of cols
 		\param aMinus determines if operator is negated \sa isMinus
 	*/
-	flexMatrix(int  aNumRows, int aNumCols, bool aMinus) : rowToIndexList(aNumRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(aNumRows, aNumCols, matrixOp, aMinus){};
+	flexMatrix(int aNumRows, int aNumCols, bool aMinus) : rowToIndexList(aNumRows + 1, static_cast<int>(0)), indexList(0, 0), valueList(0, 0), flexLinearOperator<T>(aNumRows, aNumCols, matrixOp, aMinus){};
 
 	flexMatrix<T>* copy()
 	{
@@ -43,9 +43,6 @@ public:
 
 		return A;
 	}
-
-
-
 
 	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
@@ -119,7 +116,6 @@ public:
 			//update rowToIndexList
 			rowToIndexList[indexRow + 1] = rowToIndexList[indexRow] + numElements;
 		}
-
 	}
 
 	/*
@@ -213,7 +209,6 @@ public:
 		}
 
 		printf("\n");
-
 	}
 
 	//! prints the whole matrix
@@ -236,7 +231,7 @@ public:
     #endif
 
 	private:
-		void doTimesCPU(bool transposed, const Tdata &input, Tdata &output,const mySign s)
+	void doTimesCPU(bool transposed, const Tdata &input, Tdata &output,const mySign s)
 	{
         if (transposed)
 		{
