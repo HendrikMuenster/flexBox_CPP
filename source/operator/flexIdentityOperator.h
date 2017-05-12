@@ -59,7 +59,7 @@ public:
 		}
 	}
 
-		void timesPlus(bool transposed, const Tdata &input, Tdata &output)
+	void timesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
 		if (this->isMinus)
 		{

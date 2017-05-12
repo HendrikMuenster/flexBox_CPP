@@ -79,6 +79,7 @@ public:
 				for (int i = 0; i < numElements; i++)
 				{
 					ptrY[i] = myMax<T>((T)0, ptrYtilde[i] - ptrSigma[i] * this->maxVal) + myMin<T>((T)0, ptrYtilde[i] - ptrSigma[i] * this->minVal);
+					//if (i == 54)printf("%f\n", ptrY[i]);
 				}
 			}
 		#endif

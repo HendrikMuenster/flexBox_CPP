@@ -154,6 +154,8 @@ public:
 				const int primalNum = primalNumbers[j];
 				const int dualNum = dualNumbers[i];
 
+				//printf("i=%d,j=%d,primalNum=%d,dualNum=%d\n",i,j, primalNum, dualNum);
+
 				dualTerm->operatorList[operatorNumber]->timesPlus(true, data->y[dualNum], data->xTilde[primalNum]);
 			}
 		}

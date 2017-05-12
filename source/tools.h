@@ -140,7 +140,8 @@ T vectorSum(const std::vector<T> &v)
 	return std::accumulate(v.begin(), v.end(), (T)0);
 }
 
-float vectorMax(std::vector<float> &v)
+template < typename T >
+float vectorMax(std::vector<T> &v)
 {
 	return *std::max_element(v.begin(), v.end());
 }
@@ -151,19 +152,22 @@ void vectorScalarProduct(std::vector<T> &v,T scalarValue)
 	std::transform(v.begin(), v.end(), v.begin(), [scalarValue](T x) {return scalarValue*x;});
 }
 
-void vectorScalarSet(std::vector<float> &v, const float scalarValue)
+template < typename T >
+void vectorScalarSet(std::vector<T> &v, const T scalarValue)
 {
 	std::fill(v.begin(), v.end(), scalarValue);
 }
 
-void vectorPlus(std::vector<float> &v1, std::vector<float> &v2)
+template < typename T >
+void vectorPlus(std::vector<T> &v1, std::vector<T> &v2)
 {
-	std::transform(v1.begin(), v1.end(), v2.begin(), v1.begin(), std::plus<float>());
+	std::transform(v1.begin(), v1.end(), v2.begin(), v1.begin(), std::plus<T>());
 }
 
-void vectorMinus(std::vector<float> &v1, std::vector<float> &v2)
+template < typename T >
+void vectorMinus(std::vector<T> &v1, std::vector<T> &v2)
 {
-	std::transform(v1.begin(), v1.end(), v2.begin(), v1.begin(), std::minus<float>());
+	std::transform(v1.begin(), v1.end(), v2.begin(), v1.begin(), std::minus<T>());
 }
 
 template < typename T >

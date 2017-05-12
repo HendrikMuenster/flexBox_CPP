@@ -142,6 +142,11 @@ public:
 				}
 			}
 
+			/*for (int k = 0; k < this->getNumCols(); ++k)
+			{
+				printf("T%f\n", result[k]);
+			}*/
+
 			return result;
 		}
 		else
@@ -159,6 +164,11 @@ public:
 
 				result[k] = tmpSum;
 			}
+
+			/*for (int k = 0; k < this->getNumRows(); ++k)
+			{
+				printf("%f\n", result[k]);
+			}*/
 
 			return result;
 		}

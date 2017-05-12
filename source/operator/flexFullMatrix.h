@@ -97,7 +97,7 @@ public:
 	{
 		if (transposed)
 		{
-			std::vector<T> result(this->getNumCols());
+			std::vector<T> result(this->getNumCols(), (T)0);
 
 			for (int i = 0; i < this->getNumRows(); ++i)
 			{
@@ -116,7 +116,7 @@ public:
 		}
 		else
 		{
-			std::vector<T> result(this->getNumRows());
+			std::vector<T> result(this->getNumRows(),(T)0);
 
 			for (int i = 0; i < this->getNumRows(); ++i)
 			{

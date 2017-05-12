@@ -71,7 +71,7 @@
 
 
 
-typedef float floatingType;
+typedef double floatingType;
 
 #ifdef __CUDACC__
 	using namespace thrust;
@@ -129,6 +129,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mainObject.tol = (float)mxGetScalar(mxGetFieldByNumber(params, 0, numTol));
 	}
 
+	int numCheckError = mxGetFieldNumber(params, "checkError");
+	if (numCheckError >= 0)
+	{
+		mainObject.checkError = (int)mxGetScalar(mxGetFieldByNumber(params, 0, numCheckError));
+	}
+
 	int verbose = mainObject.verbose;
 
 	if (verbose > 0)
@@ -137,7 +143,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		printf("maxIterations: %d\n",mainObject.maxIterations);
 		printf("verbose: %d\n",mainObject.verbose);
-		printf("tol: %f\n",mainObject.tol);
+		printf("tol: %f\n", mainObject.tol);
+		printf("checkError: %d\n", mainObject.checkError);
 	}
 
 	// read primal vars
@@ -259,7 +266,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			float minVal = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"minVal"));
 			float maxVal = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"maxVal"));
-
 			myProx = new flexProxDualBoxConstraint<floatingType>(minVal, maxVal);
 		}
         else if (checkProx(classPointer,"innerProductProxDual"))

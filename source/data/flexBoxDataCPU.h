@@ -28,11 +28,14 @@ public:
 	void setPrimal(int i, std::vector<T> input)
 	{
 		this->x[i] = input;
+		this->xOld[i] = input;
+		this->xBar[i] = input;
 	}
 
 	void setDual(int i, std::vector<T> input)
 	{
 		this->y[i] = input;
+		this->yOld[i] = input;
 	}
 };
 

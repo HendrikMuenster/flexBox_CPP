@@ -11,6 +11,7 @@ option(USE_OPENMP "Use OpenMP" OFF)
 option(USE_CUDA "Use CUDA" OFF)
 option(BUILD_MATLAB "Build Matlab (mex) interface" ON)
 option(BUILD_EXAMPLES "Build C++/CUDA examples" ON)
+option(DO_TESTS "Run tests using CATCH framework" ON)
 
 ##########################
 #     FILES/INCUDES      #
@@ -203,3 +204,9 @@ endif(Matlab_FOUND)
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(BUILD_EXAMPLES)
+
+#Tests target
+if(DO_TESTS)
+  add_subdirectory(tests)
+endif(DO_TESTS)
+
