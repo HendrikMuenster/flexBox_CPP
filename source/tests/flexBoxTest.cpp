@@ -87,8 +87,6 @@ TEST_CASE("Operator flexFullMatrix<floatingType>", "[flexFullMatrix]") {
 			REQUIRE(std::abs(resultAv1[i] - resultAv1Expected[i]) < tol);
 		for (int i = 0; i < resultAtv2Expected.size(); ++i)
 			REQUIRE(std::abs(resultAtv2[i] - resultAtv2Expected[i]) < tol);
-
-
 	}
 }
 

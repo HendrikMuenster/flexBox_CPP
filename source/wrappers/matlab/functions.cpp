@@ -377,6 +377,10 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 		printf("isMinus is set to %d\n", isMinus);
 	}
 
+	if (checkClassType(pointerA, std::string("functionHandleOperator")))
+	{
+		mexErrMsgTxt("Operator type functionHandleOperator not supported!\n");
+	}
 	if (checkClassType(pointerA, std::string("gradientOperator")))
 	{
 		if (verbose > 1)
@@ -587,7 +591,6 @@ void copyToVector(std::vector<floatingType> &vector,const double *input, int num
 
 bool checkClassType(mxArray *object, const std::string& className)
 {
-
 	mxArray *output[1], *input[2];
 
 	input[0] = object;
@@ -603,7 +606,6 @@ bool checkClassType(mxArray *object, const std::string& className)
 	{
 		return false;
 	}
-
 }
 
 bool checkSparse(mxArray *object)
