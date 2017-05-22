@@ -11,7 +11,7 @@ option(USE_OPENMP "Use OpenMP" OFF)
 option(USE_CUDA "Use CUDA" OFF)
 option(BUILD_MATLAB "Build Matlab (mex) interface" ON)
 option(BUILD_EXAMPLES "Build C++/CUDA examples" ON)
-option(DO_TESTS "Run tests using CATCH framework" ON)
+option(BUILD_TESTS "Run tests using CATCH framework" ON)
 
 ##########################
 #     FILES/INCUDES      #
@@ -120,22 +120,18 @@ else()
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message (STATUS  "No build type specified. Default is 'Release'.")
   set (CMAKE_BUILD_TYPE Release CACHE STRING "The type of build" FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
-
 set (WRAPPERS_DIR "wrappers")
-
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_FLAGS}")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 
-#OpenMP
 if(USE_OPENMP)
   find_package(OpenMP)
 
@@ -151,7 +147,7 @@ endif(USE_OPENMP)
 #include own modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 
-#Matlab
+
 if(BUILD_MATLAB)
   find_package(Matlab COMPONENTS MX_LIBRARY)
 
@@ -161,7 +157,7 @@ if(BUILD_MATLAB)
 
 endif(BUILD_MATLAB)
 
-#CUDA
+
 if(USE_CUDA)
   find_package(CUDA)
 
@@ -179,14 +175,13 @@ if(USE_CUDA)
   endif()
 endif(USE_CUDA)
 
-#EXAMPLES
 if(BUILD_EXAMPLES AND UNIX)
   find_package(X11 REQUIRED)
   find_package(Threads REQUIRED)
 endif(BUILD_EXAMPLES AND UNIX)
 
 
-#flexBox template library
+# flexBox template library
 add_library(flexBoxLib INTERFACE)
 target_include_directories(flexBoxLib INTERFACE ${INCLUDE_DIRS})
 
@@ -200,13 +195,12 @@ if(Matlab_FOUND)
   add_subdirectory(${WRAPPERS_DIR}/matlab)
 endif(Matlab_FOUND)
 
-#Examples target
+# examples targets
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(BUILD_EXAMPLES)
 
-#Tests target
-if(DO_TESTS)
+# test targets
+if(BUILD_TESTS)
   add_subdirectory(tests)
-endif(DO_TESTS)
-
+endif(BUILD_TESTS)
