@@ -37,24 +37,57 @@ public:
 	//apply linear operator to vector
 	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
-		int numElements = (int)output.size();
+		int numRows = this->getNumRows();
+		int numCols = this->getNumCols();
 
 		if (this->isMinus)
 		{
-			int numElements = (int)input.size();
-			#pragma omp parallel for
-			for (int i = 0; i < numElements; ++i)
+			if(transposed)
 			{
-				output[i] = -input[i];
+				#pragma omp parallel for
+				for (int i = 0; i < numCols; ++i)
+				{
+					if(numCols > numRows && i >= numRows)
+						output[i] = 0;
+					else
+						output[i] = -input[i];
+				}
+			}
+			else
+			{
+				#pragma omp parallel for
+				for (int i = 0; i < numRows; ++i)
+				{
+					if(numRows > numCols && i >= numCols)
+						output[i] = 0;
+					else
+						output[i] = -input[i];
+				}
 			}
 		}
 		else
 		{
-			int numElements = (int)input.size();
-			#pragma omp parallel for
-			for (int i = 0; i < numElements; ++i)
+			if(transposed)
 			{
-				output[i] = input[i];
+				#pragma omp parallel for
+				for (int i = 0; i < numCols; ++i)
+				{
+					if(numCols > numRows && i >= numRows)
+						output[i] = 0;
+					else
+						output[i] = input[i];
+				}
+			}
+			else
+			{
+				#pragma omp parallel for
+				for (int i = 0; i < numRows; ++i)
+				{
+					if(numRows > numCols && i >= numCols)
+						output[i] = 0;
+					else
+						output[i] = input[i];
+				}
 			}
 		}
 	}
@@ -63,11 +96,11 @@ public:
 	{
 		if (this->isMinus)
 		{
-			doTimesMinus(input, output);
+			doTimesMinus(transposed, input, output);
 		}
 		else
 		{
-			doTimesPlus(input, output);
+			doTimesPlus(transposed, input, output);
 		}
 	}
 
@@ -75,11 +108,11 @@ public:
 	{
 		if (this->isMinus)
 		{
-			doTimesPlus(input, output);
+			doTimesPlus(transposed, input, output);
 		}
 		else
 		{
-			doTimesMinus(input, output);
+			doTimesMinus(transposed, input, output);
 		}
 	}
 
@@ -90,7 +123,12 @@ public:
 
 	std::vector<T> getAbsRowSum(bool transposed)
 	{
-		std::vector<T> result(this->getNumRows(), (T)1);
+		std::vector<T> result;
+
+		if(transposed)
+			result = std::vector<T>(this->getNumCols(), (T)1);
+		else
+			result = std::vector<T>(this->getNumRows(), (T)1);
 
 		return result;
 	}
@@ -98,39 +136,104 @@ public:
 	#ifdef __CUDACC__
 	thrust::device_vector<T> getAbsRowSumCUDA(bool transposed)
 	{
-		thrust::device_vector<T> result(this->getNumRows(), (T)1);
+		thrust::device_vector<T> result;
+
+		if(transposed)
+			result = thrust::device_vector<T>(this->getNumCols(), (T)1);
+		else
+			result = thrust::device_vector<T>(this->getNumRows(), (T)1);
 
 		return result;
 	}
 	#endif
 
 private:
-	void doTimesPlus(const Tdata &input, Tdata &output)
+	void doTimesPlus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		#ifdef __CUDACC__
-			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::plus<T>());
-		#else
-            int numElements = (int)input.size();
-            #pragma omp parallel for
-            for (int i = 0; i < numElements; ++i)
-            {
-                output[i] += input[i];
-            }
-		#endif
+		int numRows = this->getNumRows();
+		int numCols = this->getNumCols();
+
+		if(transposed)
+		{
+			#ifdef __CUDACC__
+				if(numCols <= numRows)
+					thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::plus<T>());
+				else
+				{
+					thrust::transform(output.begin(), output.begin() + numRows, input.begin(), output.begin(), thrust::plus<T>());
+				}
+
+			#else
+				#pragma omp parallel for
+				for (int i = 0; i < numCols; ++i)
+				{
+					if(numCols <= numRows || i < numRows)
+						output[i] += input[i];
+				}
+			#endif
+		}
+		else
+		{
+			#ifdef __CUDACC__
+				if(numRows <= numCols)
+					thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::plus<T>());
+				else
+				{
+					thrust::transform(output.begin(), output.begin() + numCols, input.begin(), output.begin(), thrust::plus<T>());
+				}
+			#else
+				#pragma omp parallel for
+				for (int i = 0; i < numRows; ++i)
+				{
+					if(numRows <= numCols || i < numCols)
+						output[i] += input[i];
+				}
+			#endif
+		}
 	}
 
-	void doTimesMinus(const Tdata &input, Tdata &output)
+	void doTimesMinus(bool transposed, const Tdata &input, Tdata &output)
 	{
-		#ifdef __CUDACC__
-			thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::minus<T>());
-		#else
-            int numElements = (int)input.size();
-            #pragma omp parallel for
-            for (int i = 0; i < numElements; ++i)
-            {
-                output[i] -= input[i];
-            }
-		#endif
+		int numRows = this->getNumRows();
+		int numCols = this->getNumCols();
+
+		if(transposed)
+		{
+			#ifdef __CUDACC__
+				if(numCols <= numRows)
+					thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::minus<T>());
+				else
+				{
+					thrust::transform(output.begin(), output.begin() + numRows, input.begin(), output.begin(), thrust::minus<T>());
+				}
+
+			#else
+				#pragma omp parallel for
+				for (int i = 0; i < numCols; ++i)
+				{
+					if(numCols <= numRows || i < numRows)
+						output[i] -= input[i];
+				}
+			#endif
+		}
+		else
+		{
+			#ifdef __CUDACC__
+				if(numRows <= numCols)
+					thrust::transform(output.begin(), output.end(), input.begin(), output.begin(), thrust::minus<T>());
+				else
+				{
+					thrust::transform(output.begin(), output.begin() + numCols, input.begin(), output.begin(), thrust::minus<T>());
+				}
+			#else
+				#pragma omp parallel for
+				for (int i = 0; i < numRows; ++i)
+				{
+					if(numRows <= numCols || i < numCols)
+						output[i] -= input[i];
+				}
+			#endif
+		}
 	}
 };
 
