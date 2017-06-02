@@ -49,7 +49,12 @@ public:
 
 	std::vector<T> getAbsRowSum(bool transposed)
 	{
-		std::vector<T> result(this->getNumRows(),(T)0);
+		std::vector<T> result;
+		if(transposed)
+				result = std::vector<T>(this->getNumCols(),(T)0);
+		else
+				result = std::vector<T>(this->getNumRows(),(T)0);
+
 
 		return result;
 	}

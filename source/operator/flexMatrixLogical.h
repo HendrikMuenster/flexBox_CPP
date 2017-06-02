@@ -5,7 +5,7 @@
 
 #include <vector>
 
-//! represents a full (non-CUDA) matrix
+//! represents a full (non-CUDA) logical matrix
 template<typename T>
 class flexMatrixLogical : public flexLinearOperator<T>
 {
@@ -43,6 +43,7 @@ public:
 		return A;
 	}
 
+	//todo
 	void times(bool transposed, const Tdata &input, Tdata &output)
 	{
 
@@ -113,7 +114,7 @@ public:
 			rowToIndexList[indexRow + 1] = rowToIndexList[indexRow] + numElements;
 		}
 	}
-    
+
     int index2DtoLinear(int i, int j)
 	{
 		return i + j*this->getNumRows();

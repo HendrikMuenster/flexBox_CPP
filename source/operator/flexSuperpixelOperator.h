@@ -32,8 +32,7 @@ public:
 	flexSuperpixelOperator(std::vector<int> aTargetDimension, T aUpsamplingFactor, bool aMinus) : flexLinearOperator<T>((int)(vectorProduct(aTargetDimension)), (int)(vectorProduct(aTargetDimension)*aUpsamplingFactor*aUpsamplingFactor), superpixelOp, aMinus)
 	{
 		this->targetDimension.resize(aTargetDimension.size());
-
-        this->targetDimension = aTargetDimension;
+    this->targetDimension = aTargetDimension;
 		this->upsamplingFactor = aUpsamplingFactor;
 	};
 

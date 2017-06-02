@@ -10,13 +10,13 @@
 #include "flexLinearOperator.h"
 #include "flexConcatOperator.h"
 #include "flexDiagonalOperator.h"
-
 #include "flexFullMatrix.h"
-#include "flexMatrix.h"
-#include "flexIdentityOperator.h"
 #include "flexGradientOperator.h"
-#include "flexProxDualDataL2.h"
-#include "flexProxDualL1Iso.h"
+#include "flexIdentityOperator.h"
+#include "flexMatrix.h"
+#include "flexMatrixLogical.h"
+#include "flexSuperpixelOperator.h"
+#include "flexZeroOperator.h"
 
 using namespace std;
 
@@ -201,10 +201,46 @@ TEST_CASE("Operator flexFullMatrix<floatingType>", "[flexFullMatrix]")
 }
 
 
-/*TEST_CASE("Operator flexGradientOperator<floatingType>", "[flexGradientOperator]")
+TEST_CASE("Operator flexGradientOperator<floatingType>", "[flexGradientOperator]")
 {
+	floatingType tol = 1e-7;
+	flexGradientOperator<floatingType> gradOpForward({ 3, 4 }, 0, gradientType::forward, false);
+	flexGradientOperator<floatingType> gradOpBackward({ 3, 4 }, 0, gradientType::backward, false);
 
-}*/
+	REQUIRE(gradOpForward.getNumRows() == 12);
+	REQUIRE(gradOpForward.getNumCols() == 12);
+	REQUIRE(gradOpForward.isMinus == false);
+
+	REQUIRE(gradOpBackward.getNumRows() == 12);
+	REQUIRE(gradOpBackward.getNumCols() == 12);
+	REQUIRE(gradOpBackward.isMinus == false);
+
+
+	SECTION("check matrix vector multiplication")
+	{
+		//define vector v = [1,2,3....];
+		std::vector<floatingType> v(12); //3*4
+		std::iota(v.begin(), v.end(), 1);
+
+		std::vector<floatingType> resultForward(12, (floatingType)0);
+		std::vector<floatingType> resultBackward(12, (floatingType)0);
+
+		gradOpForward.times(false, v, resultForward);
+		gradOpBackward.times(false, v, resultBackward);
+
+		std::vector<floatingType> resultForwardExpected = { 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0};
+		std::vector<floatingType> resultBackwardExpected = { 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1};
+
+		for (int i = 0; i < resultForward.size(); ++i)
+		{
+			REQUIRE(std::abs(resultForward[i] - resultForwardExpected[i]) < tol);
+			//REQUIRE(std::abs(resultBackward[i] - resultBackwardExpected[i]) < tol);
+		}
+	}
+
+
+
+}
 
 TEST_CASE("Operator flexIdentityOperator<floatingType>", "[flexIdentityOperator]")
 {
@@ -342,17 +378,184 @@ TEST_CASE("Operator flexMatrix<floatingType>", "[flexMatrix]")
 	}
 }
 
-/*TEST_CASE("Operator flexMatrixLogical<floatingType>", "[flexMatrixLogical]")
+TEST_CASE("Operator flexMatrixLogical<floatingType>", "[flexMatrixLogical]")
 {
+	floatingType tol = 1e-7;
+	flexMatrixLogical<floatingType> A(2, 3, false);
 
-}*/
+	//add elements to matrix. Structure is:
+	//A =	[1 1 0;
+	//		 0 1 1 ]
+	std::vector<int> rows = { 0, 0, 1, 1 };
+	std::vector<int> cols = { 0, 1, 1, 2 };
+	A.blockInsert(rows, cols);
 
-/*TEST_CASE("Operator flexSuperpixelOperator<floatingType>", "[flexSuperpixelOperator]")
+	REQUIRE(A.getNumRows() == 2);
+	REQUIRE(A.getNumCols() == 3);
+	REQUIRE(A.isMinus == false);
+
+	SECTION("calculate row and col sums")
+	{
+		std::vector<floatingType> rowsSums = A.getAbsRowSum(false);
+		std::vector<floatingType> colsSums = A.getAbsRowSum(true);
+
+		std::vector<floatingType> rowSumsExpected = { 2, 2 };
+		std::vector<floatingType> colSumsExpected = { 1, 2, 1 };
+
+		for (int i = 0; i < rowSumsExpected.size(); ++i)
+			REQUIRE(std::abs(rowSumsExpected[i] - rowsSums[i]) < tol);
+
+		for (int i = 0; i < colSumsExpected.size(); ++i)
+			REQUIRE(std::abs(colSumsExpected[i] - colsSums[i]) < tol);
+	}
+
+	SECTION("check matrix vector multiplication")
+	{
+		//define vector v1 = [1.1, 0.9, 4.6];
+		std::vector<floatingType> v1 = { 1.1, 0.9, 4.6 };
+		//define vector v2 = [1.1, 0.9];
+		std::vector<floatingType> v2 = { 1.1, 0.9 };
+
+		std::vector<floatingType> resultAv1(2, (floatingType)0);
+		std::vector<floatingType> resultAtv2(3, (floatingType)0);
+
+		A.timesPlus(false, v1, resultAv1);
+		A.timesPlus(true, v2, resultAtv2);
+
+		std::vector<floatingType> resultAv1Expected = { 2, 5.5 };
+		std::vector<floatingType> resultAtv2Expected = { 1.1, 2, 0.9 };
+
+		for (int i = 0; i < resultAv1Expected.size(); ++i)
+			REQUIRE(std::abs(resultAv1[i] - resultAv1Expected[i]) < tol);
+		for (int i = 0; i < resultAtv2Expected.size(); ++i)
+			REQUIRE(std::abs(resultAtv2[i] - resultAtv2Expected[i]) < tol);
+	}
+
+	SECTION("check empty matrix")
+	{
+		flexMatrixLogical<floatingType> empty(0, 0, false);
+		std::vector<int> emptyIntVec = {};
+		std::vector<floatingType> emptyFloatVec = {};
+		empty.blockInsert(emptyIntVec, emptyIntVec);
+
+		REQUIRE(empty.getNumRows() == 0);
+		REQUIRE(empty.getNumCols() == 0);
+		REQUIRE(empty.isMinus == false);
+
+		std::vector<floatingType> v = {};
+		std::vector<floatingType> resultAv = {};
+
+		empty.timesPlus(false, v, resultAv);
+		REQUIRE(resultAv.size() == 0);
+	}
+
+}
+
+TEST_CASE("Operator flexSuperpixelOperator<floatingType>", "[flexSuperpixelOperator]")
 {
+	floatingType tol = 1e-7;
+	//target dimension is [3,2] with upsampling factor of 2 (so [6,4])
+	flexSuperpixelOperator<floatingType> A({ 3, 2 }, 2, false);
 
-}*/
+	REQUIRE(A.getNumRows() == 6); //prod of all dimensions on target dim == 3*2
+	REQUIRE(A.getNumCols() == 24); //prod of all dimensions on target dim times upsampling factor squared == (3*2)*(2*2)
+	REQUIRE(A.isMinus == false);
 
-/*TEST_CASE("Operator flexZeroOperator<floatingType>", "[flexZeroOperator]")
+	SECTION("calculate row and col sums")
+	{
+		std::vector<floatingType> rowsSums = A.getAbsRowSum(false);
+		std::vector<floatingType> colsSums = A.getAbsRowSum(true);
+
+		std::vector<floatingType> rowSumsExpected(6);
+		std::vector<floatingType> colSumsExpected(24);
+		std::fill(rowSumsExpected.begin(), rowSumsExpected.end(), 1);
+		std::fill(colSumsExpected.begin(), colSumsExpected.end(), 0.25); //== 1/(upsam Factor)^2
+
+		for (int i = 0; i < rowSumsExpected.size(); ++i)
+			REQUIRE(std::abs(rowSumsExpected[i] - rowsSums[i]) < tol);
+
+		for (int i = 0; i < colSumsExpected.size(); ++i)
+			REQUIRE(std::abs(colSumsExpected[i] - colsSums[i]) < tol);
+	}
+
+	SECTION("check matrix vector multiplication")
+	{
+		//define vector v1 = [1.1, 0.9, 4.6];
+		std::vector<floatingType> v1 = { 8, -9, 9, -2, -10, -3, 5, 6, 1, 4, 8, -9, -4, -10, -6, 5, 5, 8, 2, -9, 9, 6, -4, 1 };
+
+		std::vector<floatingType> resultAv1(6, (floatingType)0);
+
+		A.timesPlus(false, v1, resultAv1);
+
+		std::vector<floatingType> resultAv1Expected = { -3.5, 4.5, -2.25, -0.5, 7, -2.5};
+
+		for (int i = 0; i < resultAv1Expected.size(); ++i)
+			REQUIRE(std::abs(resultAv1[i] - resultAv1Expected[i]) < tol);
+	}
+
+}
+
+TEST_CASE("Operator flexZeroOperator<floatingType>", "[flexZeroOperator]")
 {
+	floatingType tol = 1e-7;
+	flexZeroOperator<floatingType> A(2, 3, false);
 
-}*/
+	REQUIRE(A.getNumRows() == 2);
+	REQUIRE(A.getNumCols() == 3);
+	REQUIRE(A.isMinus == false);
+
+	SECTION("calculate row and col sums")
+	{
+		std::vector<floatingType> rowsSums = A.getAbsRowSum(false);
+		std::vector<floatingType> colsSums = A.getAbsRowSum(true);
+
+		std::vector<floatingType> rowSumsExpected = { 0, 0 };
+		std::vector<floatingType> colSumsExpected = { 0, 0, 0};
+
+		for (int i = 0; i < rowSumsExpected.size(); ++i)
+			REQUIRE(std::abs(rowSumsExpected[i] - rowsSums[i]) < tol);
+
+		for (int i = 0; i < colSumsExpected.size(); ++i)
+			REQUIRE(std::abs(colSumsExpected[i] - colsSums[i]) < tol);
+	}
+
+	SECTION("check matrix vector multiplication")
+	{
+		//define vector v1 = [1.1, 0.9, 4.6];
+		std::vector<floatingType> v1 = { 1.1, 0.9, 4.6 };
+		//define vector v2 = [1.1, 0.9];
+		std::vector<floatingType> v2 = { 1.1, 0.9 };
+
+		std::vector<floatingType> resultAv1(2, (floatingType)0);
+		std::vector<floatingType> resultAtv2(3, (floatingType)0);
+
+		A.times(false, v1, resultAv1);
+		A.times(true, v2, resultAtv2);
+
+		std::vector<floatingType> resultAv1Expected = { 0, 0 };
+		std::vector<floatingType> resultAtv2Expected = { 0, 0, 0 };
+
+		for (int i = 0; i < resultAv1Expected.size(); ++i)
+			REQUIRE(std::abs(resultAv1[i] - resultAv1Expected[i]) < tol);
+		for (int i = 0; i < resultAtv2Expected.size(); ++i)
+			REQUIRE(std::abs(resultAtv2[i] - resultAtv2Expected[i]) < tol);
+	}
+
+	SECTION("check empty matrix")
+	{
+		flexZeroOperator<floatingType> empty(0, 0, false);
+		std::vector<int> emptyIntVec = {};
+		std::vector<floatingType> emptyFloatVec = {};
+
+		REQUIRE(empty.getNumRows() == 0);
+		REQUIRE(empty.getNumCols() == 0);
+		REQUIRE(empty.isMinus == false);
+
+		std::vector<floatingType> v = {};
+		std::vector<floatingType> resultAv = {};
+
+		empty.times(false, v, resultAv);
+		REQUIRE(resultAv.size() == 0);
+	}
+
+}
