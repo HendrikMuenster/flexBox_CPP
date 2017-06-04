@@ -60,6 +60,7 @@
 #include "prox/flexProxDualDataL1.h"
 #include "prox/flexProxDualDataL2.h"
 #include "prox/flexProxDualDataKL.h"
+#include "prox/flexProxDualDataHuber.h"
 #include "prox/flexProxDualL1Aniso.h"
 #include "prox/flexProxDualL1Iso.h"
 #include "prox/flexProxDualL2.h"
@@ -68,8 +69,6 @@
 #include "prox/flexProxDualBoxConstraint.h"
 #include "prox/flexProxDualInnerProduct.h"
 #include "prox/flexProxDualLabeling.h"
-
-
 
 typedef double floatingType;
 
@@ -261,6 +260,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		else if (checkProx(classPointer,"KLDataProxDual"))
 		{
 			myProx = new flexProxDualDataKL<floatingType>();
+		}
+		else if (checkProx(classPointer,"HuberDataProxDual"))
+		{
+			float huberEpsilon = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"epsi"));
+			myProx = new flexProxDualDataHuber<floatingType>(huberEpsilon);
 		}
 		else if (checkProx(classPointer,"constraintBoxDualized"))
 		{

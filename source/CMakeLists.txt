@@ -57,6 +57,7 @@ set(SOURCES_IDE_PROX
   prox/flexProxDualDataKL.h
   prox/flexProxDualDataL1.h
   prox/flexProxDualDataL2.h
+  prox/flexProxDualDataHuber.h
   prox/flexProxDualFrobenius.h
   prox/flexProxDualHuber.h
   prox/flexProxDualL1Aniso.h
