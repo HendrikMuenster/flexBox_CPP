@@ -64,14 +64,16 @@ enum mySign
 //! enum representing the type of prox
 enum prox
 {
-	primalEmptyProx,
-	dualL1AnisoProx,
-	dualL1IsoProx,
-	dualL2Prox,
+    primalEmptyProx,
+    dualL1AnisoProx,
+    dualL1IsoProx,
+    dualL2Prox,
+    dualLInfProx,
 	dualFrobeniusProx,
 	dualHuberProx,
 	dualL2DataProx,
 	dualL1DataProx,
+    dualLInfDataProx,
 	dualKLDataProx,
 	dualBoxConstraintProx,
 	dualInnerProductProx
