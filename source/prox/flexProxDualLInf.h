@@ -5,6 +5,7 @@
 #include <numeric>
 
 #include <thrust/transform_reduce.h>
+#include <thrust/host_vector.h>
 #include <thrust/functional.h>
 #include <thrust/sort.h>
 #include <thrust/find.h>
@@ -36,6 +37,15 @@ public:
     }
 
 #ifdef __CUDACC__
+
+    struct CompareFunctor
+    {
+	__host__ __device__
+	bool operator()(const T& lhs, const T& rhs)
+	{
+		return abs(lhs) > abs(rhs);
+	}
+    };
     struct UpdateYFunctor
     {
         __host__ __device__
@@ -45,7 +55,7 @@ public:
         __host__ __device__
             void operator()(Tuple t)
         {
-            thrust::get<0>(t) = (thrust::get<0>(t) > 0 ? 1 : -1) * max((T)0, abs(thrust::get<1>(t) - theta));
+            thrust::get<0>(t) = (thrust::get<1>(t) > 0 ? 1 : -1) * max((T)0, abs(thrust::get<1>(t)) - theta);
         }
 
         T theta;
@@ -71,7 +81,7 @@ public:
         __host__ __device__
             T operator()(const T& x) const
         {
-            return x < T(0) ? -x : x;
+            return (T)abs(x);
         }
     };
 #endif
@@ -85,19 +95,17 @@ public:
         }
         else
         {
-            T norm = thrust::transform_reduce(data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].end(), AbsFunctor(), 0, thrust::plus<T>());
-#if IS_MATLAB
-mexPrintf("norm: %f\n", norm);
-#endif
-
-            if (norm < alpha)
+           T norm = (T)thrust::transform_reduce(data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].end(), AbsFunctor(), (T)0, thrust::plus<T>());
+            
+		if (norm < alpha)
             {
                 data->y[dualNumbers[0]] = data->yTilde[dualNumbers[0]];
+                thrust::host_vector<T> hostVec = data->y[dualNumbers[0]];
                 return;
             }
 
             Tdata yTildeSort(data->yTilde[dualNumbers[0]]);
-            thrust::sort(yTildeSort.begin(), yTildeSort.end());
+            thrust::sort(yTildeSort.begin(), yTildeSort.end(), CompareFunctor());
             Tdata cumSum(yTildeSort);
             thrust::inclusive_scan(yTildeSort.begin(), yTildeSort.end(), cumSum.begin());
 
@@ -109,17 +117,16 @@ mexPrintf("norm: %f\n", norm);
 
             auto findIt = thrust::find_if(startIterator, endIterator, FindFunctor(alpha));
             auto derefIt = *findIt;
-            T theta = (thrust::get<1>(derefIt) + alpha) / thrust::get<2>(derefIt);
+            T theta = (thrust::get<1>(derefIt) - alpha) / thrust::get<2>(derefIt);
             theta = std::max(static_cast<T>(0), theta);
 
             auto startIterator2 = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].begin()));
             auto endIterator2 = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[0]].end(), data->yTilde[dualNumbers[0]].end()));
 
-            thrust::for_each(startIterator2, endIterator2, UpdateYFunctor(alpha));
+            thrust::for_each(startIterator2, endIterator2, UpdateYFunctor(theta));
         }
         
 #else
-	return;
         if(dualNumbers.size() != 1)
             printf("Alert! LInf prox only defined for dim = 1");
         else
