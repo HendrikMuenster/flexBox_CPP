@@ -4,6 +4,11 @@
 #include <algorithm>
 #include <numeric>
 
+#include <thrust/transform_reduce.h>
+#include <thrust/functional.h>
+#include <thrust/sort.h>
+#include <thrust/find.h>
+
 #include "flexProx.h"
 
 
@@ -31,10 +36,10 @@ public:
     }
 
 #ifdef __CUDACC__
-    struct flexProxDualLInfFunctor
+    struct UpdateYFunctor
     {
         __host__ __device__
-            flexProxDualLInfFunctor(T aTheta) : theta(aTheta) {}
+            UpdateYFunctor(T aTheta) : theta(aTheta) {}
 
         template <typename Tuple>
         __host__ __device__
@@ -46,27 +51,25 @@ public:
         T theta;
     };
 
-    struct flexProxDualLInfFindFunctor
+    struct FindFunctor
     {
         __host__ __device__
-            flexProxDualLInfFunctor(T alpha) : alpha(alpha) {}
+            FindFunctor(T aAlpha) : alpha(aAlpha) {}
 
         template <typename Tuple>
         __host__ __device__
-            void operator()(Tuple t)
+            bool operator()(Tuple t)
         {
-            return thrust::get<0>(t) > (thrust::get<1>(t) - alpha) / thrust::get<2>(t)
+            return thrust::get<0>(t) > (thrust::get<1>(t) - alpha) / thrust::get<2>(t);
         }
 
         T alpha;
     };
 
-    template<typename T>
-    struct absFunctor : public unary_function<T, T>
+    struct AbsFunctor
     {
-        template <typename Tuple>
         __host__ __device__
-            T operator()(const T &)
+            T operator()(const T& x) const
         {
             return x < T(0) ? -x : x;
         }
@@ -82,7 +85,10 @@ public:
         }
         else
         {
-            T norm = thrust::transform_reduce(data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].end(), absFunctor<T>(), 0, thrust::plus<T>());
+            T norm = thrust::transform_reduce(data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].end(), AbsFunctor(), 0, thrust::plus<T>());
+#if IS_MATLAB
+mexPrintf("norm: %f\n", norm);
+#endif
 
             if (norm < alpha)
             {
@@ -101,17 +107,19 @@ public:
             auto startIterator = thrust::make_zip_iterator(thrust::make_tuple(yTildeSort.rbegin(), cumSum.rbegin(), seq.rbegin()));
             auto endIterator = thrust::make_zip_iterator(thrust::make_tuple(yTildeSort.rend(), cumSum.rend(), seq.rend()));
 
-            auto findIt = thrust::find_if(startIterator, endIterator, flexProxDualLInfFindFunctor(alpha));
-            T theta = (thrust::get<1>(*findIt) - alpha) / thrust::get<3>(*findIt);
+            auto findIt = thrust::find_if(startIterator, endIterator, FindFunctor(alpha));
+            auto derefIt = *findIt;
+            T theta = (thrust::get<1>(derefIt) + alpha) / thrust::get<2>(derefIt);
             theta = std::max(static_cast<T>(0), theta);
 
-            startIterator = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].begin()));
-            endIterator = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[0]].end(), data->yTilde[dualNumbers[0]].end()));
+            auto startIterator2 = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].begin()));
+            auto endIterator2 = thrust::make_zip_iterator(thrust::make_tuple(data->y[dualNumbers[0]].end(), data->yTilde[dualNumbers[0]].end()));
 
-            thrust::for_each(startIterator, endIterator, flexProxDualLInfFunctor(alpha));
+            thrust::for_each(startIterator2, endIterator2, UpdateYFunctor(alpha));
         }
         
 #else
+	return;
         if(dualNumbers.size() != 1)
             printf("Alert! LInf prox only defined for dim = 1");
         else
