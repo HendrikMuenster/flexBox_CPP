@@ -5,7 +5,6 @@
 #include <numeric>
 
 #include <thrust/transform_reduce.h>
-#include <thrust/host_vector.h>
 #include <thrust/functional.h>
 #include <thrust/sort.h>
 #include <thrust/find.h>
@@ -100,7 +99,6 @@ public:
 		if (norm < alpha)
             {
                 data->y[dualNumbers[0]] = data->yTilde[dualNumbers[0]];
-                thrust::host_vector<T> hostVec = data->y[dualNumbers[0]];
                 return;
             }
 
