@@ -4,10 +4,12 @@
 #include <algorithm>
 #include <numeric>
 
-#include <thrust/transform_reduce.h>
-#include <thrust/functional.h>
-#include <thrust/sort.h>
-#include <thrust/find.h>
+#ifdef __CUDACC__
+	#include <thrust/transform_reduce.h>
+	#include <thrust/functional.h>
+	#include <thrust/sort.h>
+	#include <thrust/find.h>
+#endif
 
 #include "flexProx.h"
 
@@ -157,7 +159,9 @@ public:
             //find maximal index s.t. yTildeSort(rho) > (cumSum(rho) - alpha)/rho
             T theta = 0;
             auto cumSumPtr = cumSum.data();
-            #pragma omp parallel for
+			volatile bool flag = false;
+
+			//omp should not be used here!
             for (int i = static_cast<int>(ySize) - 1; i >= 0; i--)
             {
                 if (yTildeSortPtr[i] > (cumSumPtr[i] - alpha)/ (i + 1))
