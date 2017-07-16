@@ -101,7 +101,7 @@ public:
         else
         {
            T norm = (T)thrust::transform_reduce(data->yTilde[dualNumbers[0]].begin(), data->yTilde[dualNumbers[0]].end(), AbsFunctor(), (T)0, thrust::plus<T>());
-            
+
 		if (norm < alpha)
             {
                 data->y[dualNumbers[0]] = data->yTilde[dualNumbers[0]];
@@ -129,13 +129,13 @@ public:
 
             thrust::for_each(startIterator2, endIterator2, UpdateYFunctor(theta));
         }
-        
+
 #else
         if(dualNumbers.size() != 1)
             printf("Alert! LInf prox only defined for dim = 1");
         else
         {
-            //project yTilde onto L1 ball with radius alpha, see: Efficient Projections onto the l1-Ball for Learning in High Dimensions, Duchi et. al. 
+            //project yTilde onto L1 ball with radius alpha, see: Efficient Projections onto the l1-Ball for Learning in High Dimensions, Duchi et. al.
             auto& yTilde = data->yTilde[dualNumbers[0]];
             int dim = static_cast<int>(data->yTilde[dualNumbers[0]].size());
             std::vector<int> indices(dim);
@@ -147,11 +147,11 @@ public:
             {
                 std::uniform_int<int> dist(0, static_cast<int>(indices.size()) - 1);
                 int elem = indices[dist(gen)];
-                auto partIt = std::partition(std::begin(indices), std::end(indices), 
+                auto partIt = std::partition(std::begin(indices), std::end(indices),
                     [&yTilde, elem](int index) {
                         return fabs(yTilde[index]) >= fabs(yTilde[elem]);
                 });
-                
+
                 T dRho = (T)std::distance(std::begin(indices), partIt);
                 T dS = std::accumulate(std::begin(indices), partIt, (T)0, [&yTilde](T lhs, int rhs) { //Omp
                     return lhs + (T)fabs(yTilde[rhs]);
@@ -175,7 +175,7 @@ public:
             T theta = (s - alpha) / rho;
             std::transform(std::begin(yTilde), std::end(yTilde), std::begin(data->y[dualNumbers[0]]), [theta](T elem) { //omp
                 return (elem > 0 ? (T)1 : (T)0) * std::max(static_cast<T>(fabs(elem)) - theta, (T)0);
-            });            
+            });
         }
 #endif
     }
