@@ -58,12 +58,14 @@ set(SOURCES_IDE_PROX
   prox/flexProxDualDataL1.h
   prox/flexProxDualDataL2.h
   prox/flexProxDualDataHuber.h
+  prox/flexProxDualDataLInf.h
   prox/flexProxDualFrobenius.h
   prox/flexProxDualHuber.h
   prox/flexProxDualL1Aniso.h
   prox/flexProxDualL1Iso.h
   prox/flexProxDualL2.h
   prox/flexProxDualLabeling.h
+  prox/flexProxDualLInf.h
 )
 
 #solver

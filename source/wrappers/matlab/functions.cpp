@@ -64,6 +64,7 @@
 #include "prox/flexProxDualL1Aniso.h"
 #include "prox/flexProxDualL1Iso.h"
 #include "prox/flexProxDualL2.h"
+#include "prox/flexProxDualLInf.h"
 #include "prox/flexProxDualHuber.h"
 #include "prox/flexProxDualFrobenius.h"
 #include "prox/flexProxDualBoxConstraint.h"
@@ -239,6 +240,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			myProx = new flexProxDualL2<floatingType>();
 		}
+        else if (checkProx(classPointer, "LInfProxDual"))
+        {
+            myProx = new flexProxDualLInf<floatingType>();
+        }
 		else if (checkProx(classPointer,"HuberProxDual"))
 		{
 			float huberEpsilon = (float)mxGetScalar(mxGetProperty(mxGetCell(duals,i),0,"epsi"));
