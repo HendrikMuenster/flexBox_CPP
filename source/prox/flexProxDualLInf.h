@@ -3,11 +3,14 @@
 
 #include <algorithm>
 #include <numeric>
+#include <random>
 
+#ifdef __CUDACC__
 #include <thrust/transform_reduce.h>
 #include <thrust/functional.h>
 #include <thrust/sort.h>
 #include <thrust/find.h>
+#endif
 
 #include "flexProx.h"
 
@@ -25,10 +28,13 @@ class flexProxDualLInf : public flexProx<T>
 #else
     typedef std::vector<T> Tdata;
 #endif
+private:
+    std::random_device rd;
+    std::mt19937 gen;
 
 public:
 
-    flexProxDualLInf() : flexProx<T>(dualL1IsoProx) {}
+    flexProxDualLInf() : flexProx<T>(dualL1IsoProx), rd(), gen(rd()) {}
 
     ~flexProxDualLInf()
     {
@@ -129,54 +135,47 @@ public:
             printf("Alert! LInf prox only defined for dim = 1");
         else
         {
-            T* ptrYtilde = data->yTilde[dualNumbers[0]].data();
-            T* ptrY = data->y[dualNumbers[0]].data();
-            size_t ySize = data->yTilde[dualNumbers[0]].size();
+            //project yTilde onto L1 ball with radius alpha, see: Efficient Projections onto the l1-Ball for Learning in High Dimensions, Duchi et. al. 
+            auto& yTilde = data->yTilde[dualNumbers[0]];
+            int dim = static_cast<int>(data->yTilde[dualNumbers[0]].size());
+            std::vector<int> indices(dim);
+            std::iota(std::begin(indices), std::end(indices), 0); //TODO: Omp
 
-            
-            T norm = 0;
-            #pragma omp parallel for reduction (+:norm)
-            for (int i = 0; i < static_cast<int>(ySize); i++)
-                norm += fabs(ptrYtilde[i]);
-
-            if (norm < alpha)
+            T s = (T)0;
+            T rho = (T)0;
+            while (!indices.empty())
             {
-                data->y[dualNumbers[0]] = data->yTilde[dualNumbers[0]];
-                return;
-            }
+                std::uniform_int<int> dist(0, static_cast<int>(indices.size()) - 1);
+                int elem = indices[dist(gen)];
+                auto partIt = std::partition(std::begin(indices), std::end(indices), 
+                    [&yTilde, elem](int index) {
+                        return fabs(yTilde[index]) >= fabs(yTilde[elem]);
+                });
+                
+                T dRho = (T)std::distance(std::begin(indices), partIt);
+                T dS = std::accumulate(std::begin(indices), partIt, (T)0, [&yTilde](T lhs, int rhs) { //Omp
+                    return lhs + (T)fabs(yTilde[rhs]);
+                });
 
-            
-            auto yTildeSort = data->yTilde[dualNumbers[0]]; //copy because it needs to be sorted
-            std::sort(std::begin(yTildeSort), std::end(yTildeSort), [](T lhs, T rhs) { return fabs(lhs) > fabs(rhs); }); //sort abs descending
-            Tdata cumSum = Tdata(yTildeSort.size());
-            std::partial_sum(std::begin(yTildeSort), std::end(yTildeSort), std::begin(cumSum)); //no omp because it has data dependencies
-
-            T sum = 0;
-            auto yTildeSortPtr = yTildeSort.data();
-
-            //find maximal index s.t. yTildeSort(rho) > (cumSum(rho) - alpha)/rho
-            T theta = 0;
-            auto cumSumPtr = cumSum.data();
-            #pragma omp parallel for
-            for (int i = static_cast<int>(ySize) - 1; i >= 0; i--)
-            {
-                if (yTildeSortPtr[i] > (cumSumPtr[i] - alpha)/ (i + 1))
+                if ((s + dS) - (rho + dRho) * fabs(yTilde[elem]) < alpha)
                 {
-                    theta = (cumSumPtr[i] - alpha) / (i + 1);
-                    break;
+                    s += dS;
+                    rho += dRho;
+                    indices = std::vector<int>(partIt, std::end(indices));
+                }
+                else
+                {
+                    indices = std::vector<int>(std::begin(indices), partIt);
+                    auto findIt = std::find(std::begin(indices), std::end(indices), elem);
+                    if(findIt != std::end(indices))
+                        indices.erase(findIt);
                 }
             }
 
-            theta = std::max(static_cast<T>(0), theta);
-
-            #pragma omp parallel for
-            for (int i = 0; i < static_cast<int>(ySize); i++)
-            {
-                ptrY[i] = (ptrYtilde[i] > 0 ? 1 : -1) * std::max(static_cast<T>(0), static_cast<T>(fabs(ptrYtilde[i])) - theta);
-                
-            }
-
-
+            T theta = (s - alpha) / rho;
+            std::transform(std::begin(yTilde), std::end(yTilde), std::begin(data->y[dualNumbers[0]]), [theta](T elem) { //omp
+                return (elem > 0 ? (T)1 : (T)0) * std::max(static_cast<T>(fabs(elem)) - theta, (T)0);
+            });            
         }
 #endif
     }
