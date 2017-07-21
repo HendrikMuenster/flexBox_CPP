@@ -705,8 +705,8 @@ void copyMatlabToFlexLogicalMatrix(const mxArray *input, flexMatrixLogical<float
 
 	output->blockInsert(indexI, indexJ);*/
 
-	int sizeM = mxGetM(input);
-	int sizeN = mxGetN(input);
+	int sizeM = static_cast<int>(mxGetM(input));
+	int sizeN = static_cast<int>(mxGetN(input));
 
 	for (int i = 0; i < sizeM; ++i)
 	{

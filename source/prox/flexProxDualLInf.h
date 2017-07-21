@@ -145,7 +145,7 @@ public:
             T rho = (T)0;
             while (!indices.empty())
             {
-                std::uniform_int<int> dist(0, static_cast<int>(indices.size()) - 1);
+                std::uniform_int_distribution<int> dist(0, static_cast<int>(indices.size()) - 1);
                 int elem = indices[dist(gen)];
                 auto partIt = std::partition(std::begin(indices), std::end(indices),
                     [&yTilde, elem](int index) {

@@ -88,7 +88,7 @@ public:
                     //apply A first
 					#ifdef __CUDACC__
 						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
-					#else if
+					#else
 						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
@@ -108,7 +108,7 @@ public:
                     //apply B first
 					#ifdef __CUDACC__
 						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
-					#else if
+					#else
 						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
@@ -167,7 +167,7 @@ public:
                     //apply A first
 					#ifdef __CUDACC__
 						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
-					#else if
+					#else
 						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
@@ -186,7 +186,7 @@ public:
                     //apply B first
 					#ifdef __CUDACC__
 						thrust::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
-					#else if
+					#else
 						std::fill(this->tmpVec.begin(), this->tmpVec.end(), (T)0);
 					#endif
 
@@ -246,19 +246,11 @@ public:
                 T maxB = *std::max_element(rowSumB.begin(), rowSumB.end());
                 T maxProd = maxA * maxB;
 
-                switch (transposed)
-                {
-                    case true:
-                    {
-                        result.resize(this->B->getNumCols(), maxProd);
-                        break;
-                    }
-                    case false:
-                    {
-                        result.resize(this->A->getNumRows(), maxProd);
-                        break;
-                    }
-                }
+                if(transposed)
+                    result.resize(this->B->getNumCols(), maxProd);
+                else
+                    result.resize(this->A->getNumRows(), maxProd);
+
                 break;
             }
         }
@@ -304,19 +296,11 @@ public:
                 T maxB = *thrust::max_element(rowSumB.begin(), rowSumB.end());
                 T maxProd = maxA * maxB;
 
-                switch (transposed)
-                {
-                    case true:
-                    {
-                        result.resize(this->B->getNumCols(), maxProd);
-                        break;
-                    }
-                    case false:
-                    {
-                        result.resize(this->A->getNumRows(), maxProd);
-                        break;
-                    }
-                }
+                if(transposed)
+                    result.resize(this->B->getNumCols(), maxProd);
+                else
+                    result.resize(this->A->getNumRows(), maxProd);
+
                 break;
             }
         }
