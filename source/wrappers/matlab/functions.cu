@@ -58,19 +58,21 @@
 #include "prox/flexProxDualDataL1.h"
 #include "prox/flexProxDualDataL2.h"
 #include "prox/flexProxDualDataKL.h"
+
 #include "prox/flexProxDualL1Aniso.h"
 #include "prox/flexProxDualL1Iso.h"
 #include "prox/flexProxDualL2.h"
+#include "prox/flexProxDualLInf.h"
 #include "prox/flexProxDualHuber.h"
 #include "prox/flexProxDualFrobenius.h"
 #include "prox/flexProxDualBoxConstraint.h"
 #include "prox/flexProxDualInnerProduct.h"
 #include "prox/flexProxDualLabeling.h"
-#include "prox/flexProxDualLInf.h"
 
 
 
-typedef float floatingType;
+
+typedef double floatingType;
 
 #ifdef __CUDACC__
 	using namespace thrust;
@@ -123,6 +125,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mainObject.tol = (float)mxGetScalar(mxGetFieldByNumber(params, 0, numTol));
 	}
 
+	int numCheckError = mxGetFieldNumber(params, "checkError");
+	if (numCheckError >= 0)
+	{
+		mainObject.checkError = (int)mxGetScalar(mxGetFieldByNumber(params, 0, numCheckError));
+	}
+
 	int verbose = mainObject.verbose;
 
 	if (verbose > 0)
@@ -131,7 +139,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		printf("maxIterations: %d\n",mainObject.maxIterations);
 		printf("verbose: %d\n",mainObject.verbose);
-		printf("tol: %f\n",mainObject.tol);
+		printf("tol: %f\n", mainObject.tol);
+		printf("checkError: %d\n", mainObject.checkError);
 	}
 
 	// read primal vars
@@ -165,6 +174,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mainObject.setPrimal(i, tmpVector);
 	}
 
+	// copy primal terms
 	mxArray *duals = mxGetProperty(prhs[0],0,"duals");
 	mxArray *dcp = mxGetProperty(prhs[0],0,"DcP");  //numbers of primal variables corresponding to dual terms
 	mxArray *dcd = mxGetProperty(prhs[0],0,"DcD");  //numbers of dual variables corresponding to dual terms
@@ -208,7 +218,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			int correspondingNumberPrimalVar = k%_correspondingPrimals.size();
 
 			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
-			
+
 			operatorList.push_back(transformMatlabToFlexOperator(pointerA, verbose, k));
 		}
 
@@ -226,7 +236,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			myProx = new flexProxDualL2<floatingType>();
 		}
-		else if (checkProx(classPointer,"LInfProxDual"))
+		else if (checkProx(classPointer, "LInfProxDual"))
 		{
 			myProx = new flexProxDualLInf<floatingType>();
 		}
@@ -325,6 +335,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			ptrResult[j] = flexResult[j];
 		}
 
+		delete[] resultSize;
+
 	}
 
 	//send content of dual vars
@@ -344,6 +356,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			ptrResult[j] = flexResult[j];
 		}
+
+		delete[] resultSize;
 	}
 }
 
@@ -532,6 +546,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			valList[l] = pr[l];
 		}
 		A = new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList, false, isMinus);
+		delete[] colList; delete[] rowList; delete[] valList;
 		#else
 		auto Atmp = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)), isMinus);
 		copyMatlabToFlexmatrix(pointerA, Atmp);

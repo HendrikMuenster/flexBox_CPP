@@ -222,7 +222,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			int correspondingNumberPrimalVar = k%_correspondingPrimals.size();
 
 			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
-			
+
 			operatorList.push_back(transformMatlabToFlexOperator(pointerA, verbose, k));
 		}
 
@@ -343,6 +343,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			ptrResult[j] = flexResult[j];
 		}
 
+        delete[] resultSize;
+
 	}
 
 	//send content of dual vars
@@ -362,6 +364,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			ptrResult[j] = flexResult[j];
 		}
+
+        delete[] resultSize;
 	}
 }
 
@@ -554,6 +558,7 @@ flexLinearOperator<floatingType>* transformMatlabToFlexOperator(mxArray *pointer
 			valList[l] = pr[l];
 		}
 		A = new flexMatrixGPU<floatingType>((int)mxGetM(pointerA), (int)mxGetN(pointerA), rowList, colList, valList, false, isMinus);
+        delete[] colList; delete[] rowList; delete[] valList;
 		#else
 		auto Atmp = new flexMatrix<floatingType>(static_cast<int>(mxGetM(pointerA)), static_cast<int>(mxGetN(pointerA)), isMinus);
 		copyMatlabToFlexmatrix(pointerA, Atmp);
