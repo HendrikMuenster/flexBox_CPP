@@ -135,6 +135,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mainObject.checkError = (int)mxGetScalar(mxGetFieldByNumber(params, 0, numCheckError));
 	}
 
+    
+
 	int verbose = mainObject.verbose;
 
 	if (verbose > 0)
@@ -177,6 +179,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		mainObject.setPrimal(i, tmpVector);
 	}
+
+    
 
 	// copy primal terms
 	mxArray *duals = mxGetProperty(prhs[0],0,"duals");
@@ -221,10 +225,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			int correspondingNumberPrimalVar = k%_correspondingPrimals.size();
 
-			mxArray *pointerA = mxGetCell(matlabOperatorList,k);
+			mxArray* pointerA = mxGetCell(matlabOperatorList,k);
 
 			operatorList.push_back(transformMatlabToFlexOperator(pointerA, verbose, k));
 		}
+
+        mxDestroyArray(matlabOperatorList);
 
 		flexProx<floatingType>* myProx;
 
@@ -304,8 +310,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			copyToVector(fList[k], mxGetPr(fListInputElement), (int)mxGetN(fListInputElement) * (int)mxGetM(fListInputElement));
 		}
 
+        mxDestroyArray(fListInput);
 		mainObject.addTerm(new flexTerm<floatingType>(myProx, alpha, (int)_correspondingPrimals.size(), operatorList, fList), _correspondingPrimals);
 	}
+
+    
 
 	// copy content for dual vars from MATLAB
 	mxArray* y = mxGetProperty(prhs[0],0,"y");
@@ -318,13 +327,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		int numberOfElementsVector = (int)mxGetN(yElement) * (int)mxGetM(yElement);
 		//copy matlab variable to c++ variable
 		std::vector<floatingType> tmpVector(numberOfElementsVector, 0.0);
-
 		copyToVector(tmpVector, mxGetPr(yElement), numberOfElementsVector);
-
 		mainObject.setDual(i, tmpVector);
 	}
 
+    //cleanup
+    mxDestroyArray(params);
+    mxDestroyArray(x);
+    mxDestroyArray(dims);
+    
+    mxDestroyArray(y);
+    mxDestroyArray(duals);
+    mxDestroyArray(dcd);
+    mxDestroyArray(dcp);
+
 	mainObject.runAlgorithm();
+
+
 
 	//send content of primal vars
 	//retrieve results from FlexBox
