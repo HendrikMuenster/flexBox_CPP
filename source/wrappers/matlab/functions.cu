@@ -72,7 +72,7 @@
 
 
 
-typedef double floatingType;
+typedef float floatingType;
 
 #ifdef __CUDACC__
 	using namespace thrust;
