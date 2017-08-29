@@ -63,6 +63,7 @@ set(SOURCES_IDE_PROX
   prox/flexProxDualL1Aniso.h
   prox/flexProxDualL1Iso.h
   prox/flexProxDualL2.h
+  prox/flexProxDualL2Inf.h
   prox/flexProxDualLabeling.h
   prox/flexProxDualLInf.h
 )
