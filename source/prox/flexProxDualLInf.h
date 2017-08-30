@@ -114,7 +114,7 @@ public:
             thrust::inclusive_scan(yTildeSort.begin(), yTildeSort.end(), cumSum.begin());
 
             thrust::device_vector<T> seq(data->y[dualNumbers[0]].size());
-            thrust::sequence(seq.begin(), seq.end(), 1);
+            thrust::sequence(seq.begin(), seq.end(), 1); //TODO: replace with thrust::counting_iterator
 
             auto startIterator = thrust::make_zip_iterator(thrust::make_tuple(yTildeSort.rbegin(), cumSum.rbegin(), seq.rbegin()));
             auto endIterator = thrust::make_zip_iterator(thrust::make_tuple(yTildeSort.rend(), cumSum.rend(), seq.rend()));
