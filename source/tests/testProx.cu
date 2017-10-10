@@ -2,6 +2,9 @@
 #include <vector>
 #include <iostream>
 
+//CUDA
+#include <thrust/device_vector.h>
+
 //catch
 #include "catch.hpp"
 
@@ -9,8 +12,7 @@
 #include "tools.h"
 #include "flexBox.h"
 #include "flexBoxData.h"
-#include "flexBoxDataCPU.h"
-#include "flexSolverPrimalDual.h"
+#include "flexBoxDataGPU.h"
 
 //proxs
 #include "flexProx.h"
@@ -33,7 +35,8 @@
 using namespace std;
 
 typedef double floatingType;
-typedef std::vector<floatingType> Tdata;
+typedef thrust::device_vector<floatingType> Tdata;
+
 
 flexBoxData<floatingType>* fData;
 int numElem = 64; //64 x 2 if 2D
@@ -42,28 +45,28 @@ floatingType tol = 1e-4;
 
 void init1d()
 {
-    fData = new flexBoxDataCPU<floatingType>();
+    fData = new flexBoxDataGPU<floatingType>();
 
-    fData->tauElt.push_back(std::vector<floatingType>(numElem, 1.0f));
-    fData->sigmaElt.push_back(std::vector<floatingType>(numElem, 1.0f));
+    fData->tauElt.push_back(thrust::device_vector<floatingType>(numElem, 1.0f));
+    fData->sigmaElt.push_back(thrust::device_vector<floatingType>(numElem, 1.0f));
 
-    std::vector<floatingType> sequence(numElem);
-    std::iota(std::begin(sequence), std::end(sequence), 1.0f);
-    fData->yTilde.push_back(sequence);
+    thrust::device_vector<floatingType> seq(numElem);
+    thrust::sequence(seq.begin(), seq.end(), 1.0f);
+    fData->yTilde.push_back(seq);
 
-    fData->y.push_back(std::vector<floatingType>(numElem, 0.0f));
+    fData->y.push_back(thrust::device_vector<floatingType>(numElem, 0.0f));
 }
 
 void init2d()
 {
     init1d();
-    fData->sigmaElt.push_back(std::vector<floatingType>(numElem, 1.0f));
+    fData->sigmaElt.push_back(thrust::device_vector<floatingType>(numElem, 1.0f));
 
-    std::vector<floatingType> sequence(numElem);
-    std::iota(std::begin(sequence), std::end(sequence), 2.0f);
-    fData->yTilde.push_back(sequence);
+    thrust::device_vector<floatingType> seq(numElem);
+    thrust::sequence(seq.begin(), seq.end(), 2.0f);
+    fData->yTilde.push_back(seq);
 
-    fData->y.push_back(std::vector<floatingType>(numElem, 0.0f));
+    fData->y.push_back(thrust::device_vector<floatingType>(numElem, 0.0f));
 }
 
 void cleanup()
@@ -88,26 +91,8 @@ TEST_CASE("Prox: flexProxDualBoxConstraint<floatingType>", "[flexProxDualBoxCons
     cleanup();
 }
 
-TEST_CASE("Prox: flexProxDualDataHuber<floatingType>", "[flexProxDualDataHuber]")
-{
-    init1d();
-    auto prox = new flexProxDualDataHuber<floatingType>(50.0f);
-    std::vector<floatingType> f(numElem, 10.0f);
-    std::vector<Tdata> fList;
-    fList.push_back(f);
-    prox->applyProx(weight, fData, { 0 }, {}, fList); //only corresponding first and only dual variable, primal variables are not needed
 
-    SECTION("prox result")
-    {
-        std::vector<floatingType> resultYShould = { -0.0179641,-0.0159681,-0.0139721,-0.011976,-0.00998004,-0.00798403,-0.00598802,-0.00399202,-0.00199601,0,0.00199601,0.00399202,0.00598802,0.00798403,0.00998004,0.011976,0.0139721,0.0159681,0.0179641,0.0199601,0.0219561,0.0239521,0.0259481,0.0279441,0.0299401,0.0319361,0.0339321,0.0359281,0.0379242,0.0399202,0.0419162,0.0439122,0.0459082,0.0479042,0.0499002,0.0518962,0.0538922,0.0558882,0.0578842,0.0598802,0.0618762,0.0638723,0.0658683,0.0678643,0.0698603,0.0718563,0.0738523,0.0758483,0.0778443,0.0798403,0.0818363,0.0838323,0.0858283,0.0878244,0.0898204,0.0918164,0.0938124,0.0958084,0.0978044,0.0998004,0.1,0.1,0.1,0.1 };
-        auto resultYIs = fData->y[0];
-        for (size_t i = 0; i < resultYIs.size(); i++)
-            REQUIRE(std::abs(resultYIs[i] - resultYShould[i]) < tol);
-    }
-    cleanup();
-}
-
-TEST_CASE("Prox: flexProxDualHuber<floatingType>", "[flexProxDualHuber]")
+/*TEST_CASE("Prox: flexProxDualHuber<floatingType>", "[flexProxDualHuber]")
 {
     init1d();
     auto prox = new flexProxDualHuber<floatingType>(50.0f);
@@ -121,7 +106,7 @@ TEST_CASE("Prox: flexProxDualHuber<floatingType>", "[flexProxDualHuber]")
             REQUIRE(std::abs(resultYIs[i] - resultYShould[i]) < tol);
     }
     cleanup();
-}
+}*/
 
 TEST_CASE("Prox: flexProxDualDataKL<floatingType>", "[flexProxDualDataKL]")
 {
@@ -270,7 +255,7 @@ TEST_CASE("Prox: flexProxDualL2Inf<floatingType>", "[flexProxDualL2]")
     {
         std::vector<floatingType> resultYShould0 = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.315943,1.30581,2.29607,3.28672,4.27773,5.26907,6.26073,7.2527,8.24495,9.23747,10.2302,11.2233,12.2165,13.21,14.2037,15.1976,16.1916 };
         std::vector<floatingType> resultYShould1 = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.322525,1.33246,2.342,3.35117,4.35999,5.36849,6.37667,7.38456,8.39218,9.39953,10.4066,11.4135,12.4201,13.4265,14.4328,15.4388,16.4446 };
-        
+
         auto resultYIs0 = fData->y[0];
         auto resultYIs1 = fData->y[1];
 
@@ -307,5 +292,5 @@ TEST_CASE("Prox: flexProxDualLInf<floatingType>", "[flexProxDualLInf]")
 
 /*TEST_CASE("Prox: flexProxDualLabeling<floatingType>", "[flexProxDualLabeling]")
 {
-    
+
 }*/
