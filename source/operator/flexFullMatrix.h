@@ -200,10 +200,10 @@ public:
         }
         else
         {
-			#pragma omp parallel for
 			for (int j = 0; j < this->getNumCols(); ++j)
 			{
 				T tmp = input[j];
+                #pragma omp parallel for
 				for (int i = 0; i < this->getNumRows(); ++i)
 				{
 					switch (s)
