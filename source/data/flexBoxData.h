@@ -32,7 +32,30 @@ class flexBoxData
 	std::vector<Tdata> tauElt;
 	std::vector<Tdata> sigmaElt;
 
-	flexBoxData(){}
+    T error; //combined error
+
+	flexBoxData()
+    {
+        error = static_cast<T>(1);
+        this->x = std::vector<Tdata>();
+        this->xTmp = std::vector<Tdata>();
+        this->xOld = std::vector<Tdata>();
+        this->xTilde = std::vector<Tdata>();
+        this->xError = std::vector<Tdata>();
+        this->y = std::vector<Tdata>();
+        this->yTmp = std::vector<Tdata>();
+        this->yOld = std::vector<Tdata>();
+        this->yTilde = std::vector<Tdata>();
+        this->yError = std::vector<Tdata>();
+        this->tauElt = std::vector<Tdata>();
+        this->sigmaElt = std::vector<Tdata>();
+    }
+
+    ~flexBoxData()
+    {
+        int pi = 0;
+        std::cout << pi << std::endl;
+    }
 
 
 	void addPrimalVar(int numberOfElements)

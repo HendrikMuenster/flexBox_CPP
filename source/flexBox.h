@@ -27,6 +27,7 @@ class flexBox
 private:
 	flexBoxData<T>* data;
 	flexSolver<T>* solver;
+    bool firstRun;
 
 	public:
 		T tol; 							//!< stopping tolerance using the primal dual residual proposed by Goldstein, Esser and Baraniuk \cite goldstein2013adaptive. Default value is 1e-5.
@@ -57,7 +58,7 @@ private:
 			#endif
 
 			this->isMATLAB = false;
-
+            this->firstRun = true;
 		};
 
 		~flexBox()
@@ -65,6 +66,12 @@ private:
 			delete data;
 			delete solver;
 		}
+
+        //! sets the firstRun variable (only used via MEX internally)
+        /*!
+        \param val new value of firstRun
+        */
+        void setFirstRun(bool val) { this->firstRun = val; }
 
 		//! returns the number of primal vars
 		/*!
@@ -165,7 +172,6 @@ private:
 		{
 			solver->init(data);
 
-			T error = static_cast<int>(1);
 			int iteration = 0;
 
 			Timer timer;
@@ -174,7 +180,9 @@ private:
 
 			if (doTime) timer.reset();
 
-			while (error > tol && iteration < maxIterations)
+            if(!firstRun)
+                data->error = solver->calculateError(data);
+			while (data->error > tol && iteration < maxIterations)
 			{
 				//timer2.reset();
 				solver->doIteration(data);
@@ -187,7 +195,7 @@ private:
 						if (this->verbose > 0)
 						{
 							#if IS_MATLAB
-							mexPrintf("Iteration #%d | Error:%f\n", iteration, error);
+							mexPrintf("Iteration #%d | Error:%f\n", iteration, data->error);
 							mexEvalString("pause(.0001);");
 							#endif
 
@@ -201,7 +209,7 @@ private:
 
 				if (iteration % checkError == 0)
 				{
-					error = solver->calculateError(data);
+					data->error = solver->calculateError(data);
 				}
                 //error = solver->calculateError(data);
 
