@@ -26,13 +26,16 @@ enum \hyperlink{tools_8h_aa34fd4f0962337a24e898ac0abdfff22}{prox} \{ \newline
 {\bfseries dual\+L1\+Iso\+Prox}, 
 {\bfseries dual\+L2\+Prox}, 
 \newline
+{\bfseries dual\+L\+Inf\+Prox}, 
 {\bfseries dual\+Frobenius\+Prox}, 
 {\bfseries dual\+Huber\+Prox}, 
 {\bfseries dual\+L2\+Data\+Prox}, 
-{\bfseries dual\+L1\+Data\+Prox}, 
 \newline
+{\bfseries dual\+L1\+Data\+Prox}, 
+{\bfseries dual\+L\+Inf\+Data\+Prox}, 
 {\bfseries dual\+K\+L\+Data\+Prox}, 
 {\bfseries dual\+Box\+Constraint\+Prox}, 
+\newline
 {\bfseries dual\+Inner\+Product\+Prox}
  \}\begin{DoxyCompactList}\small\item\em enum representing the type of prox \end{DoxyCompactList}
 \item 
@@ -81,20 +84,20 @@ float {\bfseries pow2} (float x)
 \mbox{\Hypertarget{tools_8h_a0ea5640424f56d4b1a6b33a4a30c4218}\label{tools_8h_a0ea5640424f56d4b1a6b33a4a30c4218}} 
 {\footnotesize template$<$typename T $>$ }\\T {\bfseries vector\+Sum} (const std\+::vector$<$ T $>$ \&v)
 \item 
-\mbox{\Hypertarget{tools_8h_a9a624331066f771d67486345ecaabb1f}\label{tools_8h_a9a624331066f771d67486345ecaabb1f}} 
-float {\bfseries vector\+Max} (std\+::vector$<$ float $>$ \&v)
+\mbox{\Hypertarget{tools_8h_adf4af5480d0be1fc5c0f6aca27ee5bc6}\label{tools_8h_adf4af5480d0be1fc5c0f6aca27ee5bc6}} 
+{\footnotesize template$<$typename T $>$ }\\float {\bfseries vector\+Max} (std\+::vector$<$ T $>$ \&v)
 \item 
 \mbox{\Hypertarget{tools_8h_ae31fe4ccd5002a1efd0bf7e4678ce742}\label{tools_8h_ae31fe4ccd5002a1efd0bf7e4678ce742}} 
 {\footnotesize template$<$typename T $>$ }\\void {\bfseries vector\+Scalar\+Product} (std\+::vector$<$ T $>$ \&v, T scalar\+Value)
 \item 
-\mbox{\Hypertarget{tools_8h_afca0d71e8db787c5163428382e86d266}\label{tools_8h_afca0d71e8db787c5163428382e86d266}} 
-void {\bfseries vector\+Scalar\+Set} (std\+::vector$<$ float $>$ \&v, const float scalar\+Value)
+\mbox{\Hypertarget{tools_8h_a68f6ec5e196e90ce57c712f8e686d4e5}\label{tools_8h_a68f6ec5e196e90ce57c712f8e686d4e5}} 
+{\footnotesize template$<$typename T $>$ }\\void {\bfseries vector\+Scalar\+Set} (std\+::vector$<$ T $>$ \&v, const T scalar\+Value)
 \item 
-\mbox{\Hypertarget{tools_8h_a7cb74d0cb2a66778ce71e089d3a9f03f}\label{tools_8h_a7cb74d0cb2a66778ce71e089d3a9f03f}} 
-void {\bfseries vector\+Plus} (std\+::vector$<$ float $>$ \&v1, std\+::vector$<$ float $>$ \&v2)
+\mbox{\Hypertarget{tools_8h_a87aa5bc2d3985689d51af071b8a4da60}\label{tools_8h_a87aa5bc2d3985689d51af071b8a4da60}} 
+{\footnotesize template$<$typename T $>$ }\\void {\bfseries vector\+Plus} (std\+::vector$<$ T $>$ \&v1, std\+::vector$<$ T $>$ \&v2)
 \item 
-\mbox{\Hypertarget{tools_8h_a27a4ca3fc1ca7328c3d9fcb9f36264a1}\label{tools_8h_a27a4ca3fc1ca7328c3d9fcb9f36264a1}} 
-void {\bfseries vector\+Minus} (std\+::vector$<$ float $>$ \&v1, std\+::vector$<$ float $>$ \&v2)
+\mbox{\Hypertarget{tools_8h_a52a5258ea6e3361cfdf281f947335742}\label{tools_8h_a52a5258ea6e3361cfdf281f947335742}} 
+{\footnotesize template$<$typename T $>$ }\\void {\bfseries vector\+Minus} (std\+::vector$<$ T $>$ \&v1, std\+::vector$<$ T $>$ \&v2)
 \item 
 \mbox{\Hypertarget{tools_8h_af7a41c43ce5bf2074604398647960508}\label{tools_8h_af7a41c43ce5bf2074604398647960508}} 
 {\footnotesize template$<$typename T $>$ }\\void {\bfseries vector\+Abs} (std\+::vector$<$ T $>$ \&v)

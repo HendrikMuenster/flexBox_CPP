@@ -1,0 +1,291 @@
+\hypertarget{classflex_matrix_logical}{}\section{flex\+Matrix\+Logical$<$ T $>$ Class Template Reference}
+\label{classflex_matrix_logical}\index{flex\+Matrix\+Logical$<$ T $>$@{flex\+Matrix\+Logical$<$ T $>$}}
+
+
+represents a full (non-\/\+C\+U\+DA) logical matrix  
+
+
+
+
+{\ttfamily \#include $<$flex\+Matrix\+Logical.\+h$>$}
+
+Inheritance diagram for flex\+Matrix\+Logical$<$ T $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classflex_matrix_logical}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classflex_matrix_logical_a638c50a335498ef4f78d76f7304561f6}\label{classflex_matrix_logical_a638c50a335498ef4f78d76f7304561f6}} 
+\hyperlink{classflex_matrix_logical_a638c50a335498ef4f78d76f7304561f6}{flex\+Matrix\+Logical} ()
+\begin{DoxyCompactList}\small\item\em initializes an empty matrix \end{DoxyCompactList}\item 
+\hyperlink{classflex_matrix_logical_abbd2d5d1be94e9d98167e82b6f0395be}{flex\+Matrix\+Logical} (int a\+Num\+Rows, int a\+Num\+Cols, bool a\+Minus)
+\begin{DoxyCompactList}\small\item\em initializes a matrix \end{DoxyCompactList}\item 
+\hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$ $\ast$ \hyperlink{classflex_matrix_logical_a25c9ecc21cfccc07e1390c554784ee27}{copy} ()
+\begin{DoxyCompactList}\small\item\em copies the linear operator \end{DoxyCompactList}\item 
+void \hyperlink{classflex_matrix_logical_ab1ccf3400da547a27b5753a894905c63}{times} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector \end{DoxyCompactList}\item 
+void \hyperlink{classflex_matrix_logical_ad8a018f29237002d79faed523e5e2546}{times\+Plus} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector and adds its result to y \end{DoxyCompactList}\item 
+void \hyperlink{classflex_matrix_logical_a7f3b3d9f007696d7140c2f2256de8dd8}{times\+Minus} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector and substracts its result from y \end{DoxyCompactList}\item 
+void \hyperlink{classflex_matrix_logical_aea3347c0b215b0210ad5c100f32cea50}{block\+Insert} (const std\+::vector$<$ int $>$ \&indexI, const std\+::vector$<$ int $>$ \&indexJ)
+\begin{DoxyCompactList}\small\item\em inserts position of all non-\/zero elements into matrix \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_matrix_logical_a613206c02ddb2de7d984258f307e664f}\label{classflex_matrix_logical_a613206c02ddb2de7d984258f307e664f}} 
+int {\bfseries index2\+Dto\+Linear} (int i, int j)
+\item 
+T \hyperlink{classflex_matrix_logical_ab35a9ebf590236184573731bb08e176d}{get\+Max\+Row\+Sum\+Abs} (bool transposed)
+\begin{DoxyCompactList}\small\item\em returns the maximum sum of absolute values per row used for preconditioning \end{DoxyCompactList}\item 
+std\+::vector$<$ T $>$ \hyperlink{classflex_matrix_logical_a0c7cf2e5dde3a2d55ae95c6e54f94342}{get\+Abs\+Row\+Sum} (bool transposed)
+\begin{DoxyCompactList}\small\item\em returns a vector of sum of absolute values per row used for preconditioning \end{DoxyCompactList}\item 
+void \hyperlink{classflex_matrix_logical_a27805a561e6e94bdffe965dc8b9a3915}{print\+Row} (int i)
+\begin{DoxyCompactList}\small\item\em prints requested row \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_matrix_logical_a36d592ff72cdd6d52268e3f0cbe38687}\label{classflex_matrix_logical_a36d592ff72cdd6d52268e3f0cbe38687}} 
+void \hyperlink{classflex_matrix_logical_a36d592ff72cdd6d52268e3f0cbe38687}{print\+Matrix} ()
+\begin{DoxyCompactList}\small\item\em prints the whole matrix \end{DoxyCompactList}\item 
+thrust\+::device\+\_\+vector$<$ T $>$ \hyperlink{classflex_matrix_logical_a0245c73fb7d1fb3b1900208e0deb48d6}{get\+Abs\+Row\+Sum\+C\+U\+DA} (bool transposed)
+\begin{DoxyCompactList}\small\item\em same function as \hyperlink{classflex_matrix_logical_a0c7cf2e5dde3a2d55ae95c6e54f94342}{get\+Abs\+Row\+Sum()} but implemented in C\+U\+DA \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classflex_matrix_logical_ae7b012bd8935f92c9e266f4a6d7ea91c}\label{classflex_matrix_logical_ae7b012bd8935f92c9e266f4a6d7ea91c}} 
+std\+::vector$<$ int $>$ {\bfseries row\+To\+Index\+List}
+\item 
+\mbox{\Hypertarget{classflex_matrix_logical_aa8279c96a0b4f8f80db84b92faa763df}\label{classflex_matrix_logical_aa8279c96a0b4f8f80db84b92faa763df}} 
+std\+::vector$<$ int $>$ {\bfseries index\+List}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Matrix\+Logical$<$ T $>$}
+
+represents a full (non-\/\+C\+U\+DA) logical matrix 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classflex_matrix_logical_abbd2d5d1be94e9d98167e82b6f0395be}\label{classflex_matrix_logical_abbd2d5d1be94e9d98167e82b6f0395be}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{flex\+Matrix\+Logical()}{flexMatrixLogical()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::\hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical} (\begin{DoxyParamCaption}\item[{int}]{a\+Num\+Rows,  }\item[{int}]{a\+Num\+Cols,  }\item[{bool}]{a\+Minus }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+initializes a matrix 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+Num\+Rows} & number of rows \\
+\hline
+{\em a\+Num\+Cols} & number of cols \\
+\hline
+{\em a\+Minus} & determines if operator is negated \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_linear_operator_a7f986517e10aee21099ec7692b77905d}{is\+Minus} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classflex_matrix_logical_aea3347c0b215b0210ad5c100f32cea50}\label{classflex_matrix_logical_aea3347c0b215b0210ad5c100f32cea50}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!block\+Insert@{block\+Insert}}
+\index{block\+Insert@{block\+Insert}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{block\+Insert()}{blockInsert()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::block\+Insert (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ int $>$ \&}]{indexI,  }\item[{const std\+::vector$<$ int $>$ \&}]{indexJ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+inserts position of all non-\/zero elements into matrix 
+
+this is the fastest way to fill \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical} 
+\begin{DoxyParams}{Parameters}
+{\em indexI} & vector of row indices \\
+\hline
+{\em indexJ} & vector of column indices \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classflex_matrix_logical_a25c9ecc21cfccc07e1390c554784ee27}\label{classflex_matrix_logical_a25c9ecc21cfccc07e1390c554784ee27}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!copy@{copy}}
+\index{copy@{copy}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$T$>$$\ast$ \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+copies the linear operator 
+
+\begin{DoxyReturn}{Returns}
+copy of linear operator 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_a7cc1425677cc30fcbd092ffd28d508c9}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_matrix_logical_a0c7cf2e5dde3a2d55ae95c6e54f94342}\label{classflex_matrix_logical_a0c7cf2e5dde3a2d55ae95c6e54f94342}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!get\+Abs\+Row\+Sum@{get\+Abs\+Row\+Sum}}
+\index{get\+Abs\+Row\+Sum@{get\+Abs\+Row\+Sum}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{get\+Abs\+Row\+Sum()}{getAbsRowSum()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+std\+::vector$<$T$>$ \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::get\+Abs\+Row\+Sum (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+returns a vector of sum of absolute values per row used for preconditioning 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_ad6caa7b09e6e3c401cadef61b8e2307e}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_matrix_logical_a0245c73fb7d1fb3b1900208e0deb48d6}\label{classflex_matrix_logical_a0245c73fb7d1fb3b1900208e0deb48d6}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!get\+Abs\+Row\+Sum\+C\+U\+DA@{get\+Abs\+Row\+Sum\+C\+U\+DA}}
+\index{get\+Abs\+Row\+Sum\+C\+U\+DA@{get\+Abs\+Row\+Sum\+C\+U\+DA}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{get\+Abs\+Row\+Sum\+C\+U\+D\+A()}{getAbsRowSumCUDA()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+thrust\+::device\+\_\+vector$<$T$>$ \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::get\+Abs\+Row\+Sum\+C\+U\+DA (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+same function as \hyperlink{classflex_matrix_logical_a0c7cf2e5dde3a2d55ae95c6e54f94342}{get\+Abs\+Row\+Sum()} but implemented in C\+U\+DA 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_a0a0a431d43f4f9d36cbee0d31ba5a29b}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_matrix_logical_ab35a9ebf590236184573731bb08e176d}\label{classflex_matrix_logical_ab35a9ebf590236184573731bb08e176d}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!get\+Max\+Row\+Sum\+Abs@{get\+Max\+Row\+Sum\+Abs}}
+\index{get\+Max\+Row\+Sum\+Abs@{get\+Max\+Row\+Sum\+Abs}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{get\+Max\+Row\+Sum\+Abs()}{getMaxRowSumAbs()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+T \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::get\+Max\+Row\+Sum\+Abs (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+returns the maximum sum of absolute values per row used for preconditioning 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+maximum sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_afcb74697385ccb7c8d29870d7034c12a}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_matrix_logical_a27805a561e6e94bdffe965dc8b9a3915}\label{classflex_matrix_logical_a27805a561e6e94bdffe965dc8b9a3915}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!print\+Row@{print\+Row}}
+\index{print\+Row@{print\+Row}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{print\+Row()}{printRow()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::print\+Row (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+prints requested row 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & row to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classflex_matrix_logical_ab1ccf3400da547a27b5753a894905c63}\label{classflex_matrix_logical_ab1ccf3400da547a27b5753a894905c63}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!times@{times}}
+\index{times@{times}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{times()}{times()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::times (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector 
+
+equals $ y = Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a883982edf3be857815d2095e53f76e75}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_matrix_logical_a7f3b3d9f007696d7140c2f2256de8dd8}\label{classflex_matrix_logical_a7f3b3d9f007696d7140c2f2256de8dd8}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!times\+Minus@{times\+Minus}}
+\index{times\+Minus@{times\+Minus}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{times\+Minus()}{timesMinus()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::times\+Minus (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector and substracts its result from y 
+
+equals $ y = y - Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a62708874e134a649c8445df333079c69}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_matrix_logical_ad8a018f29237002d79faed523e5e2546}\label{classflex_matrix_logical_ad8a018f29237002d79faed523e5e2546}} 
+\index{flex\+Matrix\+Logical@{flex\+Matrix\+Logical}!times\+Plus@{times\+Plus}}
+\index{times\+Plus@{times\+Plus}!flex\+Matrix\+Logical@{flex\+Matrix\+Logical}}
+\subsubsection{\texorpdfstring{times\+Plus()}{timesPlus()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_matrix_logical}{flex\+Matrix\+Logical}$<$ T $>$\+::times\+Plus (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector and adds its result to y 
+
+equals $ y = y + Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a3f2978ad1c5eae8cd4ae16deb2337416}{flex\+Linear\+Operator$<$ T $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Matrix\+Logical.\+h\end{DoxyCompactItemize}

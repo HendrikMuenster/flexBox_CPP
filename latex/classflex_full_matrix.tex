@@ -1,0 +1,269 @@
+\hypertarget{classflex_full_matrix}{}\section{flex\+Full\+Matrix$<$ T $>$ Class Template Reference}
+\label{classflex_full_matrix}\index{flex\+Full\+Matrix$<$ T $>$@{flex\+Full\+Matrix$<$ T $>$}}
+
+
+represents a full (non-\/\+C\+U\+DA) matrix  
+
+
+
+
+{\ttfamily \#include $<$flex\+Full\+Matrix.\+h$>$}
+
+Inheritance diagram for flex\+Full\+Matrix$<$ T $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classflex_full_matrix}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classflex_full_matrix_a125feeded467ace162fc6b1002df6ef2}\label{classflex_full_matrix_a125feeded467ace162fc6b1002df6ef2}} 
+\hyperlink{classflex_full_matrix_a125feeded467ace162fc6b1002df6ef2}{flex\+Full\+Matrix} ()
+\begin{DoxyCompactList}\small\item\em initializes an empty matrix \end{DoxyCompactList}\item 
+\hyperlink{classflex_full_matrix_a1523d991180fa00de2db44b10231987b}{flex\+Full\+Matrix} (int a\+Num\+Rows, int a\+Num\+Cols, bool a\+Minus)
+\begin{DoxyCompactList}\small\item\em initializes a matrix \end{DoxyCompactList}\item 
+\hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$ $\ast$ \hyperlink{classflex_full_matrix_a849d2974a11456c6a23801f51838bc7b}{copy} ()
+\begin{DoxyCompactList}\small\item\em copies the linear operator \end{DoxyCompactList}\item 
+void \hyperlink{classflex_full_matrix_ad5c9cc8d3618cba2f96c963a6d180224}{times} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector \end{DoxyCompactList}\item 
+void \hyperlink{classflex_full_matrix_a5c5dc25704d934e28dd6944bbe4b3496}{times\+Plus} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector and adds its result to y \end{DoxyCompactList}\item 
+void \hyperlink{classflex_full_matrix_adf676d913b1409d6792fcd6cce144285}{times\+Minus} (bool transposed, const Tdata \&input, Tdata \&output)
+\begin{DoxyCompactList}\small\item\em applies linear operator on vector and substracts its result from y \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_full_matrix_a5e800f6cfa4dce076db573506a4ef350}\label{classflex_full_matrix_a5e800f6cfa4dce076db573506a4ef350}} 
+void {\bfseries insert\+Element} (int i, int j, T val)
+\item 
+\mbox{\Hypertarget{classflex_full_matrix_a9cbb6fb192b366be32bb53e3850830d6}\label{classflex_full_matrix_a9cbb6fb192b366be32bb53e3850830d6}} 
+void {\bfseries insert\+Element} (int i, T val)
+\item 
+\mbox{\Hypertarget{classflex_full_matrix_a70f1a87d9e7cc34241fe0f46db0d3101}\label{classflex_full_matrix_a70f1a87d9e7cc34241fe0f46db0d3101}} 
+int {\bfseries index2\+Dto\+Linear} (int i, int j)
+\item 
+T \hyperlink{classflex_full_matrix_a3ca8466b330c14b23689cb9f5507d40a}{get\+Max\+Row\+Sum\+Abs} (bool transposed)
+\begin{DoxyCompactList}\small\item\em returns the maximum sum of absolute values per row used for preconditioning \end{DoxyCompactList}\item 
+std\+::vector$<$ T $>$ \hyperlink{classflex_full_matrix_a911d6b2a452edb8233f56c1e5250855e}{get\+Abs\+Row\+Sum} (bool transposed)
+\begin{DoxyCompactList}\small\item\em returns a vector of sum of absolute values per row used for preconditioning \end{DoxyCompactList}\item 
+void \hyperlink{classflex_full_matrix_a0b9340f3b7a7559c56db7d1ce0d9d510}{print\+Row} (int i)
+\begin{DoxyCompactList}\small\item\em prints requested row \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classflex_full_matrix_ab61b7be5bc8b511f283be8a266c85833}\label{classflex_full_matrix_ab61b7be5bc8b511f283be8a266c85833}} 
+void \hyperlink{classflex_full_matrix_ab61b7be5bc8b511f283be8a266c85833}{print\+Matrix} ()
+\begin{DoxyCompactList}\small\item\em prints the whole matrix \end{DoxyCompactList}\item 
+thrust\+::device\+\_\+vector$<$ T $>$ \hyperlink{classflex_full_matrix_af8ade69023e1c5140a82ad3583a8acb6}{get\+Abs\+Row\+Sum\+C\+U\+DA} (bool transposed)
+\begin{DoxyCompactList}\small\item\em same function as \hyperlink{classflex_full_matrix_a911d6b2a452edb8233f56c1e5250855e}{get\+Abs\+Row\+Sum()} but implemented in C\+U\+DA \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Full\+Matrix$<$ T $>$}
+
+represents a full (non-\/\+C\+U\+DA) matrix 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classflex_full_matrix_a1523d991180fa00de2db44b10231987b}\label{classflex_full_matrix_a1523d991180fa00de2db44b10231987b}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{flex\+Full\+Matrix()}{flexFullMatrix()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::\hyperlink{classflex_full_matrix}{flex\+Full\+Matrix} (\begin{DoxyParamCaption}\item[{int}]{a\+Num\+Rows,  }\item[{int}]{a\+Num\+Cols,  }\item[{bool}]{a\+Minus }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+initializes a matrix 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\+Num\+Rows} & number of rows \\
+\hline
+{\em a\+Num\+Cols} & number of cols \\
+\hline
+{\em a\+Minus} & determines if operator is negated \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_linear_operator_a7f986517e10aee21099ec7692b77905d}{is\+Minus} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classflex_full_matrix_a849d2974a11456c6a23801f51838bc7b}\label{classflex_full_matrix_a849d2974a11456c6a23801f51838bc7b}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!copy@{copy}}
+\index{copy@{copy}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$T$>$$\ast$ \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+copies the linear operator 
+
+\begin{DoxyReturn}{Returns}
+copy of linear operator 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_a7cc1425677cc30fcbd092ffd28d508c9}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_full_matrix_a911d6b2a452edb8233f56c1e5250855e}\label{classflex_full_matrix_a911d6b2a452edb8233f56c1e5250855e}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!get\+Abs\+Row\+Sum@{get\+Abs\+Row\+Sum}}
+\index{get\+Abs\+Row\+Sum@{get\+Abs\+Row\+Sum}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{get\+Abs\+Row\+Sum()}{getAbsRowSum()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+std\+::vector$<$T$>$ \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::get\+Abs\+Row\+Sum (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+returns a vector of sum of absolute values per row used for preconditioning 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_ad6caa7b09e6e3c401cadef61b8e2307e}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_full_matrix_af8ade69023e1c5140a82ad3583a8acb6}\label{classflex_full_matrix_af8ade69023e1c5140a82ad3583a8acb6}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!get\+Abs\+Row\+Sum\+C\+U\+DA@{get\+Abs\+Row\+Sum\+C\+U\+DA}}
+\index{get\+Abs\+Row\+Sum\+C\+U\+DA@{get\+Abs\+Row\+Sum\+C\+U\+DA}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{get\+Abs\+Row\+Sum\+C\+U\+D\+A()}{getAbsRowSumCUDA()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+thrust\+::device\+\_\+vector$<$T$>$ \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::get\+Abs\+Row\+Sum\+C\+U\+DA (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+same function as \hyperlink{classflex_full_matrix_a911d6b2a452edb8233f56c1e5250855e}{get\+Abs\+Row\+Sum()} but implemented in C\+U\+DA 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_a0a0a431d43f4f9d36cbee0d31ba5a29b}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_full_matrix_a3ca8466b330c14b23689cb9f5507d40a}\label{classflex_full_matrix_a3ca8466b330c14b23689cb9f5507d40a}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!get\+Max\+Row\+Sum\+Abs@{get\+Max\+Row\+Sum\+Abs}}
+\index{get\+Max\+Row\+Sum\+Abs@{get\+Max\+Row\+Sum\+Abs}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{get\+Max\+Row\+Sum\+Abs()}{getMaxRowSumAbs()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+T \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::get\+Max\+Row\+Sum\+Abs (\begin{DoxyParamCaption}\item[{bool}]{transposed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+returns the maximum sum of absolute values per row used for preconditioning 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+maximum sum of absolute values per row 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classflex_linear_operator_afcb74697385ccb7c8d29870d7034c12a}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_full_matrix_a0b9340f3b7a7559c56db7d1ce0d9d510}\label{classflex_full_matrix_a0b9340f3b7a7559c56db7d1ce0d9d510}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!print\+Row@{print\+Row}}
+\index{print\+Row@{print\+Row}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{print\+Row()}{printRow()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::print\+Row (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+prints requested row 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & row to be printed \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classflex_full_matrix_ad5c9cc8d3618cba2f96c963a6d180224}\label{classflex_full_matrix_ad5c9cc8d3618cba2f96c963a6d180224}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!times@{times}}
+\index{times@{times}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{times()}{times()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::times (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector 
+
+equals $ y = Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a883982edf3be857815d2095e53f76e75}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_full_matrix_adf676d913b1409d6792fcd6cce144285}\label{classflex_full_matrix_adf676d913b1409d6792fcd6cce144285}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!times\+Minus@{times\+Minus}}
+\index{times\+Minus@{times\+Minus}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{times\+Minus()}{timesMinus()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::times\+Minus (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector and substracts its result from y 
+
+equals $ y = y - Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a62708874e134a649c8445df333079c69}{flex\+Linear\+Operator$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_full_matrix_a5c5dc25704d934e28dd6944bbe4b3496}\label{classflex_full_matrix_a5c5dc25704d934e28dd6944bbe4b3496}} 
+\index{flex\+Full\+Matrix@{flex\+Full\+Matrix}!times\+Plus@{times\+Plus}}
+\index{times\+Plus@{times\+Plus}!flex\+Full\+Matrix@{flex\+Full\+Matrix}}
+\subsubsection{\texorpdfstring{times\+Plus()}{timesPlus()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classflex_full_matrix}{flex\+Full\+Matrix}$<$ T $>$\+::times\+Plus (\begin{DoxyParamCaption}\item[{bool}]{transposed,  }\item[{const Tdata \&}]{input,  }\item[{Tdata \&}]{output }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies linear operator on vector and adds its result to y 
+
+equals $ y = y + Ax $ 
+\begin{DoxyParams}{Parameters}
+{\em transposed} & is true if operator should be (temporarily) transposed before usage \\
+\hline
+{\em input} & data to be processed \\
+\hline
+{\em output} & output data \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_linear_operator_a3f2978ad1c5eae8cd4ae16deb2337416}{flex\+Linear\+Operator$<$ T $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Full\+Matrix.\+h\end{DoxyCompactItemize}

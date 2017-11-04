@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['myabsgpu',['myAbsGPU',['../structmy_abs_g_p_u.html',1,'']]]
+  ['greaterequalzero',['GreaterEqualZero',['../structflex_prox_dual_l2_inf_1_1_greater_equal_zero.html',1,'flexProxDualL2Inf']]]
 ];

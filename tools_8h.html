@@ -100,14 +100,17 @@ Enumerations</h2></td></tr>
 <b>dualL1IsoProx</b>, 
 <b>dualL2Prox</b>, 
 <br />
-&#160;&#160;<b>dualFrobeniusProx</b>, 
+&#160;&#160;<b>dualLInfProx</b>, 
+<b>dualFrobeniusProx</b>, 
 <b>dualHuberProx</b>, 
 <b>dualL2DataProx</b>, 
-<b>dualL1DataProx</b>, 
 <br />
-&#160;&#160;<b>dualKLDataProx</b>, 
+&#160;&#160;<b>dualL1DataProx</b>, 
+<b>dualLInfDataProx</b>, 
+<b>dualKLDataProx</b>, 
 <b>dualBoxConstraintProx</b>, 
-<b>dualInnerProductProx</b>
+<br />
+&#160;&#160;<b>dualInnerProductProx</b>
 <br />
  }<tr class="memdesc:aa34fd4f0962337a24e898ac0abdfff22"><td class="mdescLeft">&#160;</td><td class="mdescRight">enum representing the type of prox <br /></td></tr>
 </td></tr>
@@ -163,22 +166,26 @@ template&lt;typename T &gt; </td></tr>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a0ea5640424f56d4b1a6b33a4a30c4218"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorSum</b> (const std::vector&lt; T &gt; &amp;v)</td></tr>
 <tr class="separator:a0ea5640424f56d4b1a6b33a4a30c4218"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a624331066f771d67486345ecaabb1f"><td class="memItemLeft" align="right" valign="top"><a id="a9a624331066f771d67486345ecaabb1f"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>vectorMax</b> (std::vector&lt; float &gt; &amp;v)</td></tr>
-<tr class="separator:a9a624331066f771d67486345ecaabb1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf4af5480d0be1fc5c0f6aca27ee5bc6"><td class="memTemplParams" colspan="2"><a id="adf4af5480d0be1fc5c0f6aca27ee5bc6"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:adf4af5480d0be1fc5c0f6aca27ee5bc6"><td class="memTemplItemLeft" align="right" valign="top">float&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorMax</b> (std::vector&lt; T &gt; &amp;v)</td></tr>
+<tr class="separator:adf4af5480d0be1fc5c0f6aca27ee5bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae31fe4ccd5002a1efd0bf7e4678ce742"><td class="memTemplParams" colspan="2"><a id="ae31fe4ccd5002a1efd0bf7e4678ce742"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ae31fe4ccd5002a1efd0bf7e4678ce742"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorScalarProduct</b> (std::vector&lt; T &gt; &amp;v, T scalarValue)</td></tr>
 <tr class="separator:ae31fe4ccd5002a1efd0bf7e4678ce742"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afca0d71e8db787c5163428382e86d266"><td class="memItemLeft" align="right" valign="top"><a id="afca0d71e8db787c5163428382e86d266"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>vectorScalarSet</b> (std::vector&lt; float &gt; &amp;v, const float scalarValue)</td></tr>
-<tr class="separator:afca0d71e8db787c5163428382e86d266"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cb74d0cb2a66778ce71e089d3a9f03f"><td class="memItemLeft" align="right" valign="top"><a id="a7cb74d0cb2a66778ce71e089d3a9f03f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>vectorPlus</b> (std::vector&lt; float &gt; &amp;v1, std::vector&lt; float &gt; &amp;v2)</td></tr>
-<tr class="separator:a7cb74d0cb2a66778ce71e089d3a9f03f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27a4ca3fc1ca7328c3d9fcb9f36264a1"><td class="memItemLeft" align="right" valign="top"><a id="a27a4ca3fc1ca7328c3d9fcb9f36264a1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>vectorMinus</b> (std::vector&lt; float &gt; &amp;v1, std::vector&lt; float &gt; &amp;v2)</td></tr>
-<tr class="separator:a27a4ca3fc1ca7328c3d9fcb9f36264a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68f6ec5e196e90ce57c712f8e686d4e5"><td class="memTemplParams" colspan="2"><a id="a68f6ec5e196e90ce57c712f8e686d4e5"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a68f6ec5e196e90ce57c712f8e686d4e5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorScalarSet</b> (std::vector&lt; T &gt; &amp;v, const T scalarValue)</td></tr>
+<tr class="separator:a68f6ec5e196e90ce57c712f8e686d4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87aa5bc2d3985689d51af071b8a4da60"><td class="memTemplParams" colspan="2"><a id="a87aa5bc2d3985689d51af071b8a4da60"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a87aa5bc2d3985689d51af071b8a4da60"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorPlus</b> (std::vector&lt; T &gt; &amp;v1, std::vector&lt; T &gt; &amp;v2)</td></tr>
+<tr class="separator:a87aa5bc2d3985689d51af071b8a4da60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52a5258ea6e3361cfdf281f947335742"><td class="memTemplParams" colspan="2"><a id="a52a5258ea6e3361cfdf281f947335742"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a52a5258ea6e3361cfdf281f947335742"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorMinus</b> (std::vector&lt; T &gt; &amp;v1, std::vector&lt; T &gt; &amp;v2)</td></tr>
+<tr class="separator:a52a5258ea6e3361cfdf281f947335742"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7a41c43ce5bf2074604398647960508"><td class="memTemplParams" colspan="2"><a id="af7a41c43ce5bf2074604398647960508"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:af7a41c43ce5bf2074604398647960508"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>vectorAbs</b> (std::vector&lt; T &gt; &amp;v)</td></tr>

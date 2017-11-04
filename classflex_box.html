@@ -77,6 +77,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa325ce1968dc664c0e8e37bdefc25247"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classflex_box.html#aa325ce1968dc664c0e8e37bdefc25247">flexBox</a> ()</td></tr>
 <tr class="memdesc:aa325ce1968dc664c0e8e37bdefc25247"><td class="mdescLeft">&#160;</td><td class="mdescRight">initializes the main object setting default values for parameters.  <a href="#aa325ce1968dc664c0e8e37bdefc25247">More...</a><br /></td></tr>
 <tr class="separator:aa325ce1968dc664c0e8e37bdefc25247"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d02845bc454275d32d237a4034b15b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classflex_box.html#a2d02845bc454275d32d237a4034b15b1">setFirstRun</a> (bool val)</td></tr>
+<tr class="memdesc:a2d02845bc454275d32d237a4034b15b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the firstRun variable (only used via MEX internally)  <a href="#a2d02845bc454275d32d237a4034b15b1">More...</a><br /></td></tr>
+<tr class="separator:a2d02845bc454275d32d237a4034b15b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a367b7a1fe57fd898ef7ad4159ed14a62"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classflex_box.html#a367b7a1fe57fd898ef7ad4159ed14a62">getNumPrimalVars</a> () const</td></tr>
 <tr class="memdesc:a367b7a1fe57fd898ef7ad4159ed14a62"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of primal vars  <a href="#a367b7a1fe57fd898ef7ad4159ed14a62">More...</a><br /></td></tr>
 <tr class="separator:a367b7a1fe57fd898ef7ad4159ed14a62"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -475,6 +478,42 @@ template&lt;typename T &gt; </div>
   <table class="params">
     <tr><td class="paramname">i</td><td>internal identifcation for variable. Id starts at zero is is incremented by one if a new dual variable is added. </td></tr>
     <tr><td class="paramname">input</td><td>data for dual variable </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2d02845bc454275d32d237a4034b15b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d02845bc454275d32d237a4034b15b1">&#9670;&nbsp;</a></span>setFirstRun()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classflex_box.html">flexBox</a>&lt; T &gt;::setFirstRun </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>sets the firstRun variable (only used via MEX internally) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>new value of firstRun </td></tr>
   </table>
   </dd>
 </dl>

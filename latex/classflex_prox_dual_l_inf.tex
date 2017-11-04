@@ -1,0 +1,127 @@
+\hypertarget{classflex_prox_dual_l_inf}{}\section{flex\+Prox\+Dual\+L\+Inf$<$ T $>$ Class Template Reference}
+\label{classflex_prox_dual_l_inf}\index{flex\+Prox\+Dual\+L\+Inf$<$ T $>$@{flex\+Prox\+Dual\+L\+Inf$<$ T $>$}}
+
+
+represents prox for a L\+Inf non-\/data term  
+
+
+
+
+{\ttfamily \#include $<$flex\+Prox\+Dual\+L\+Inf.\+h$>$}
+
+Inheritance diagram for flex\+Prox\+Dual\+L\+Inf$<$ T $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classflex_prox_dual_l_inf}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bfseries Abs\+Functor}
+\item 
+struct {\bfseries Compare\+Functor}
+\item 
+struct {\bfseries Find\+Functor}
+\item 
+struct {\bfseries Update\+Y\+Functor}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classflex_prox_dual_l_inf_a90e3ad5244d8bf6cef50541593fb9da0}{apply\+Prox} (T alpha, \hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data, const std\+::vector$<$ int $>$ \&dual\+Numbers, const std\+::vector$<$ int $>$ \&primal\+Numbers)
+\begin{DoxyCompactList}\small\item\em applies prox for non-\/data terms \end{DoxyCompactList}\item 
+void \hyperlink{classflex_prox_dual_l_inf_a3ead6ede3f9535c5540c91955f83313b}{apply\+Prox} (T alpha, \hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$data, const std\+::vector$<$ int $>$ \&dual\+Numbers, const std\+::vector$<$ int $>$ \&primal\+Numbers, std\+::vector$<$ Tdata $>$ \&f\+List)
+\begin{DoxyCompactList}\small\item\em applies prox for data terms \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class flex\+Prox\+Dual\+L\+Inf$<$ T $>$}
+
+represents prox for a L\+Inf non-\/data term 
+
+$ \alpha \|\cdot\|_{\infty} $ 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classflex_prox_dual_l_inf_a90e3ad5244d8bf6cef50541593fb9da0}\label{classflex_prox_dual_l_inf_a90e3ad5244d8bf6cef50541593fb9da0}} 
+\index{flex\+Prox\+Dual\+L\+Inf@{flex\+Prox\+Dual\+L\+Inf}!apply\+Prox@{apply\+Prox}}
+\index{apply\+Prox@{apply\+Prox}!flex\+Prox\+Dual\+L\+Inf@{flex\+Prox\+Dual\+L\+Inf}}
+\subsubsection{\texorpdfstring{apply\+Prox()}{applyProx()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \hyperlink{classflex_prox_dual_l_inf}{flex\+Prox\+Dual\+L\+Inf}$<$ T $>$\+::apply\+Prox (\begin{DoxyParamCaption}\item[{T}]{alpha,  }\item[{\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$}]{data,  }\item[{const std\+::vector$<$ int $>$ \&}]{dual\+Numbers,  }\item[{const std\+::vector$<$ int $>$ \&}]{primal\+Numbers }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies prox for non-\/data terms 
+
+the function body should be empty if implemented prox is a data prox 
+\begin{DoxyParams}{Parameters}
+{\em alpha} & weight of term \\
+\hline
+{\em data} & data object \\
+\hline
+{\em dual\+Numbers} & vector of internal identifactions of dual numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em primal\+Numbers} & vector of internal identifactions of primal numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{classflex_prox_a6d3119bd368c4216ad264a1f6dc1d01f}{flex\+Prox$<$ T $>$}.
+
+\mbox{\Hypertarget{classflex_prox_dual_l_inf_a3ead6ede3f9535c5540c91955f83313b}\label{classflex_prox_dual_l_inf_a3ead6ede3f9535c5540c91955f83313b}} 
+\index{flex\+Prox\+Dual\+L\+Inf@{flex\+Prox\+Dual\+L\+Inf}!apply\+Prox@{apply\+Prox}}
+\index{apply\+Prox@{apply\+Prox}!flex\+Prox\+Dual\+L\+Inf@{flex\+Prox\+Dual\+L\+Inf}}
+\subsubsection{\texorpdfstring{apply\+Prox()}{applyProx()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \hyperlink{classflex_prox_dual_l_inf}{flex\+Prox\+Dual\+L\+Inf}$<$ T $>$\+::apply\+Prox (\begin{DoxyParamCaption}\item[{T}]{alpha,  }\item[{\hyperlink{classflex_box_data}{flex\+Box\+Data}$<$ T $>$ $\ast$}]{data,  }\item[{const std\+::vector$<$ int $>$ \&}]{dual\+Numbers,  }\item[{const std\+::vector$<$ int $>$ \&}]{primal\+Numbers,  }\item[{std\+::vector$<$ Tdata $>$ \&}]{f\+List }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+applies prox for data terms 
+
+the function body should be empty if implemented prox is a non-\/data prox 
+\begin{DoxyParams}{Parameters}
+{\em alpha} & weight of term \\
+\hline
+{\em data} & data object \\
+\hline
+{\em dual\+Numbers} & vector of internal identifactions of dual numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em primal\+Numbers} & vector of internal identifactions of primal numbers corresponding to the term \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classflex_box}{flex\+Box} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em f\+List} & data part of term \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classflex_prox_aec433ffbf1a7586f26a2116c6b94bdd6}{flex\+Prox$<$ T $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+flex\+Prox\+Dual\+L\+Inf.\+h\end{DoxyCompactItemize}

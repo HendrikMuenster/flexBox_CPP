@@ -14,6 +14,8 @@ Flex\+Box main class.
 \item 
 \hyperlink{classflex_box_aa325ce1968dc664c0e8e37bdefc25247}{flex\+Box} ()
 \begin{DoxyCompactList}\small\item\em initializes the main object setting default values for parameters. \end{DoxyCompactList}\item 
+void \hyperlink{classflex_box_a2d02845bc454275d32d237a4034b15b1}{set\+First\+Run} (bool val)
+\begin{DoxyCompactList}\small\item\em sets the first\+Run variable (only used via M\+EX internally) \end{DoxyCompactList}\item 
 int \hyperlink{classflex_box_a367b7a1fe57fd898ef7ad4159ed14a62}{get\+Num\+Primal\+Vars} () const
 \begin{DoxyCompactList}\small\item\em returns the number of primal vars \end{DoxyCompactList}\item 
 int \hyperlink{classflex_box_ab6c7512dee891983f60e0f3a63bff8b5}{get\+Num\+Dual\+Vars} () const
@@ -230,6 +232,22 @@ set the dual variable identifed by i
 {\em i} & internal identifcation for variable. Id starts at zero is is incremented by one if a new dual variable is added. \\
 \hline
 {\em input} & data for dual variable \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classflex_box_a2d02845bc454275d32d237a4034b15b1}\label{classflex_box_a2d02845bc454275d32d237a4034b15b1}} 
+\index{flex\+Box@{flex\+Box}!set\+First\+Run@{set\+First\+Run}}
+\index{set\+First\+Run@{set\+First\+Run}!flex\+Box@{flex\+Box}}
+\subsubsection{\texorpdfstring{set\+First\+Run()}{setFirstRun()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \hyperlink{classflex_box}{flex\+Box}$<$ T $>$\+::set\+First\+Run (\begin{DoxyParamCaption}\item[{bool}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+sets the first\+Run variable (only used via M\+EX internally) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & new value of first\+Run \\
 \hline
 \end{DoxyParams}
 \mbox{\Hypertarget{classflex_box_aacb08dc862943d6bb24353a62e2c9341}\label{classflex_box_aacb08dc862943d6bb24353a62e2c9341}} 
