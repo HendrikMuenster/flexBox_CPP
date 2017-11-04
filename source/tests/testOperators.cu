@@ -117,7 +117,7 @@ TEST_CASE("Operator flexDiagonalOperator<floatingType>", "[flexDiagonalOperator]
     }
 }
 
-/*TEST_CASE("Operator flexGradientOperator<floatingType>", "[flexGradientOperator]")
+TEST_CASE("Operator flexGradientOperator<floatingType>", "[flexGradientOperator]")
 {
     floatingType tol = 1e-3f;
     flexGradientOperator<floatingType> gradOpForward({ 3, 4 }, 0, gradientType::forward, false);
@@ -153,7 +153,7 @@ TEST_CASE("Operator flexDiagonalOperator<floatingType>", "[flexDiagonalOperator]
             REQUIRE(std::abs(resultBackward[i] - resultBackwardExpected[i]) < tol);
         }
     }
-}*/
+}
 
 TEST_CASE("Operator flexIdentityOperator<floatingType>", "[flexIdentityOperator]")
 {

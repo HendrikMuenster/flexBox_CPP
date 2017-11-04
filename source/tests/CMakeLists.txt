@@ -1,6 +1,5 @@
 if(CUDA_FOUND)
     set(TEST_FILES
-       testAll.cu
        testProx.cu
        testOperators.cu
     )
@@ -14,7 +13,6 @@ if(CUDA_FOUND)
     endforeach()
 else()
     set(TEST_FILES
-       testAll.cpp
        testProx.cpp
        testOperators.cpp
     )
