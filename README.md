@@ -54,8 +54,9 @@ Check the variable `params.relativePathToMex` if it doesn't and set accordingly.
 
 ## Known Problems
 ### Linux
+#### 'GLIBCXX' not found
 The MEX-Interface is built with the Compiler found by CMake and thus could be unsupported by MathWorks (see [Supported Compilers](https://de.mathworks.com/support/sysreq/previous_releases.html)).
-This could result in an issue similiar to <https://github.com/HendrikMuenster/flexBox_CPP/issues/2>. If this happens you could either set a supported compiler in cmake via `export C=/usr/bin/supportedCompilerC` and `export CXX=/usr/bin/supportedCompilerCXX` 
+This could result in an issue similiar to <https://github.com/HendrikMuenster/flexBox_CPP/issues/2>. If this happens, you could either set a supported compiler in CMake via `export C=/usr/bin/supportedCompilerC` and `export CXX=/usr/bin/supportedCompilerCXX`,
 or try to preload the correct libraries ***before*** starting Matlab like `LD_PRELOAD=/usr/bin/lib/libstdc++.so.6 matlab` (see [Matlab Answers](https://de.mathworks.com/matlabcentral/answers/329796-issue-with-libstdc-so-6)).
 The real path and correct name depends on your specific environment. The error message should give you a hint which library is missing and the concrete library should be under `/usr/lib`, `/usr/lib32` or `/usr/lib64`. 
 If you still can't make the MEX-Interface work, feel free to add another issue at <https://github.com/HendrikMuenster/flexBox_CPP/issues/2>
