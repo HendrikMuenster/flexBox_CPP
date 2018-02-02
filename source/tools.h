@@ -58,7 +58,7 @@ enum mySign
 	PLUS,
 	MINUS,
 	EQUALS,
-  COMPOSE
+    COMPOSE
 };
 
 //! enum representing the type of prox
@@ -90,7 +90,10 @@ enum linOp
 	matrixGPUOp,
 	zeroOp,
 	superpixelOp,
-  concatOp
+    concatOp,
+    permuteOp,
+    subsamplingOp,
+    convolutionOp
 };
 
 //! enum representing the type of gradient
